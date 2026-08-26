@@ -1,5 +1,4 @@
 from collections.abc import Iterable
-from typing import cast
 
 import pandas as pd
 
@@ -21,7 +20,9 @@ def validate_prices(prices: pd.DataFrame, *, allow_missing: bool = False) -> pd.
         raise ValueError(f"prices contain missing observations: {affected}")
     if (clean <= 0).any().any():
         raise ValueError("prices must be positive")
-    return cast(pd.DataFrame, clean)
+    if not isinstance(clean, pd.DataFrame):  # defensive across pandas/stub versions
+        raise TypeError("price validation did not return a DataFrame")
+    return clean
 
 
 def download_adjusted_close(
