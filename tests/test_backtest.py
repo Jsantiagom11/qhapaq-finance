@@ -36,8 +36,20 @@ def test_transaction_costs_reduce_returns() -> None:
     assert costly.returns["strategy_net"].sum() < free.returns["strategy_net"].sum()
 
 
+def test_cost_scenarios_degrade_monotonically() -> None:
+    totals = [
+        run_backtest(
+            synthetic_prices(),
+            ResearchConfig(lookback_days=20, rebalance_days=10, top_n=1, transaction_cost_bps=cost),
+        )
+        .returns["strategy_net"]
+        .sum()
+        for cost in [0, 10, 25, 50, 100]
+    ]
+    assert totals == sorted(totals, reverse=True)
+
+
 def test_metrics_include_a_benchmark() -> None:
     result = run_backtest(synthetic_prices(), ResearchConfig(lookback_days=20))
     assert "equal_weight_benchmark" in result.metrics.index
     assert {"annual_return", "annual_volatility", "max_drawdown"} <= set(result.metrics)
-

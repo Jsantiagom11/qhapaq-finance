@@ -3,7 +3,7 @@ from collections.abc import Iterable
 import pandas as pd
 
 
-def validate_prices(prices: pd.DataFrame) -> pd.DataFrame:
+def validate_prices(prices: pd.DataFrame, *, allow_missing: bool = False) -> pd.DataFrame:
     """Return a clean price panel without silently filling missing observations."""
     if not isinstance(prices.index, pd.DatetimeIndex):
         raise TypeError("prices must use a DatetimeIndex")
@@ -12,8 +12,16 @@ def validate_prices(prices: pd.DataFrame) -> pd.DataFrame:
     if prices.index.has_duplicates or not prices.index.is_monotonic_increasing:
         raise ValueError("price index must be unique and increasing")
     clean = prices.astype(float).dropna(how="all")
+    if not clean.columns.is_unique:
+        raise ValueError("asset columns must be unique")
+    if not allow_missing and clean.isna().any().any():
+        missing = clean.isna().sum()
+        affected = ", ".join(f"{name}={count}" for name, count in missing.items() if count)
+        raise ValueError(f"prices contain missing observations: {affected}")
     if (clean <= 0).any().any():
         raise ValueError("prices must be positive")
+    if not isinstance(clean, pd.DataFrame):  # defensive across pandas/stub versions
+        raise TypeError("price validation did not return a DataFrame")
     return clean
 
 
@@ -29,10 +37,22 @@ def download_adjusted_close(
     symbols = list(dict.fromkeys(tickers))
     if len(symbols) < 2:
         raise ValueError("provide at least two unique tickers")
-    raw = yf.download(symbols, start=start, end=end, auto_adjust=True, progress=False)
+    raw = yf.download(
+        symbols,
+        start=start,
+        end=end,
+        auto_adjust=True,
+        progress=False,
+        threads=False,
+        timeout=10,
+    )
     if raw.empty:
         raise RuntimeError("the data provider returned no observations")
     close = raw["Close"] if isinstance(raw.columns, pd.MultiIndex) else raw[["Close"]]
-    close.columns = symbols if len(symbols) == close.shape[1] else close.columns
+    if not isinstance(close, pd.DataFrame):
+        close = close.to_frame()
+    missing_symbols = [symbol for symbol in symbols if symbol not in close.columns]
+    if missing_symbols:
+        raise RuntimeError(f"the data provider omitted requested symbols: {missing_symbols}")
+    close = close.reindex(columns=symbols)
     return validate_prices(close)
-

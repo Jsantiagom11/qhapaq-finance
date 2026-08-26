@@ -5,7 +5,10 @@ def trailing_momentum(prices: pd.DataFrame, lookback_days: int) -> pd.DataFrame:
     """Past-only momentum; the signal observed at t is used from t+1."""
     if lookback_days < 2:
         raise ValueError("lookback_days must be at least 2")
-    return prices.pct_change(lookback_days, fill_method=None)
+    momentum = prices.pct_change(lookback_days, fill_method=None)
+    if not isinstance(momentum, pd.DataFrame):  # defensive across pandas/stub versions
+        raise TypeError("momentum calculation did not return a DataFrame")
+    return momentum
 
 
 def target_weights(momentum: pd.DataFrame, top_n: int, rebalance_days: int) -> pd.DataFrame:
@@ -17,4 +20,7 @@ def target_weights(momentum: pd.DataFrame, top_n: int, rebalance_days: int) -> p
         selected = scores[scores > 0].nlargest(top_n).index
         if len(selected):
             scheduled.loc[date, selected] = 1.0 / len(selected)
-    return scheduled.reindex(momentum.index).ffill().fillna(0.0)
+    weights = scheduled.reindex(momentum.index).ffill().fillna(0.0)
+    if not isinstance(weights, pd.DataFrame):  # defensive across pandas/stub versions
+        raise TypeError("weight calculation did not return a DataFrame")
+    return weights
