@@ -25,18 +25,24 @@ source .venv/bin/activate              # Windows PowerShell: .venv\Scripts\Activ
 python -m pip install -e ".[data,dev]"
 pytest
 quantancash --tickers SPY QQQ IWM EFA --start 2015-01-01 --cost-bps 10
+quantancash --tickers SPY QQQ IWM EFA --start 2015-01-01 --walk-forward \
+  --report-json reports/generated/baseline.json
 ```
 
 The CLI downloads current provider data, so results can vary with corrections and the
-chosen end date. For a reproducible study, cache a dated input snapshot outside Git and
-record its checksum in the report.
+chosen end date. JSON reports record the exact panel checksum, date range, assets,
+configuration, environment and out-of-sample metrics. Preserve the matching dated input
+snapshot outside Git when reproducing a published study.
 
 ## Leakage controls
 
 - Features use trailing observations only.
 - Portfolio weights are shifted one day before they earn returns.
 - Walk-forward folds are chronological and test windows do not overlap.
+- Every walk-forward test fold is evaluated with its preceding history, then only the
+  unseen test rows are concatenated into reported performance.
 - Costs are charged when weights change.
+- Missing prices and omitted provider symbols fail loudly instead of becoming zero returns.
 - Feature selection and parameter tuning must occur inside each training fold; the
   baseline has neither, which keeps the first experiment auditable.
 
@@ -54,20 +60,24 @@ src/quantancash/
   metrics.py        transparent performance statistics
   signals.py        past-only baseline signal and weights
   walk_forward.py   chronological expanding splits
+  report.py         checksummed machine-readable research manifest
 tests/              deterministic tests using synthetic data
 docs/AUDIT.md       findings from the original prototype
 ```
 
 ## Interpreting the output
 
-`sharpe_zero_rf` uses a zero risk-free rate and annual return divided by annualized
+`sharpe_zero_rf` uses a zero risk-free rate, arithmetic mean return and annualized
 daily volatility. It is descriptive, not a statistical significance test. Always
 compare `strategy_net` with `equal_weight_benchmark`, inspect multiple cost assumptions,
 and report negative or inconclusive results.
 
+The deterministic [rainy-day matrix](docs/RAINY_DAY_TESTING.md) covers provider column
+reordering, missing observations, impossible returns, cost sensitivity, walk-forward
+boundaries and manifest integrity.
+
 ## Next research milestone
 
-Add a frozen, point-in-time dataset and a walk-forward experiment runner that emits a
-machine-readable manifest (data checksum, parameters, commit SHA and environment) plus
-an HTML report. Only after that foundation should predictive models be reintroduced.
-
+Add a frozen, point-in-time universe with constituent history, uncertainty estimates and
+an HTML report derived from the machine-readable manifest. Only after that foundation
+should predictive models be reintroduced.

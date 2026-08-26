@@ -39,4 +39,3 @@ def run_backtest(prices: pd.DataFrame, config: ResearchConfig) -> BacktestResult
         }
     ).T
     return BacktestResult(returns=result_returns, weights=weights, metrics=metrics)
-

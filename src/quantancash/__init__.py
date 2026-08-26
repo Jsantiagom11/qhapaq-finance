@@ -5,4 +5,3 @@ from .config import ResearchConfig
 
 __all__ = ["BacktestResult", "ResearchConfig", "run_backtest"]
 __version__ = "0.2.0"
-

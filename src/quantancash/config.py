@@ -24,4 +24,3 @@ class ResearchConfig:
     @property
     def transaction_cost(self) -> float:
         return self.transaction_cost_bps / 10_000
-
