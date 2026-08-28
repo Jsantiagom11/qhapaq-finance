@@ -6,7 +6,7 @@ from .data import download_adjusted_close
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run the documented QuantAncash baseline")
+    parser = argparse.ArgumentParser(description="Run the documented Qhapaq Finance baseline")
     parser.add_argument("--tickers", nargs="+", default=["SPY", "QQQ", "IWM", "EFA"])
     parser.add_argument("--start", default="2015-01-01")
     parser.add_argument("--end")

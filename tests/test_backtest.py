@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from quantancash.backtest import run_backtest
-from quantancash.config import ResearchConfig
+from qhapaq_finance.backtest import run_backtest
+from qhapaq_finance.config import ResearchConfig
 
 
 def synthetic_prices(rows: int = 180) -> pd.DataFrame:

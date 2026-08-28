@@ -25,7 +25,7 @@ def download_adjusted_close(
         # yfinance does not publish typing metadata.
         import yfinance as yf  # type: ignore[import-untyped]
     except ImportError as exc:  # pragma: no cover - optional dependency
-        raise RuntimeError("Install QuantAncash with the 'data' extra") from exc
+        raise RuntimeError("Install Qhapaq Finance with the 'data' extra") from exc
 
     symbols = list(dict.fromkeys(tickers))
     if len(symbols) < 2:

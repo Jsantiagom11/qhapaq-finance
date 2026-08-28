@@ -1,4 +1,4 @@
-"""QuantAncash: small, auditable quantitative research primitives."""
+"""Qhapaq Finance: small, auditable quantitative research primitives."""
 
 from .backtest import BacktestResult, run_backtest
 from .config import ResearchConfig

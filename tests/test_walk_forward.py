@@ -1,6 +1,6 @@
 import pandas as pd
 
-from quantancash.walk_forward import expanding_splits
+from qhapaq_finance.walk_forward import expanding_splits
 
 
 def test_splits_are_chronological_and_tests_do_not_overlap() -> None:

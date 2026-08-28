@@ -1,6 +1,6 @@
-# QuantAncash
+# Qhapaq Finance
 
-QuantAncash is a compact, reproducible research project for testing a simple
+Qhapaq Finance is a compact, reproducible research project for testing a simple
 cross-sectional momentum rule against an equal-weight benchmark. Its purpose is
 methodological: make every assumption visible and make optimistic mistakes difficult.
 
@@ -24,7 +24,7 @@ python -m venv .venv
 source .venv/bin/activate              # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install -e ".[data,dev]"
 pytest
-quantancash --tickers SPY QQQ IWM EFA --start 2015-01-01 --cost-bps 10
+qhapaq --tickers SPY QQQ IWM EFA --start 2015-01-01 --cost-bps 10
 ```
 
 The CLI downloads current provider data, so results can vary with corrections and the
@@ -47,7 +47,7 @@ taxes and borrow constraints remain outside this baseline.
 ## Repository map
 
 ```text
-src/quantancash/
+src/qhapaq_finance/
   backtest.py       portfolio accounting and benchmark
   config.py         explicit experiment assumptions
   data.py           validation and optional provider adapter
@@ -70,4 +70,3 @@ and report negative or inconclusive results.
 Add a frozen, point-in-time dataset and a walk-forward experiment runner that emits a
 machine-readable manifest (data checksum, parameters, commit SHA and environment) plus
 an HTML report. Only after that foundation should predictive models be reintroduced.
-
