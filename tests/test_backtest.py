@@ -40,4 +40,3 @@ def test_metrics_include_a_benchmark() -> None:
     result = run_backtest(synthetic_prices(), ResearchConfig(lookback_days=20))
     assert "equal_weight_benchmark" in result.metrics.index
     assert {"annual_return", "annual_volatility", "max_drawdown"} <= set(result.metrics)
-

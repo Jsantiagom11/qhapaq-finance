@@ -10,4 +10,3 @@ def test_splits_are_chronological_and_tests_do_not_overlap() -> None:
     assert all(fold.train.index.max() < fold.test.index.min() for fold in folds)
     test_indices = [index for fold in folds for index in fold.test.index]
     assert len(test_indices) == len(set(test_indices))
-

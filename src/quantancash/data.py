@@ -22,7 +22,8 @@ def download_adjusted_close(
 ) -> pd.DataFrame:
     """Download adjusted prices. Network data is deliberately isolated here."""
     try:
-        import yfinance as yf
+        # yfinance does not publish typing metadata.
+        import yfinance as yf  # type: ignore[import-untyped]
     except ImportError as exc:  # pragma: no cover - optional dependency
         raise RuntimeError("Install QuantAncash with the 'data' extra") from exc
 
@@ -35,4 +36,3 @@ def download_adjusted_close(
     close = raw["Close"] if isinstance(raw.columns, pd.MultiIndex) else raw[["Close"]]
     close.columns = symbols if len(symbols) == close.shape[1] else close.columns
     return validate_prices(close)
-

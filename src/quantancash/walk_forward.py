@@ -19,4 +19,3 @@ def expanding_splits(
     for test_start in range(min_train_size, len(data), test_size):
         test_end = min(test_start + test_size, len(data))
         yield Fold(train=data.iloc[:test_start].copy(), test=data.iloc[test_start:test_end].copy())
-

@@ -21,4 +21,3 @@ def performance_metrics(returns: pd.Series, annualization: int = 252) -> dict[st
         "sharpe_zero_rf": float(sharpe),
         "max_drawdown": float(drawdown.min()),
     }
-
