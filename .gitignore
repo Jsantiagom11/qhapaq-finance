@@ -11,4 +11,4 @@ data/raw/
 reports/generated/
 logs/
 .env
-
+/artifacts/research-tearsheet-demo.png
