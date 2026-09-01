@@ -1,6 +1,6 @@
 # Evidence
 
-Last verified: 2026-08-28
+Last verified: 2026-09-01
 
 Evidence here supports current governance claims; it is not a terminal transcript.
 
@@ -25,13 +25,33 @@ not validate live market data or financial usefulness.
 
 ## Reproducibility boundary
 
+### Frozen ECB FX snapshot
+
+| Evidence | Verified value |
+| --- | --- |
+| Dataset ID | `ecb-exr-daily-eur-reference-rates-2015-01-01_2026-08-31` |
+| Raw artifact | `data/frozen/ecb/exr_daily_eur_reference_rates_2015-01-01_2026-08-31.csv` |
+| Raw bytes / SHA-256 | `2541412` / `9233e2547b72171b8b007e1056e09482e360a765b843330532b2a0e9a05a199e` |
+| Manifest | `data/frozen/ecb/exr_daily_eur_reference_rates_2015-01-01_2026-08-31.manifest.json` |
+| Manifest SHA-256 | `424e1e1e034a25bc141933cbe7c356b0a18057469ca3b46da22bee2a98720dc4` |
+| Requested / actual window | `2015-01-01`–`2026-08-31` / `2015-01-02`–`2026-08-31` |
+| Series | `D.CHF.EUR.SP00.A`, `D.GBP.EUR.SP00.A`, `D.JPY.EUR.SP00.A`, `D.USD.EUR.SP00.A` |
+| Observations | `11940` total; `2985` per series |
+| Validation | Checksum-first offline loader and 13 targeted data/manifest tests pass |
+
+The artifact is the unmodified ECB API response. Values are units of each quoted currency per one
+euro. Source: ECB statistics. The acquisition URL, attribution, reuse policy, and point-in-time
+semantics are documented in the dataset README and deterministic manifest.
+
+### Remaining boundary
+
 The committed `uv.lock` SHA-256 is
 `42430d0aee5a3bc67e0a71be64f36fde8a038abdbd98015fc8bbe60eb55e1136`.
 
-Current source supports explicit configuration and deterministic synthetic tests. It does not yet
-produce the complete evidence package required for a reproducible quantitative experiment:
+Current source supports explicit configuration, deterministic tests, and one validated frozen
+dataset. It does not yet produce the complete evidence package required for a reproducible
+quantitative experiment:
 
-- dataset identity and checksum;
 - configuration and applicable random seed;
 - Git commit SHA and dependency lock identity;
 - walk-forward configuration;

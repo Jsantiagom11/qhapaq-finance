@@ -2,6 +2,19 @@
 
 Only decisions supported by repository history or current project documentation belong here.
 
+## 2026-09-01 — Freeze the official ECB response as raw bytes
+
+- **Decision:** Use the official ECB Data Portal `EXR` API for the first point-in-time dataset and
+  preserve its CSV response body without normalization or reserialization.
+- **Context:** Research reporting requires an independently identifiable input before any result can
+  be represented as verified. The ECB publishes daily EUR reference rates and an explicit reuse
+  policy with required attribution.
+- **Reason:** A canonical official source, fixed request window, raw-byte SHA-256, deterministic
+  manifest, and offline loader form a small independently reviewable evidence boundary.
+- **Trade-off:** The snapshot remains fixed if the ECB later revises history; refreshing it requires
+  a new artifact and manifest rather than silently changing the current evidence.
+- **Status:** ACCEPTED for the snapshot acquired 2026-09-01. Source: ECB statistics.
+
 ## 2026-08-28 — Adopt the Qhapaq Finance identity
 
 - **Decision:** Use Qhapaq Finance as the human name, `qhapaq-finance` as the repository and Python
