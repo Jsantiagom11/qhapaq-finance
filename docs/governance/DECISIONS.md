@@ -1,0 +1,43 @@
+# Decisions
+
+Only decisions supported by repository history or current project documentation belong here.
+
+## 2026-08-28 — Adopt the Qhapaq Finance identity
+
+- **Decision:** Use Qhapaq Finance as the human name, `qhapaq-finance` as the repository and Python
+  distribution name, `qhapaq_finance` as the import package, and `qhapaq` as the CLI.
+- **Context:** The maintained baseline previously used the QuantAncash identity.
+- **Reason:** Commit `9fb4fe4` deliberately renamed the README, project metadata, source package,
+  imports, tests, CLI entry point, and lock metadata as one coherent identity change.
+- **Trade-off:** Existing imports and command invocations using the former names must change.
+- **Status:** ACCEPTED and implemented in `9fb4fe4`.
+
+## 2026-08-28 — Do not retain a `quantancash` compatibility alias
+
+- **Decision:** Expose only `qhapaq_finance` and `qhapaq` in the active package and CLI metadata.
+- **Context:** The rename commit moved the source package and replaced the console entry point; no
+  alias is declared in `pyproject.toml`.
+- **Reason:** The committed rename is a clean identity transition; there is no repository evidence
+  of a compatibility requirement.
+- **Trade-off:** Consumers of the former package or CLI receive no compatibility bridge.
+- **Status:** ACCEPTED as evidenced by `9fb4fe4` and current project metadata.
+
+## 2026-08-28 — Commit `uv.lock` as dependency evidence
+
+- **Decision:** Version the generated `uv.lock` file.
+- **Context:** The original prototype audit recorded that no reproducible dependency lock was
+  supplied.
+- **Reason:** Commit `2ebc421` added the lock as the repository's environment-resolution artifact.
+- **Trade-off:** Dependency changes must keep project metadata and the lock synchronized.
+- **Status:** ACCEPTED and implemented in `2ebc421`.
+
+## 2026-08-28 — Preserve the original prototype audit as history
+
+- **Decision:** Keep `docs/AUDIT.md` under its historical QuantAncash title while active governance
+  uses Qhapaq Finance.
+- **Context:** The audit explicitly scopes itself to the supplied original prototype and explains
+  why the smaller baseline replaced it.
+- **Reason:** Rewriting the old name or findings would erase useful decision context.
+- **Trade-off:** Readers must distinguish historical findings from current state; this governance
+  layer provides that boundary.
+- **Status:** ACCEPTED.

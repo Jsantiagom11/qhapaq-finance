@@ -1,6 +1,17 @@
 from collections.abc import Iterable
+from hashlib import sha256
+from pathlib import Path
 
 import pandas as pd
+
+
+def file_sha256(path: str | Path) -> str:
+    """Return the SHA-256 identity of an artifact's exact bytes."""
+    digest = sha256()
+    with Path(path).open("rb") as artifact:
+        for chunk in iter(lambda: artifact.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def validate_prices(prices: pd.DataFrame) -> pd.DataFrame:
