@@ -1,13 +1,13 @@
 # Current state
 
-Last verified: 2026-08-28
+Last verified: 2026-08-31
 
 | Area | Status | Current fact |
 | --- | --- | --- |
 | Project identity | GO | Human name: **Qhapaq Finance**; repository/distribution: `qhapaq-finance`; Python package: `qhapaq_finance`; CLI: `qhapaq`. |
 | Current branch | GO | `main`, synchronized with `origin/main` before this governance commit. |
 | Stable baseline | GO | Commit `9fb4fe4` contains the renamed, installable methodological research baseline. |
-| Quality | GO | Format, lint, tests, typing, and whitespace checks pass; see `EVIDENCE.md`. |
+| Quality | GO | Lock validation, format, lint, cold and incremental typing, tests, CLI smoke, and whitespace checks pass; see the 2026-08-31 daily report. |
 | Packaging | GO | Hatchling builds `src/qhapaq_finance`; project version is `0.2.0`. |
 | CLI | GO | The declared `qhapaq` entry point responds to `--help`. Live provider execution is not part of the verified baseline. |
 | Dependencies | GO | `uv.lock` is committed and `uv lock --check` passes. |
