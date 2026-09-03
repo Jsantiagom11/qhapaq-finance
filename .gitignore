@@ -12,3 +12,4 @@ reports/generated/
 logs/
 .env
 /artifacts/research-tearsheet-demo.png
+/artifacts/research/
