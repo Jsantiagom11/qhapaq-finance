@@ -1,8 +1,17 @@
 # Evidence
 
-Last verified: 2026-09-01
+Last verified: 2026-09-02
 
 Evidence here supports current governance claims; it is not a terminal transcript.
+
+## Product-alignment evidence
+
+| Claim | Evidence | Result |
+| --- | --- | --- |
+| Local implementation boundary inspected | `README.md`, `pyproject.toml`, `src/qhapaq_finance/`, `tests/`, frozen ECB manifest, and renderer evidence at `92381c9` | Momentum baseline and ECB demonstration only |
+| ECB rendered output visually inspected | `artifacts/research-tearsheet-demo.png` and `docs/reports/daily/2026-09-01-tearsheet.md` | Legible provenance-labeled FX tear sheet; not equity research |
+| Product direction documented | `docs/PRODUCT_SPEC.md` | Planned semantics and acceptance criteria; no implementation claim |
+| Documentation increment execution | `docs/reports/daily/2026-09-02-product-alignment.md` | Baseline, scope, and validation results recorded |
 
 ## Stable baseline
 
@@ -48,9 +57,9 @@ semantics are documented in the dataset README and deterministic manifest.
 The committed `uv.lock` SHA-256 is
 `42430d0aee5a3bc67e0a71be64f36fde8a038abdbd98015fc8bbe60eb55e1136`.
 
-Current source supports explicit configuration, deterministic tests, and one validated frozen
-dataset. It does not yet produce the complete evidence package required for a reproducible
-quantitative experiment:
+Current source supports explicit configuration, deterministic tests, one validated frozen dataset,
+and a deterministic ECB FX renderer with recorded visual evidence. It does not yet produce the
+complete evidence package required for a general reproducible quantitative experiment:
 
 - configuration and applicable random seed;
 - Git commit SHA and dependency lock identity;

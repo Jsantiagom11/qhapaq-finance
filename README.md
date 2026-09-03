@@ -1,72 +1,82 @@
 # Qhapaq Finance
 
-Qhapaq Finance is a compact, reproducible research project for testing a simple
-cross-sectional momentum rule against an equal-weight benchmark. Its purpose is
-methodological: make every assumption visible and make optimistic mistakes difficult.
+Qhapaq Finance is research software for evidence-based company research and portfolio decisions.
+Its intended report moves from general context to specific support:
 
-> Research software only. Nothing in this repository is investment advice or evidence
-> of future performance.
+```text
+Portfolio summary -> economic/statistical exposures -> asset contribution
+                  -> company thesis -> underlying evidence
+```
 
-## What the baseline tests
+The product direction and evidence contract are defined in the
+[canonical product specification](docs/PRODUCT_SPEC.md).
 
-At each scheduled rebalance, the strategy ranks assets by trailing return, holds up to
-the strongest `top_n` assets with positive momentum, and applies the new portfolio one
-trading day later. The report shows both gross and net results; net results subtract a
-configurable proportional cost from one-way turnover.
+> Research software only. Nothing in this repository is investment advice, a recommendation, or
+> evidence of future performance. The software does not execute orders.
 
-The equal-weight universe is included as a benchmark. The repository does **not** claim
-an edge, and it intentionally ships without a cherry-picked performance chart.
+## What works today
 
-## Quick start
+- A methodological cross-sectional momentum backtest ranks assets by trailing return, applies a
+  one-day signal lag, accounts for proportional turnover costs, and compares results with an
+  equal-weight universe benchmark. Deterministic synthetic fixtures test the method; they are not
+  an empirical demonstration.
+- A checksum-validating offline loader reads the committed, byte-frozen ECB daily EUR reference-rate
+  snapshot.
+- An ECB FX tear-sheet renderer produces a deterministic PNG with source hashes, effective date,
+  analysis window, descriptive calculations, and a research-only warning. It is a reproducibility
+  demonstration, not implemented equity research and not a mean-variance or MPT optimizer.
+
+The repository does not yet implement company evidence records, thesis/counterthesis workflows,
+observed portfolio ingestion, economic-dependency modeling, decision comparisons, or portfolio
+optimization.
+
+## Current usage
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate              # Windows PowerShell: .venv\Scripts\Activate.ps1
 python -m pip install -e ".[data,dev]"
 pytest
+```
+
+Run the existing momentum baseline with mutable provider data:
+
+```bash
 qhapaq --tickers SPY QQQ IWM EFA --start 2015-01-01 --cost-bps 10
 ```
 
-The CLI downloads current provider data, so results can vary with corrections and the
-chosen end date. For a reproducible study, cache a dated input snapshot outside Git and
-record its checksum in the report.
+Provider results can change with corrections and the chosen end date. This command does not create
+a vintage, reproducible research record.
 
-## Leakage controls
+Render the reproducibility demonstration entirely from the committed ECB snapshot:
 
-- Features use trailing observations only.
-- Portfolio weights are shifted one day before they earn returns.
-- Walk-forward folds are chronological and test windows do not overlap.
-- Costs are charged when weights change.
-- Feature selection and parameter tuning must occur inside each training fold; the
-  baseline has neither, which keeps the first experiment auditable.
+```bash
+qhapaq tearsheet \
+  --data data/frozen/ecb/exr_daily_eur_reference_rates_2015-01-01_2026-08-31.csv \
+  --manifest data/frozen/ecb/exr_daily_eur_reference_rates_2015-01-01_2026-08-31.manifest.json \
+  --output /tmp/qhapaq-ecb-tearsheet.png \
+  --as-of 2026-08-31
+```
 
-These safeguards reduce common errors but do not prove that a study is unbiased.
-Survivorship bias, delistings, corporate-action quality, data snooping, market impact,
-taxes and borrow constraints remain outside this baseline.
+## Methodological baseline
+
+At each scheduled rebalance, the baseline ranks assets by trailing return, holds up to the strongest
+`top_n` assets with positive momentum, and applies the new weights one trading day later. Gross and
+net results are reported; net results subtract a configurable proportional cost from one-way
+turnover. Features use trailing observations, walk-forward folds are chronological and
+non-overlapping, and an equal-weight universe is the comparison benchmark.
+
+These controls do not resolve survivorship bias, point-in-time constituent membership, delistings,
+corporate-action quality, data snooping, market impact, taxes, borrow constraints, or statistical
+uncertainty. `sharpe_zero_rf` is descriptive and is not a significance test.
 
 ## Repository map
 
 ```text
-src/qhapaq_finance/
-  backtest.py       portfolio accounting and benchmark
-  config.py         explicit experiment assumptions
-  data.py           validation and optional provider adapter
-  metrics.py        transparent performance statistics
-  signals.py        past-only baseline signal and weights
-  walk_forward.py   chronological expanding splits
-tests/              deterministic tests using synthetic data
-docs/AUDIT.md       findings from the original prototype
+docs/PRODUCT_SPEC.md          canonical product and evidence contract
+docs/governance/             workflow, state, decisions, actions, and evidence index
+docs/reports/daily/          execution-evidence reports
+data/frozen/ecb/             verified ECB snapshot and provenance manifest
+src/qhapaq_finance/          momentum baseline, data validation, and ECB renderer
+tests/                       deterministic method and evidence-boundary tests
 ```
-
-## Interpreting the output
-
-`sharpe_zero_rf` uses a zero risk-free rate and annual return divided by annualized
-daily volatility. It is descriptive, not a statistical significance test. Always
-compare `strategy_net` with `equal_weight_benchmark`, inspect multiple cost assumptions,
-and report negative or inconclusive results.
-
-## Next research milestone
-
-Add a frozen, point-in-time dataset and a walk-forward experiment runner that emits a
-machine-readable manifest (data checksum, parameters, commit SHA and environment) plus
-an HTML report. Only after that foundation should predictive models be reintroduced.

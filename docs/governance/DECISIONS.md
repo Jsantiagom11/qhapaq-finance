@@ -2,6 +2,21 @@
 
 Only decisions supported by repository history or current project documentation belong here.
 
+## 2026-09-02 — Adopt an evidence-first company-to-portfolio product direction
+
+- **Decision:** Make the canonical report flow portfolio summary, economic/statistical exposures,
+  asset contribution, company thesis, and underlying evidence; validate it first with one real
+  company through a typed record and offline HTML report.
+- **Context:** The repository implements a momentum methodological baseline and an ECB FX
+  reproducibility demonstration, but neither establishes company research, observed holdings, or
+  optimized portfolio weights.
+- **Reason:** A one-company evidence path tests provenance, information-availability semantics, the
+  research argument, and report navigation before multi-company aggregation adds complexity.
+- **Trade-off:** Five-company coverage and portfolio-weight optimization remain dependency-gated;
+  portfolio inputs that the user has not supplied remain unresolved rather than inferred.
+- **Status:** ACCEPTED as product direction; implementation remains planned in
+  `docs/PRODUCT_SPEC.md`.
+
 ## 2026-09-01 — Freeze the official ECB response as raw bytes
 
 - **Decision:** Use the official ECB Data Portal `EXR` API for the first point-in-time dataset and
