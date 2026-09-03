@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0",
+  "issuer": {"name": "QUALCOMM Incorporated", "ticker": "QCOM", "cik": "0000804328", "exchange": "Nasdaq"},
+  "universe_path": "data/research/qcom/universe.json",
+  "relative_context_path": "data/research/qcom/relative-context.json",
+  "as_of": "2026-09-01",
+  "status": "research-only",
+  "summary": "Qualcomm monetiza cómputo y conectividad de dos maneras: vende plataformas semiconductoras mediante QCT y licencia propiedad intelectual mediante QTL. La diversificación hacia automoción e IoT avanza, pero todavía debe compensar la contracción reciente en handsets, la integración vertical de clientes y la concentración geopolítica.",
+  "business": [
+    "QCT vende plataformas Snapdragon y Dragonwing, módems, radiofrecuencia y conectividad para handsets, automoción e IoT. QTL concede derechos sobre patentes esenciales y otras tecnologías, principalmente contra ventas de teléfonos de sus licenciatarios.",
+    "Es un modelo fabless: depende de pocos terceros para fabricar, ensamblar y probar. Captura valor combinando propiedad intelectual, diseño de sistemas de bajo consumo y acceso a estándares; depende de OEM, licenciatarios, fundiciones, ensambladores y demanda final.",
+    "La exposición a China no es un puntaje: opera mediante ingresos de OEM chinos, ventas de OEM no chinos dentro de China y algunos suministros críticos. Las restricciones comerciales o la sustitución local pueden afectar producto, regalías y cobros."
+  ],
+  "facts": [
+    {"id":"f-revenue-2025","label":"Ingresos GAAP FY2025","value":44284,"unit":"USD million","period":"FY ended 2025-09-28","source_id":"qcom-2025-10k","locator":"p. 55, Consolidated Statements of Operations, Total revenues"},
+    {"id":"f-revenue-2024","label":"Ingresos GAAP FY2024","value":38962,"unit":"USD million","period":"FY ended 2024-09-29","source_id":"qcom-2025-10k","locator":"p. 55, Consolidated Statements of Operations, Total revenues"},
+    {"id":"f-opinc-2025","label":"Resultado operativo GAAP FY2025","value":12355,"unit":"USD million","period":"FY ended 2025-09-28","source_id":"qcom-2025-10k","locator":"p. 55, Consolidated Statements of Operations, Operating income"},
+    {"id":"f-opinc-2024","label":"Resultado operativo GAAP FY2024","value":10071,"unit":"USD million","period":"FY ended 2024-09-29","source_id":"qcom-2025-10k","locator":"p. 55, Consolidated Statements of Operations, Operating income"},
+    {"id":"f-cfo-2025","label":"Flujo operativo FY2025","value":14012,"unit":"USD million","period":"FY ended 2025-09-28","source_id":"qcom-2025-10k","locator":"p. 58, Consolidated Statements of Cash Flows"},
+    {"id":"f-capex-2025","label":"Compras de propiedad, planta y equipo FY2025","value":1192,"unit":"USD million","period":"FY ended 2025-09-28","source_id":"qcom-2025-10k","locator":"p. 58, Consolidated Statements of Cash Flows; salida presentada en negativo"},
+    {"id":"f-q3-revenue-2026","label":"Ingresos GAAP Q3 FY2026","value":9947,"unit":"USD million","period":"Three months ended 2026-06-28","source_id":"qcom-2026-q3-10q","locator":"p. 5, Condensed Consolidated Statements of Operations"},
+    {"id":"f-q3-revenue-2025","label":"Ingresos GAAP Q3 FY2025","value":10365,"unit":"USD million","period":"Three months ended 2025-06-29","source_id":"qcom-2026-q3-10q","locator":"p. 5, comparative column"},
+    {"id":"f-q3-opinc-2026","label":"Resultado operativo GAAP Q3 FY2026","value":1626,"unit":"USD million","period":"Three months ended 2026-06-28","source_id":"qcom-2026-q3-10q","locator":"p. 5, Condensed Consolidated Statements of Operations"},
+    {"id":"f-q3-opinc-2025","label":"Resultado operativo GAAP Q3 FY2025","value":2762,"unit":"USD million","period":"Three months ended 2025-06-29","source_id":"qcom-2026-q3-10q","locator":"p. 5, comparative column"},
+    {"id":"f-handsets-2026","label":"QCT handsets Q3 FY2026","value":5086,"unit":"USD million","period":"Three months ended 2026-06-28","source_id":"qcom-2026-q3-10q","locator":"p. 12, Note 2, QCT revenue streams"},
+    {"id":"f-handsets-2025","label":"QCT handsets Q3 FY2025","value":6328,"unit":"USD million","period":"Three months ended 2025-06-29","source_id":"qcom-2026-q3-10q","locator":"p. 12, Note 2, comparative column"},
+    {"id":"f-auto-2026","label":"QCT automotive Q3 FY2026","value":1588,"unit":"USD million","period":"Three months ended 2026-06-28","source_id":"qcom-2026-q3-10q","locator":"p. 12, Note 2, QCT revenue streams"},
+    {"id":"f-auto-2025","label":"QCT automotive Q3 FY2025","value":984,"unit":"USD million","period":"Three months ended 2025-06-29","source_id":"qcom-2026-q3-10q","locator":"p. 12, Note 2, comparative column"},
+    {"id":"f-cfo-9m-2026","label":"Flujo operativo 9M FY2026","value":8405,"unit":"USD million","period":"Nine months ended 2026-06-28","source_id":"qcom-2026-q3-10q","locator":"p. 7, Condensed Consolidated Statements of Cash Flows"},
+    {"id":"f-cfo-9m-2025","label":"Flujo operativo 9M FY2025","value":10016,"unit":"USD million","period":"Nine months ended 2025-06-29","source_id":"qcom-2026-q3-10q","locator":"p. 7, comparative column"},
+    {"id":"f-apple-modem-disclosure","label":"Divulgación del riesgo de integración vertical de clientes","value":null,"text":"Qualcomm informa que Apple ya utiliza su propio módem en ciertos smartphones, que espera un uso creciente de esos productos y que esto tendrá un impacto negativo significativo en los ingresos, resultados y flujos de caja de QCT.","unit":null,"period":"Q3 FY2026 filing","source_id":"qcom-2026-q3-10q","locator":"pp. 28–29, Part II, Item 1A, customer vertical integration risk"},
+    {"id":"f-china-concentration-disclosure","label":"Divulgación de concentración y exposición en China","value":null,"text":"Qualcomm informa una porción significativa de ingresos vinculada a OEM chinos y a ventas en China de OEM no chinos, además de ciertos suministros críticos; las restricciones comerciales y la sustitución local pueden perjudicar el negocio y los flujos de caja.","unit":null,"period":"FY ended 2025-09-28","source_id":"qcom-2025-10k","locator":"p. 17, Item 1A, China concentration risk factor"}
+  ],
+  "metrics": [
+    {"id":"m-revenue-growth-2025","label":"Crecimiento de ingresos FY2025","formula":"(f-revenue-2025 / f-revenue-2024) - 1","inputs":["f-revenue-2025","f-revenue-2024"],"unit":"percent"},
+    {"id":"m-op-margin-2025","label":"Margen operativo GAAP FY2025","formula":"f-opinc-2025 / f-revenue-2025","inputs":["f-opinc-2025","f-revenue-2025"],"unit":"percent"},
+    {"id":"m-q3-revenue-growth","label":"Variación de ingresos Q3 FY2026","formula":"(f-q3-revenue-2026 / f-q3-revenue-2025) - 1","inputs":["f-q3-revenue-2026","f-q3-revenue-2025"],"unit":"percent"},
+    {"id":"m-q3-op-margin","label":"Margen operativo GAAP Q3 FY2026","formula":"f-q3-opinc-2026 / f-q3-revenue-2026","inputs":["f-q3-opinc-2026","f-q3-revenue-2026"],"unit":"percent"},
+    {"id":"m-fcf-2025","label":"Flujo de caja libre analítico FY2025","formula":"f-cfo-2025 - f-capex-2025","inputs":["f-cfo-2025","f-capex-2025"],"unit":"USD million"}
+  ],
+  "assumptions": [{"id":"a-diversification","text":"Escenario cualitativo: automoción e IoT conservan crecimiento suficiente para reducir gradualmente la dependencia de handsets; no se asigna probabilidad."}],
+  "interpretations": [
+    {"id":"i-thesis","kind":"thesis","text":"La combinación de licencias de alta rentabilidad y plataformas diferenciadas puede financiar la diversificación; automoción creció con fuerza en el trimestre comparable.","supports":["f-auto-2026","f-auto-2025","f-cfo-2025"],"contradicts":["f-handsets-2026","f-handsets-2025"]},
+    {"id":"i-counter","kind":"counterthesis","text":"La diversificación puede tardar demasiado: handsets cayó materialmente, el margen operativo trimestral se comprimió y el flujo operativo de nueve meses disminuyó.","supports":["f-handsets-2026","f-handsets-2025","f-q3-opinc-2026","f-q3-opinc-2025","f-cfo-9m-2026","f-cfo-9m-2025"],"contradicts":["f-auto-2026","f-auto-2025"]}
+  ],
+  "risks": [
+    {"title":"Integración vertical de clientes","mechanism":"Qualcomm informa que Apple ya usa su propio módem en ciertos smartphones, espera que aumente ese uso y anticipa un impacto negativo significativo en ingresos, resultados y caja de QCT.","evidence":["f-apple-modem-disclosure"],"review":"Revisar las divulgaciones del emisor sobre adopción de módems propios de clientes y su impacto en QCT."},
+    {"title":"Concentración geopolítica en China","mechanism":"Qualcomm informa una concentración significativa por ingresos de OEM chinos y ventas en China, junto con ciertos suministros críticos; las restricciones comerciales y la sustitución local pueden perjudicar el negocio y la caja.","evidence":["f-china-concentration-disclosure"],"review":"Revisar cambios en restricciones comerciales, concentración declarada y sustitución local descritos por el emisor."},
+    {"title":"Ejecución de diversificación","mechanism":"Inferencia analítica: el crecimiento observado de ingresos QCT automotive puede no compensar por sí solo la contracción observada de QCT handsets y del resultado operativo consolidado; las cifras no establecen causalidad ni suficiencia futura.","evidence":["f-auto-2026","f-auto-2025","f-handsets-2026","f-handsets-2025","f-q3-opinc-2026","f-q3-opinc-2025"],"review":"Revisar conjuntamente los ingresos comparables de automotive y handsets y el resultado operativo, sin inferir causalidad desde sus movimientos."}
+  ],
+  "invalidation": [
+    "Reconsiderar la tesis si las revelaciones futuras muestran que automoción e IoT dejan de compensar de forma sostenida parte de la caída de handsets.",
+    "Reconsiderar si la integración vertical de clientes acelera sin una fuente comparable de ingresos y margen.",
+    "Reconsiderar si el flujo operativo se debilita persistentemente mientras aumentan capex y adquisiciones sin evidencia de retorno."
+  ],
+  "valuation": {"status":"incomplete","gap":"No se congeló un precio de mercado fechado y validado al corte ni una base coherente de acciones/deuda. No se infiere precio objetivo, retorno esperado, barato/caro ni recomendación."}
+}

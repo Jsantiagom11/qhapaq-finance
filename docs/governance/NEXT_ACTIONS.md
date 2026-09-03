@@ -4,15 +4,14 @@ Queue reviewed: 2026-09-02. `DOING` is limited to two items; `NEXT` is limited t
 
 ## DOING
 
-None. Open new work only by moving a defined item from `NEXT`.
+None.
 
 ## NEXT
 
-### One-company evidence-to-report workflow
+### Review the QCOM evidence-to-report workflow
 
-- **Objective:** For one real company in the verified supplied research universe, transform
-  validated primary-source evidence into a typed research record, thesis/counterthesis/invalidation,
-  and an offline HTML report.
+- **Objective:** Review the completed bounded QCOM artifact and evidence contract before any
+  five-company expansion.
 - **Why it matters:** This is the smallest end-to-end validation of the intended company-research
   workflow and its evidence boundary.
 - **Definition of Done:** All acceptance criteria in `docs/PRODUCT_SPEC.md` pass, including
@@ -24,8 +23,7 @@ None. Open new work only by moving a defined item from `NEXT`.
 
 ## BLOCKED
 
-- Research-universe location and the one company to use are unresolved until the supplied material
-  is verified locally.
+None for company research. Investor-specific valuation and portfolio outputs remain dependency-gated.
 
 ## DEFERRED
 

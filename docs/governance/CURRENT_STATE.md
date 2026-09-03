@@ -13,13 +13,11 @@ Last verified: 2026-09-02
 | Dependencies | GO | `uv.lock` is committed and `uv lock --check` passes. |
 | Frozen dataset | GO | The byte-frozen ECB daily EUR reference-rate snapshot is checksum-validated, documented, and loadable offline for 2015-01-02 through 2026-08-31. |
 | Research reproducibility | PARTIAL | Dataset identity, point-in-time loading, deterministic ECB calculations, and the PNG renderer have recorded test and visual evidence. The PNG is an FX reproducibility demonstration, not equity research or an optimizer. |
-| Product alignment | PLANNED | `docs/PRODUCT_SPEC.md` defines company-research, joint portfolio-analysis, and decision-comparison semantics. No company research record, observed portfolio, or optimizer is implemented. |
+| Company research | REVIEW | The QCOM evidence-to-report path now has frozen primary evidence, a typed record, deterministic offline HTML, and focused tests; portfolio and valuation inputs remain unresolved. |
 
 ## Open loops
 
-- **NEXT:** Validate one real company from a verified supplied research universe through
-  primary-source evidence, a typed research record, thesis/counterthesis/invalidation, and an
-  offline HTML report.
+- **REVIEW:** Inspect and accept the bounded QCOM evidence-to-report result before expanding scope.
 - **UNRESOLVED INPUTS:** Research universe availability and company selection; portfolio horizon,
   reference currency, liquidity needs, risk tolerance, constraints, and comparison benchmark.
 - **DEFERRED:** Predictive models and performance claims remain outside the baseline until the

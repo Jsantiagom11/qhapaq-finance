@@ -12,6 +12,7 @@ Evidence here supports current governance claims; it is not a terminal transcrip
 | ECB rendered output visually inspected | `artifacts/research-tearsheet-demo.png` and `docs/reports/daily/2026-09-01-tearsheet.md` | Legible provenance-labeled FX tear sheet; not equity research |
 | Product direction documented | `docs/PRODUCT_SPEC.md` | Planned semantics and acceptance criteria; no implementation claim |
 | Documentation increment execution | `docs/reports/daily/2026-09-02-product-alignment.md` | Baseline, scope, and validation results recorded |
+| QCOM evidence-to-report execution | `docs/reports/daily/2026-09-02-qcom-research.md` | Frozen primary sources, typed record, deterministic HTML, tests, and visual QA evidence |
 
 ## Stable baseline
 

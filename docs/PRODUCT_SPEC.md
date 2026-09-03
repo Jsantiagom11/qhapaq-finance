@@ -46,6 +46,9 @@ public repository.
 
 ## Evidence contract
 
+The primary analytical conclusion of a section must remain understandable without horizontal
+scrolling at a 390 px viewport. Detailed evidence tables may use horizontal scrolling.
+
 Every evidence item must record source identity, publication date, reporting period, retrieval date,
 and a stable locator or repository-safe artifact identity where permitted. Access restrictions and
 source type must be explicit.

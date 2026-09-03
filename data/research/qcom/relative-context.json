@@ -1,0 +1,29 @@
+{
+  "schema_version": "0.1",
+  "as_of": "2026-09-01",
+  "methodology": {
+    "selection_basis": "Economic and business comparability to Qualcomm's fabless wireless, connectivity, edge and automotive semiconductor activities; sector membership alone is insufficient.",
+    "windows": ["1Y", "3Y", "5Y"],
+    "anchor_policy": "Last valid observation on or before each calendar-year anniversary and on or before the research cutoff.",
+    "return_method": "Cumulative price return: end adjusted-price observation divided by start adjusted-price observation minus one.",
+    "peer_median_minimum": 2,
+    "currency": "USD",
+    "vintage_limitation": "The provider response was retrieved after the cutoff and does not provide a historical-vintage guarantee. Calculations use no observation dated after the cutoff and make no claim that later vendor revisions are detectable."
+  },
+  "entities": [
+    {"id": "QCOM", "name": "QUALCOMM Incorporated", "role": "subject", "included_in_peer_median": false, "rationale": "Canonical research subject."},
+    {"id": "NXPI", "name": "NXP Semiconductors N.V.", "role": "peer", "included_in_peer_median": true, "rationale": "Fabless automotive, edge and connectivity semiconductor exposure provides direct context for Qualcomm's diversification beyond handsets."},
+    {"id": "MEDIATEK", "name": "MediaTek Inc.", "role": "peer", "included_in_peer_median": true, "rationale": "Closest approved economic comparator in mobile application processors, modems and connectivity; its Taiwan listing requires a defensible USD-comparable series."},
+    {"id": "AVGO", "name": "Broadcom Inc.", "role": "peer", "included_in_peer_median": true, "rationale": "Wireless, RF, connectivity and high-value semiconductor IP overlap, qualified by its material infrastructure-software exposure."},
+    {"id": "TXN", "name": "Texas Instruments Incorporated", "role": "assessed_exclusion", "included_in_peer_median": false, "rationale": "Analog and embedded breadth, internal manufacturing and industrial exposure make consolidated economics insufficiently comparable."},
+    {"id": "ADI", "name": "Analog Devices, Inc.", "role": "assessed_exclusion", "included_in_peer_median": false, "rationale": "Analog and mixed-signal focus, end markets and manufacturing economics differ materially from Qualcomm's platform, modem and licensing model."},
+    {"id": "SOXX", "name": "iShares Semiconductor ETF", "role": "benchmark", "included_in_peer_median": false, "rationale": "Approved semiconductor-sector benchmark; computationally separate from economic peers."}
+  ],
+  "series": [
+    {"entity_id": "QCOM", "source_id": "qcom-yahoo-chart-2026-09-02", "local_path": "data/evidence/qcom/relative-context/qcom-yahoo-chart.json", "price_basis": "adjusted_price", "currency": "USD", "provider_symbol": "QCOM", "byte_count": 138784, "sha256": "9bd14887b3c59507b69ca508fe23089078269254f765ee82c02af82e0d0d3e45"},
+    {"entity_id": "NXPI", "source_id": "nxpi-yahoo-chart-2026-09-02", "local_path": "data/evidence/qcom/relative-context/nxpi-yahoo-chart.json", "price_basis": "adjusted_price", "currency": "USD", "provider_symbol": "NXPI", "byte_count": 137688, "sha256": "5d26cba76c1d6b91c98a144b975c224589de41c2fe42a6ea524f6fd262be96c4"},
+    {"entity_id": "MEDIATEK", "source_id": null, "price_basis": "unavailable", "currency": "USD", "provider_symbol": null, "unavailable_reason": "No defensible frozen USD-comparable MediaTek return series was acquired; no proxy or substitute is used."},
+    {"entity_id": "AVGO", "source_id": "avgo-yahoo-chart-2026-09-02", "local_path": "data/evidence/qcom/relative-context/avgo-yahoo-chart.json", "price_basis": "adjusted_price", "currency": "USD", "provider_symbol": "AVGO", "byte_count": 138042, "sha256": "be3a588e3bfcb433ca02679864221aa255b1571be310aeb55c1973e13147bd16"},
+    {"entity_id": "SOXX", "source_id": "soxx-yahoo-chart-2026-09-02", "local_path": "data/evidence/qcom/relative-context/soxx-yahoo-chart.json", "price_basis": "adjusted_price", "currency": "USD", "provider_symbol": "SOXX", "byte_count": 139166, "sha256": "d54f2f91dcec89b86e0eb452ffe163df3b67e8e0b2f888404bf4f8fbf05dad84"}
+  ]
+}

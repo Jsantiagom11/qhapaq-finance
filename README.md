@@ -26,9 +26,9 @@ The product direction and evidence contract are defined in the
   analysis window, descriptive calculations, and a research-only warning. It is a reproducibility
   demonstration, not implemented equity research and not a mean-variance or MPT optimizer.
 
-The repository does not yet implement company evidence records, thesis/counterthesis workflows,
-observed portfolio ingestion, economic-dependency modeling, decision comparisons, or portfolio
-optimization.
+The repository now implements one bounded QCOM company evidence record and
+thesis/counterthesis workflow. It does not implement observed portfolio ingestion,
+economic-dependency aggregation, decision comparisons, or portfolio optimization.
 
 ## Current usage
 
@@ -57,6 +57,21 @@ qhapaq tearsheet \
   --output /tmp/qhapaq-ecb-tearsheet.png \
   --as-of 2026-08-31
 ```
+
+Render the verified QCOM company-research report from frozen local evidence:
+
+```bash
+qhapaq research \
+  --record data/research/qcom/research.json \
+  --manifest data/research/qcom/manifest.json \
+  --output artifacts/research/qcom/research.html \
+  --as-of 2026-09-01
+```
+
+This command is strictly offline and validates every source checksum. The immutable QCOM evidence
+bundle under `data/evidence/qcom/`, research record, evidence manifests, and bounded universe are
+repository-safe inputs. Acquisition scratch files under `data/raw/` and generated reports remain
+ignored.
 
 ## Methodological baseline
 

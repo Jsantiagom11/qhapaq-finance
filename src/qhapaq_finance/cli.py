@@ -6,6 +6,8 @@ from pathlib import Path
 from .backtest import run_backtest
 from .config import ResearchConfig
 from .data import download_adjusted_close, file_sha256
+from .research import load_research_record
+from .research_report import render_research_report
 from .tearsheet import build_tearsheet_model, png_dimensions, render_tearsheet
 
 
@@ -46,10 +48,46 @@ def _tearsheet(arguments: list[str]) -> None:
     print(f"png_sha256={file_sha256(output)}")
 
 
+def _research(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(
+        description="Render a verified offline company research report"
+    )
+    parser.add_argument("--record", type=Path, required=True)
+    parser.add_argument("--manifest", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--result-manifest", type=Path)
+    parser.add_argument(
+        "--as-of", type=lambda value: datetime.strptime(value, "%Y-%m-%d").date(), required=True
+    )
+    args = parser.parse_args(arguments)
+    record = load_research_record(
+        record_path=args.record,
+        manifest_path=args.manifest,
+        repository_root=Path("."),
+        as_of=args.as_of,
+    )
+    output = render_research_report(
+        record_path=args.record,
+        manifest_path=args.manifest,
+        output_path=args.output,
+        result_manifest_path=args.result_manifest,
+        as_of=args.as_of,
+    )
+    issuer = record.issuer
+    coverage = "; ".join(f"{source.title} [{source.reporting_period}]" for source in record.sources)
+    print(f"output={output}")
+    print(f"cutoff={args.as_of}")
+    print(f"issuer={issuer['name']} ({issuer['ticker']})")
+    print(f"evidence_coverage={coverage}")
+    print(f"html_sha256={file_sha256(output)}")
+
+
 def main(argv: list[str] | None = None) -> None:
     arguments = sys.argv[1:] if argv is None else argv
     if arguments and arguments[0] == "tearsheet":
         _tearsheet(arguments[1:])
+    elif arguments and arguments[0] == "research":
+        _research(arguments[1:])
     else:
         _baseline(arguments)
 
