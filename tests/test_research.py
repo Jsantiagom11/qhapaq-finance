@@ -17,6 +17,7 @@ from qhapaq_finance import cli
 from qhapaq_finance.data import file_sha256
 from qhapaq_finance.research import (
     ResearchRecordError,
+    _metric_value,
     _validate_relative_result_provenance,
     load_research_record,
 )
@@ -29,6 +30,16 @@ from qhapaq_finance.research_report import (
 ROOT = Path(__file__).parents[1]
 RECORD = ROOT / "data/research/qcom/research.json"
 MANIFEST = ROOT / "data/research/qcom/manifest.json"
+
+
+def test_metric_subtraction_allows_zero_subtrahend() -> None:
+    assert _metric_value("f-current - f-prior", [10.0, 0.0]) == 10.0
+
+
+@pytest.mark.parametrize("formula", ["f-current / f-prior", "(f-current / f-prior) - 1"])
+def test_metric_division_rejects_zero_denominator(formula: str) -> None:
+    with pytest.raises(ResearchRecordError, match="^metric denominator cannot be zero$"):
+        _metric_value(formula, [10.0, 0.0])
 
 
 def _load() -> object:

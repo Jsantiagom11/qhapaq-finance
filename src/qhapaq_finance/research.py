@@ -165,11 +165,13 @@ def _safe_local(root: Path, raw: Any) -> Path:
 
 
 def _metric_value(formula: str, values: list[float]) -> float:
-    if any(value == 0 for value in values[1:]):
-        raise ResearchRecordError("metric denominator cannot be zero")
     if formula.startswith("(") and formula.endswith("- 1") and len(values) == 2:
+        if values[1] == 0:
+            raise ResearchRecordError("metric denominator cannot be zero")
         return values[0] / values[1] - 1
     if " / " in formula and len(values) == 2:
+        if values[1] == 0:
+            raise ResearchRecordError("metric denominator cannot be zero")
         return values[0] / values[1]
     if " - " in formula and len(values) == 2:
         return values[0] - values[1]
