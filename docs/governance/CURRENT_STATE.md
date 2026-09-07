@@ -6,8 +6,9 @@ Last verified: 2026-09-07
 | --- | --- | --- |
 | Project identity | GO | Human name: **Qhapaq Finance**; repository/distribution: `qhapaq-finance`; Python package: `qhapaq_finance`; CLI: `qhapaq`. |
 | Main baseline | GO | `origin/main` is `6f6f966`; it remains the stable merged baseline until the current review branch is accepted. |
-| Current review branch | GO | `feat/qcom-research-relative-context-v0.1` is published and tracked on GitHub. The validated code head before this governance refresh was `06ca04d`; at PR creation it was 6 commits ahead of `main` and 0 behind. |
-| Quality | GO | Local gate passed lock validation, sync, Ruff lint, 76 tests, cold mypy on 11 source files, and `git diff --check`; the GitHub Actions push run for `06ca04d` also completed successfully. |
+| Current review branch | GO | `feat/qcom-research-relative-context-v0.1` is published and tracked on GitHub. The reviewed candidate HEAD is `aadafe3cda5aa0d19497fd357eeb4ab4ca676b12` (`aadafe3`); PR #3 remains pending integration. |
+| Quality | GO | Final local validation after the F1 fix: 3 targeted tests passed, full pytest passed with 79 tests, Ruff format check and Ruff check passed, `mypy --no-incremental src` passed, and `git diff --check` passed. GitHub Actions for candidate HEAD `aadafe3` completed successfully. |
+| Audit review | PASS | Finding F1 in `_metric_value` was reconciled, fixed, regression-tested, independently reviewed by Gemini, and resolved. Gemini review verdict: PASS; F1: RESOLVED. |
 | Packaging | GO | Hatchling builds `src/qhapaq_finance`; project version is `0.2.0`. |
 | CLI | GO | The declared `qhapaq` entry point responds to `--help`; the QCOM research path renders deterministically offline from committed evidence. |
 | Dependencies | GO | `uv.lock` is committed and `uv lock --check` passes. `yfinance` remains an optional data dependency with a module-scoped mypy override. |
@@ -17,7 +18,7 @@ Last verified: 2026-09-07
 
 ## Open loops
 
-- **PR REVIEW:** Review and integrate the QCOM candidate through PR #3; do not merge while governance or CI is inconsistent.
+- **PR INTEGRATION:** Integrate the reviewed QCOM candidate through PR #3; integration remains the immediate action, and PR #3 has not been merged. Do not merge while governance or CI is inconsistent.
 - **UNRESOLVED INVESTOR INPUTS:** Portfolio horizon, reference currency, liquidity needs, risk tolerance, constraints, comparison benchmark, cost model, and uncertainty method remain required before investor-specific portfolio outputs.
 - **DEFERRED:** Five-company expansion, portfolio optimization, predictive models, and performance claims remain outside the current bounded acceptance scope.
 
