@@ -314,7 +314,7 @@ def download_adjusted_close(
     """Download adjusted prices. Network data is deliberately isolated here."""
     try:
         # yfinance does not publish typing metadata.
-        import yfinance as yf  # type: ignore[import-untyped]
+        import yfinance as yf
     except ImportError as exc:  # pragma: no cover - optional dependency
         raise RuntimeError("Install Qhapaq Finance with the 'data' extra") from exc
 
