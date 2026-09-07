@@ -1,44 +1,46 @@
 # Next actions
 
-Queue reviewed: 2026-09-02. `DOING` is limited to two items; `NEXT` is limited to three.
+Queue reviewed: 2026-09-07. `DOING` is limited to two items; `NEXT` is limited to three.
 
 ## DOING
 
-None.
+### Review and integrate QCOM candidate
+
+- **Objective:** Complete review of PR #3 for `feat/qcom-research-relative-context-v0.1` and merge only after code, CI, evidence, and governance are mutually consistent.
+- **Why it matters:** The branch is the first bounded one-company evidence-to-report implementation and should become the next stable baseline only through a clean, auditable integration.
+- **Definition of Done:** PR diff reviewed; GitHub Actions passes on the PR head; governance documents reflect the reviewed state; no unresolved blocking comments remain; merge into `main` is explicit and traceable.
+- **Dependencies / blockers:** No known code blocker. Investor-specific valuation and portfolio outputs remain explicitly out of scope.
 
 ## NEXT
 
-### Review the QCOM evidence-to-report workflow
+### Decide whether to expand company research scope
 
-- **Objective:** Review the completed bounded QCOM artifact and evidence contract before any
-  five-company expansion.
-- **Why it matters:** This is the smallest end-to-end validation of the intended company-research
-  workflow and its evidence boundary.
-- **Definition of Done:** All acceptance criteria in `docs/PRODUCT_SPEC.md` pass, including
-  provenance, invalid/missing evidence, availability-date behavior, deterministic calculations
-  where applicable, offline rendering, evidence navigation, and recorded visual inspection.
-- **Dependencies / blockers:** Verify that the supplied universe is accessible in the working
-  environment, then select one company from it. Do not assume spreadsheets exist inside WSL or add
-  private brokerage communications, account data, or personal transactions to the repository.
+- **Objective:** Decide whether the validated one-company workflow should expand to a small multi-company research set.
+- **Why it matters:** Expansion is useful only if it preserves the evidence contract and does not turn a research watchlist into an implied portfolio.
+- **Definition of Done:** A bounded universe, evidence availability rule, comparison benchmark, and acceptance criteria are documented before implementation begins.
+- **Dependencies / blockers:** PR #3 must be integrated first.
+
+### Define portfolio-input contract before optimization
+
+- **Objective:** Specify the investor/context inputs required before any portfolio-weight recommendation or optimizer is implemented.
+- **Why it matters:** Portfolio output without horizon, reference currency, liquidity needs, risk tolerance, constraints, benchmark, costs, and uncertainty assumptions would create false precision.
+- **Definition of Done:** Required inputs and refusal/insufficient-data behavior are documented and testable.
+- **Dependencies / blockers:** Validated multi-company records and explicit user/investor context.
 
 ## BLOCKED
 
-None for company research. Investor-specific valuation and portfolio outputs remain dependency-gated.
+Investor-specific valuation, allocation, and portfolio optimization remain dependency-gated.
 
 ## DEFERRED
 
-- **Five-company expansion:** Depends on acceptance and review of the one-company workflow.
-- **Portfolio-weight optimization:** Depends on validated multi-company records and explicit
-  horizon, reference currency, liquidity needs, risk tolerance, constraints, comparison benchmark,
-  cost model, and uncertainty method.
-- **Predictive models or momentum strategy expansion:** Defer until reproducible,
-  benchmark-relative out-of-sample evidence supports a defined need.
+- **Predictive models or momentum strategy expansion:** Defer until reproducible, benchmark-relative out-of-sample evidence supports a defined need.
+- **Trading/performance claims:** Outside the current evidence boundary.
 
 ## DONE RECENTLY
 
+- 2026-09-07: Published `feat/qcom-research-relative-context-v0.1`; local release gate passed with 76 tests and cold mypy, and the GitHub Actions push run completed successfully.
+- 2026-09-03: Completed automated QCOM release validation with deterministic offline rendering and canonical SHA-256 verification.
+- 2026-09-02: Implemented the bounded QCOM evidence-to-report workflow and relative-context evidence contract.
 - 2026-09-01: Rendered and visually inspected the verified ECB FX reproducibility demonstration.
 - 2026-09-01: Froze and checksum-validated the official ECB daily EUR FX reference-rate snapshot.
-- 2026-08-28: Established the lightweight governance workflow and current evidence baseline.
-- 2026-08-28: Renamed the project, distribution, package, and CLI to Qhapaq Finance (`9fb4fe4`).
-- 2026-08-28: Committed the dependency lock (`2ebc421`) and restored the quality baseline
-  (`5ff2c1e`).
+- 2026-08-28: Established the lightweight governance workflow and renamed the project to Qhapaq Finance.
