@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "issuer": {
+    "name": "NVIDIA Corporation",
+    "ticker": "NVDA",
+    "cik": "0001045810",
+    "exchange": "Nasdaq"
+  },
+  "retrieved_at": "2026-09-07T23:10:00-05:00",
+  "sources": [
+    {
+      "id": "nvda-2026-q2-10q-capsule",
+      "publisher": "Qhapaq Finance evidence capsule derived from NVIDIA Corporation / SEC",
+      "title": "Evidence capsule — NVIDIA Form 10-Q for quarter ended July 26, 2026",
+      "canonical_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm",
+      "download_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm",
+      "discovery_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/0001045810-26-000075-index.htm",
+      "local_path": "data/evidence/nvda/nvda-q2fy27-sec-evidence.txt",
+      "publication_date": "2026-08-26",
+      "availability_evidence": "SEC accession 0001045810-26-000075 was filed 2026-08-26 for the period ended 2026-07-26. Local file is a checksum-gated Qhapaq factual capsule, not a byte-for-byte filing mirror.",
+      "reporting_period": "Q2 and six months ended 2026-07-26",
+      "media_type": "text/plain",
+      "byte_count": 2351,
+      "sha256": "b12f0d2f9a26de35704ebc42e3403cbdf6cf97038b67de6b135a2f0754732e14"
+    },
+    {
+      "id": "nvda-2026-q2-ir-capsule",
+      "publisher": "Qhapaq Finance evidence capsule derived from NVIDIA Corporation Investor Relations",
+      "title": "Evidence capsule — NVIDIA Q2 FY2027 financial results",
+      "canonical_url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/default.aspx",
+      "download_url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/default.aspx",
+      "discovery_url": "https://investor.nvidia.com/",
+      "local_path": "data/evidence/nvda/nvda-q2fy27-ir-evidence.txt",
+      "publication_date": "2026-08-26",
+      "availability_evidence": "NVIDIA Investor Relations published Q2 FY2027 results on 2026-08-26. Local file is a checksum-gated Qhapaq factual capsule, not a byte-for-byte release mirror.",
+      "reporting_period": "Q2 ended 2026-07-26 and Q3 FY2027 outlook",
+      "media_type": "text/plain",
+      "byte_count": 1135,
+      "sha256": "052660639545dc87a92f8ec0a32a44a29709e7ca1ac9ea5a181f6be197a42a98"
+    }
+  ]
+}
