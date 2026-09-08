@@ -275,8 +275,8 @@ def _bridge_html(items: tuple[CashBridgeItem, ...]) -> str:
         sign = "+" if item.amount > 0 else ""
         rows.append(
             '<div class="bridge-row">'
-            f'<span>{html.escape(item.label)}</span>'
-            f'<strong>{sign}{_money_millions(item.amount)}</strong>'
+            f"<span>{html.escape(item.label)}</span>"
+            f"<strong>{sign}{_money_millions(item.amount)}</strong>"
             "</div>"
         )
     return "".join(rows)
