@@ -7,13 +7,15 @@
 <style>
 :root {
   --bg: #09090a;
-  --panel: #111113;
-  --panel-soft: #0d0d0f;
-  --line: #262629;
+  --surface: #111113;
+  --surface-2: #151518;
+  --line: #29292d;
   --text: #f3f1eb;
-  --muted: #92918c;
+  --muted: #999893;
   --accent: #d8c49a;
-  --max: 1120px;
+  --accent-soft: rgba(216,196,154,.08);
+  --max: 1160px;
+  --r: 18px;
 }
 * { box-sizing: border-box; }
 html {
@@ -24,52 +26,48 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 74% -18%, #252019 0, transparent 32rem),
+    radial-gradient(circle at 72% -15%, rgba(216,196,154,.08), transparent 30rem),
     var(--bg);
 }
 main {
   max-width: var(--max);
   margin: auto;
-  padding: 34px 30px 64px;
+  padding: 28px 28px 56px;
 }
 .top {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 14px;
   border-bottom: 1px solid var(--line);
-  padding-bottom: 16px;
 }
 .brand {
   font-size: 11px;
-  letter-spacing: .25em;
-  font-weight: 750;
+  font-weight: 800;
+  letter-spacing: .24em;
 }
-.live {
+.live,
+.label,
+.eyebrow {
   font-size: 10px;
-  letter-spacing: .14em;
-  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: .15em;
 }
+.live { color: var(--accent); }
+.label,
+.eyebrow { color: var(--muted); }
 .hero {
   display: grid;
   grid-template-columns: 1fr auto;
-  gap: 32px;
   align-items: end;
-  padding: 48px 0 30px;
-}
-.eyebrow,
-.section-title,
-.metric-label,
-.gap-kicker {
-  font-size: 10px;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: .16em;
+  gap: 30px;
+  padding: 38px 0 26px;
 }
 .ticker {
-  font-size: clamp(54px, 8vw, 92px);
+  margin: 8px 0 6px;
+  font-size: clamp(54px, 8vw, 88px);
   letter-spacing: -.06em;
   line-height: .92;
-  margin: 10px 0;
 }
 .company {
   color: var(--muted);
@@ -77,220 +75,232 @@ main {
 }
 .quote { text-align: right; }
 .price {
-  font-size: clamp(40px, 6vw, 66px);
-  letter-spacing: -.052em;
+  font-size: clamp(42px, 6vw, 64px);
+  letter-spacing: -.05em;
+  line-height: 1;
 }
 .change {
   margin-top: 8px;
   color: var(--accent);
-  font-size: 12px;
+  font-size: 11px;
 }
-.grid3 {
+.metric-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
 }
-.metric { padding: 20px 20px 20px 0; }
-.metric + .metric {
-  border-left: 1px solid var(--line);
-  padding-left: 22px;
+.metric-card,
+.panel {
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, var(--accent-soft), transparent 48%), var(--surface);
+  border-radius: var(--r);
+}
+.metric-card {
+  padding: 17px 18px;
+  min-height: 112px;
 }
 .metric-value {
-  font-size: 20px;
-  margin-top: 9px;
+  margin-top: 10px;
+  font-size: 22px;
+  letter-spacing: -.025em;
 }
 .metric-sub {
-  font-size: 11px;
+  margin-top: 7px;
   color: var(--muted);
-  margin-top: 6px;
-  line-height: 1.55;
+  font-size: 10px;
+  line-height: 1.45;
 }
-.section {
-  padding: 42px 0;
-  border-bottom: 1px solid var(--line);
-}
-.section-title { margin-bottom: 18px; }
-.expect {
+.section { padding-top: 28px; }
+.decision-grid {
   display: grid;
   grid-template-columns: 1.15fr .85fr;
-  gap: 42px;
-  align-items: stretch;
+  gap: 12px;
 }
-.hurdle {
-  font-size: clamp(58px, 8vw, 88px);
-  letter-spacing: -.055em;
-  line-height: 1;
-}
-.hurdle-caption {
-  max-width: 520px;
-  color: var(--muted);
-  line-height: 1.6;
+.panel { padding: 22px; }
+.market-hurdle {
   margin-top: 14px;
-  font-size: 13px;
+  font-size: clamp(60px, 8vw, 86px);
+  letter-spacing: -.06em;
+  line-height: .92;
 }
-.gap-card {
-  border: 1px solid var(--line);
-  background: linear-gradient(145deg, rgba(216,196,154,.055), transparent 55%), var(--panel-soft);
-  border-radius: 20px;
-  padding: 26px;
-  min-height: 100%;
-}
-.gap-value {
-  font-size: clamp(42px, 5vw, 62px);
-  letter-spacing: -.05em;
-  margin-top: 14px;
-}
-.gap-state {
-  margin-top: 8px;
-  color: var(--accent);
-  font-size: 13px;
-  letter-spacing: .07em;
-  font-weight: 700;
-}
-.gap-detail {
+.market-copy {
+  max-width: 600px;
+  margin-top: 13px;
   color: var(--muted);
-  line-height: 1.6;
   font-size: 12px;
+  line-height: 1.6;
+}
+.state {
   margin-top: 18px;
-}
-.state-line {
+  padding-top: 16px;
   border-top: 1px solid var(--line);
-  margin-top: 20px;
-  padding-top: 18px;
 }
-.state-line strong {
-  display: block;
+.state strong {
   font-size: 12px;
   letter-spacing: .06em;
-  color: var(--text);
 }
-.state-line p {
+.state p {
+  margin: 8px 0 0;
   color: var(--muted);
-  line-height: 1.6;
   font-size: 12px;
-  margin-bottom: 0;
+  line-height: 1.55;
 }
-.columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 48px;
-}
-.copy {
-  font-size: 16px;
-  line-height: 1.68;
-  letter-spacing: -.008em;
-}
-.copy.muted { color: #b3b2ad; }
-.clean {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.clean li {
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-  line-height: 1.48;
-  font-size: 13px;
-}
-.clean li:first-child { padding-top: 0; }
-.actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 24px;
-}
+.actions { margin-top: 18px; }
 button {
   appearance: none;
   border: 1px solid var(--line);
   background: transparent;
   color: var(--text);
-  padding: 10px 15px;
   border-radius: 999px;
+  padding: 9px 14px;
   font: inherit;
   font-size: 11px;
   cursor: pointer;
 }
 button:hover { border-color: var(--accent); }
-button:disabled {
-  opacity: .35;
-  cursor: not-allowed;
-}
+button:disabled { opacity: .35; cursor: not-allowed; }
 .scenario {
   display: none;
-  margin-top: 22px;
-  padding: 22px;
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  background: var(--panel);
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
 }
 .scenario.open { display: block; }
 .control {
   display: grid;
-  grid-template-columns: 160px 1fr 72px;
-  gap: 18px;
+  grid-template-columns: 120px 1fr 60px;
+  gap: 12px;
   align-items: center;
-  padding: 10px 0;
+  padding: 8px 0;
 }
-.control label {
-  font-size: 12px;
-  color: var(--muted);
-}
-input[type="range"] {
-  width: 100%;
-  accent-color: var(--accent);
-}
+.control label,
 .control output {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  font-size: 12px;
+  color: var(--muted);
+  font-size: 11px;
 }
+.control output { text-align: right; }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
 .scenario-result {
-  margin-top: 16px;
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
   align-items: end;
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
 }
 .scenario-result strong {
-  font-size: 34px;
+  font-size: 30px;
   letter-spacing: -.04em;
 }
+.sensitivity {
+  width: 100%;
+  margin-top: 14px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.sensitivity th,
+.sensitivity td {
+  padding: 9px 8px;
+  border-bottom: 1px solid var(--line);
+  text-align: right;
+  font-size: 11px;
+}
+.sensitivity th:first-child { text-align: left; }
+.sensitivity thead th {
+  color: var(--muted);
+  font-weight: 500;
+}
+.caution {
+  margin-top: 15px;
+  padding: 12px 13px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+.bridge-grid {
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 12px;
+}
+.bridge-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin-top: 14px;
+}
+.mini {
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.mini strong {
+  display: block;
+  margin-top: 7px;
+  font-size: 18px;
+}
+.bridge-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+}
+.bridge-row:last-child { border-bottom: 0; }
+.bridge-row span { color: var(--muted); }
+.bridge-row strong { font-variant-numeric: tabular-nums; }
+.note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.55;
+}
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.copy {
+  margin-top: 13px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.copy.muted { color: #b9b7b1; }
+.clean {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+.clean li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  line-height: 1.45;
+}
+.clean li:last-child { border-bottom: 0; }
+.empty { color: var(--muted); font-size: 11px; margin-top: 12px; }
 .foot {
   padding-top: 24px;
   color: var(--muted);
-  font-size: 10px;
-  line-height: 1.7;
+  font-size: 9px;
+  line-height: 1.65;
 }
 .foot span { color: #bbb9b3; }
-@media (max-width: 760px) {
-  main { padding: 24px 18px 50px; }
-  .hero {
-    grid-template-columns: 1fr;
-    padding: 36px 0 26px;
-  }
+@media (max-width: 900px) {
+  .metric-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 720px) {
+  main { padding: 22px 16px 42px; }
+  .hero,
+  .decision-grid,
+  .bridge-grid,
+  .columns { grid-template-columns: 1fr; }
   .quote { text-align: left; }
-  .grid3 { grid-template-columns: 1fr; }
-  .metric + .metric {
-    border-left: 0;
-    border-top: 1px solid var(--line);
-    padding-left: 0;
-  }
-  .expect,
-  .columns {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-  .control {
-    grid-template-columns: 1fr 62px;
-    gap: 10px;
-  }
-  .control input { grid-column: 1 / -1; }
-  .scenario-result {
-    align-items: flex-start;
-    gap: 18px;
-    flex-direction: column;
-  }
+  .metric-grid { grid-template-columns: 1fr; }
+  .control { grid-template-columns: 100px 1fr 52px; }
 }
 </style>
 </head>
@@ -303,7 +313,7 @@ input[type="range"] {
 
 <section class="hero">
   <div>
-    <div class="eyebrow">Market expectations · research evidence</div>
+    <div class="eyebrow">Reverse-engineering workstation</div>
     <div class="ticker">__TICKER__</div>
     <div class="company">__COMPANY__</div>
   </div>
@@ -313,111 +323,138 @@ input[type="range"] {
   </div>
 </section>
 
-<section class="grid3">
-  <div class="metric">
-    <div class="metric-label">Evidence</div>
+<section class="metric-grid">
+  <article class="metric-card">
+    <div class="label">Evidence</div>
     <div class="metric-value">__EVIDENCE_STATE__</div>
     <div class="metric-sub">Cutoff · __EVIDENCE_AS_OF__</div>
-  </div>
-  <div class="metric">
-    <div class="metric-label">Equity value</div>
+  </article>
+  <article class="metric-card">
+    <div class="label">Equity value</div>
     <div class="metric-value">__MARKET_CAP__</div>
     <div class="metric-sub">__MARKET_CAP_SOURCE__</div>
-  </div>
-  <div class="metric">
-    <div class="metric-label">10Y FCF hurdle</div>
+  </article>
+  <article class="metric-card">
+    <div class="label">Normalized cash power</div>
+    <div class="metric-value">__NORMALIZED_CASH__</div>
+    <div class="metric-sub">__NORMALIZATION_STATE__ · annualized analytical run-rate</div>
+  </article>
+  <article class="metric-card">
+    <div class="label">Market requires</div>
     <div class="metric-value" id="top-hurdle">__HURDLE__</div>
-    <div class="metric-sub">Start __STARTING_FCF__ · __DR_PCT__ discount · __TG_PCT__ terminal</div>
-  </div>
+    <div class="metric-sub">10Y growth · __DR_PCT__ cost of equity · __TG_PCT__ terminal</div>
+  </article>
 </section>
 
-<section class="section">
-  <div class="section-title">Market expects</div>
-  <div class="expect">
-    <div>
-      <div class="hurdle" id="hero-hurdle">__HURDLE__</div>
-      <div class="hurdle-caption">
-        Constant annual FCF growth implied by the observed equity value over __YEARS__ years.
-        This is a hurdle, not a forecast or target price.
+<section class="section decision-grid">
+  <article class="panel">
+    <div class="label">Market requires</div>
+    <div class="market-hurdle" id="hero-hurdle">__HURDLE__</div>
+    <div class="market-copy">
+      Constant annual growth required from the current normalized cash-power base over __YEARS__
+      years. This is an expectations hurdle, not a forecast, rating, or target price.
+    </div>
+    <div class="state">
+      <strong>__STATUS__</strong>
+      <p>__STATUS_DETAIL__</p>
+    </div>
+    <div class="actions">
+      <button id="scenario-toggle"__SCENARIO_DISABLED__>Scenario</button>
+    </div>
+    <div id="scenario" class="scenario">
+      <div class="control">
+        <label for="discount">Cost of equity</label>
+        <input id="discount" type="range" min="6" max="14" step="0.1" value="__DR_VALUE__">
+        <output id="discount-out">__DR_PCT__</output>
       </div>
-      <div class="actions">
-        <button id="scenario-toggle"__SCENARIO_DISABLED__>Scenario</button>
+      <div class="control">
+        <label for="terminal">Terminal growth</label>
+        <input id="terminal" type="range" min="0" max="5" step="0.1" value="__TG_VALUE__">
+        <output id="terminal-out">__TG_PCT__</output>
       </div>
-      <div id="scenario" class="scenario">
-        <div class="control">
-          <label for="discount">Discount rate</label>
-          <input id="discount" type="range" min="6" max="14" step="0.1" value="__DR_VALUE__">
-          <output id="discount-out">__DR_PCT__</output>
-        </div>
-        <div class="control">
-          <label for="terminal">Terminal growth</label>
-          <input id="terminal" type="range" min="0" max="5" step="0.1" value="__TG_VALUE__">
-          <output id="terminal-out">__TG_PCT__</output>
-        </div>
-        <div class="scenario-result">
-          <span>Implied FCF growth</span>
-          <strong id="scenario-hurdle">__HURDLE__</strong>
-        </div>
+      <div class="scenario-result">
+        <span>Implied 10Y cash growth</span>
+        <strong id="scenario-hurdle">__HURDLE__</strong>
       </div>
     </div>
+  </article>
 
-    <aside class="gap-card">
-      <div class="gap-kicker">Expectations gap</div>
-      <div class="gap-value" id="gap-value">__EXPECTATIONS_GAP__</div>
-      <div class="gap-state" id="gap-state">__GAP_STATE__</div>
-      <div class="gap-detail">
-        Recent H1 FCF proxy growth <strong>__OBSERVED_FCF_GROWTH__</strong> versus a market hurdle
-        of <strong id="gap-hurdle">__HURDLE__</strong>. Recent growth is an observation, not a forecast.
-      </div>
-      <div class="state-line">
-        <strong>__STATUS__</strong>
-        <p>__STATUS_DETAIL__</p>
-      </div>
-    </aside>
-  </div>
+  <aside class="panel">
+    <div class="label">Sensitivity · implied 10Y growth</div>
+    __SENSITIVITY_TABLE__
+    <div class="caution">
+      Qhapaq intentionally does not claim that the business can support this hurdle yet.
+      A forward support range requires separate cycle-aware evidence.
+    </div>
+  </aside>
 </section>
 
-<section class="section">
-  <div class="columns">
-    <div>
-      <div class="section-title">Thesis</div>
-      <div class="copy">__THESIS__</div>
+<section class="section bridge-grid">
+  <article class="panel">
+    <div class="label">Normalized Cash Power</div>
+    <div class="bridge-summary">
+      <div class="mini">
+        <div class="label">Reported period FCF</div>
+        <strong>__REPORTED_PERIOD_FCF__</strong>
+      </div>
+      <div class="mini">
+        <div class="label">Normalized period FCF</div>
+        <strong>__NORMALIZED_PERIOD_FCF__</strong>
+      </div>
+      <div class="mini">
+        <div class="label">Period</div>
+        <strong style="font-size:13px">__NORMALIZATION_PERIOD__</strong>
+      </div>
+      <div class="mini">
+        <div class="label">Annualization</div>
+        <strong>__ANNUALIZATION__</strong>
+      </div>
     </div>
-    <div>
-      <div class="section-title">Counterthesis</div>
-      <div class="copy muted">__COUNTER__</div>
-    </div>
-  </div>
+    <div class="note">__NORMALIZATION_NOTE__</div>
+  </article>
+  <article class="panel">
+    <div class="label">Normalization bridge · period values</div>
+    __NORMALIZATION_BRIDGE__
+  </article>
 </section>
 
-<section class="section">
-  <div class="columns">
-    <div>
-      <div class="section-title">What matters now</div>
-      <ul class="clean">__MATTERS__</ul>
-    </div>
-    <div>
-      <div class="section-title">Invalidates</div>
-      <ul class="clean">__INVALIDATION__</ul>
-    </div>
-  </div>
+<section class="section columns">
+  <article class="panel">
+    <div class="label">Thesis</div>
+    <div class="copy">__THESIS__</div>
+  </article>
+  <article class="panel">
+    <div class="label">Counterthesis</div>
+    <div class="copy muted">__COUNTER__</div>
+  </article>
+</section>
+
+<section class="section columns">
+  <article class="panel">
+    <div class="label">What matters now</div>
+    <ul class="clean">__MATTERS__</ul>
+  </article>
+  <article class="panel">
+    <div class="label">Invalidates</div>
+    <ul class="clean">__INVALIDATION__</ul>
+  </article>
 </section>
 
 <footer class="foot">
   Price observation: <span>__OBSERVED__</span> · retrieved <span>__RETRIEVED__</span> · source
   <span>__SOURCE__</span>.<br>
-  Qhapaq One separates live market observations from checksum-gated local research evidence and
-  explicit primary-source provenance. Derived evidence capsules are not byte-for-byte source mirrors.
-  This page is research software, not investment advice.
+  Qhapaq One separates live market observations from checksum-gated evidence and an explicit
+  normalization policy. The reverse DCF uses equity cash flow and therefore interprets the discount
+  rate as cost of equity, not WACC. This page is research software, not investment advice.
 </footer>
 </main>
+
 <script>
 const scenario = __SCENARIO_JSON__;
 const toggle = document.getElementById('scenario-toggle');
 const panel = document.getElementById('scenario');
-if (toggle) {
-  toggle.addEventListener('click', () => panel.classList.toggle('open'));
-}
+if (toggle) toggle.addEventListener('click', () => panel.classList.toggle('open'));
+
 function pv(g, r, tg, years, fcf) {
   let value = 0;
   let cashFlow = fcf;
@@ -430,6 +467,7 @@ function pv(g, r, tg, years, fcf) {
   const terminal = cashFlow * (1 + tg) / (r - tg);
   return value + terminal / discountFactor;
 }
+
 function solve(r, tg) {
   if (scenario.marketCap === null || scenario.startingFcf === null || r <= tg) return null;
   let lo = -.95;
@@ -444,6 +482,7 @@ function solve(r, tg) {
   }
   return (lo + hi) / 2;
 }
+
 function update() {
   const discount = document.getElementById('discount');
   const terminal = document.getElementById('terminal');
@@ -453,18 +492,12 @@ function update() {
   document.getElementById('discount-out').textContent = discount.value + '%';
   document.getElementById('terminal-out').textContent = terminal.value + '%';
   const growth = solve(r, tg);
-  const hurdleLabel = growth === null ? '—' : (growth * 100).toFixed(1) + '%';
-  document.getElementById('scenario-hurdle').textContent = hurdleLabel;
-  document.getElementById('hero-hurdle').textContent = hurdleLabel;
-  document.getElementById('top-hurdle').textContent = hurdleLabel;
-  document.getElementById('gap-hurdle').textContent = hurdleLabel;
-  if (growth !== null && scenario.observedGrowth !== null) {
-    const gap = scenario.observedGrowth - growth;
-    const gapLabel = (gap >= 0 ? '+' : '') + (gap * 100).toFixed(1) + ' pp';
-    document.getElementById('gap-value').textContent = gapLabel;
-    document.getElementById('gap-state').textContent = gap >= 0 ? 'CLEARING HURDLE' : 'BELOW HURDLE';
-  }
+  const label = growth === null ? '—' : (growth * 100).toFixed(1) + '%';
+  document.getElementById('scenario-hurdle').textContent = label;
+  document.getElementById('hero-hurdle').textContent = label;
+  document.getElementById('top-hurdle').textContent = label;
 }
+
 for (const id of ['discount', 'terminal']) {
   const element = document.getElementById(id);
   if (element) element.addEventListener('input', update);
