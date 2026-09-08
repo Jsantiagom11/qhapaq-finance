@@ -29,11 +29,7 @@ body {
     radial-gradient(circle at 72% -15%, rgba(216,196,154,.08), transparent 30rem),
     var(--bg);
 }
-main {
-  max-width: var(--max);
-  margin: auto;
-  padding: 28px 28px 56px;
-}
+main { max-width: var(--max); margin: auto; padding: 28px 28px 56px; }
 .top {
   display: flex;
   justify-content: space-between;
@@ -41,18 +37,10 @@ main {
   padding-bottom: 14px;
   border-bottom: 1px solid var(--line);
 }
-.brand {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .24em;
-}
+.brand { font-size: 11px; font-weight: 800; letter-spacing: .24em; }
 .live,
 .label,
-.eyebrow {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: .15em;
-}
+.eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: .15em; }
 .live { color: var(--accent); }
 .label,
 .eyebrow { color: var(--muted); }
@@ -69,21 +57,10 @@ main {
   letter-spacing: -.06em;
   line-height: .92;
 }
-.company {
-  color: var(--muted);
-  font-size: 14px;
-}
+.company { color: var(--muted); font-size: 14px; }
 .quote { text-align: right; }
-.price {
-  font-size: clamp(42px, 6vw, 64px);
-  letter-spacing: -.05em;
-  line-height: 1;
-}
-.change {
-  margin-top: 8px;
-  color: var(--accent);
-  font-size: 11px;
-}
+.price { font-size: clamp(42px, 6vw, 64px); letter-spacing: -.05em; line-height: 1; }
+.change { margin-top: 8px; color: var(--accent); font-size: 11px; }
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -95,27 +72,11 @@ main {
   background: linear-gradient(160deg, var(--accent-soft), transparent 48%), var(--surface);
   border-radius: var(--r);
 }
-.metric-card {
-  padding: 17px 18px;
-  min-height: 112px;
-}
-.metric-value {
-  margin-top: 10px;
-  font-size: 22px;
-  letter-spacing: -.025em;
-}
-.metric-sub {
-  margin-top: 7px;
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.45;
-}
+.metric-card { padding: 17px 18px; min-height: 112px; }
+.metric-value { margin-top: 10px; font-size: 22px; letter-spacing: -.025em; }
+.metric-sub { margin-top: 7px; color: var(--muted); font-size: 10px; line-height: 1.45; }
 .section { padding-top: 28px; }
-.decision-grid {
-  display: grid;
-  grid-template-columns: 1.15fr .85fr;
-  gap: 12px;
-}
+.decision-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
 .panel { padding: 22px; }
 .market-hurdle {
   margin-top: 14px;
@@ -123,28 +84,10 @@ main {
   letter-spacing: -.06em;
   line-height: .92;
 }
-.market-copy {
-  max-width: 600px;
-  margin-top: 13px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.6;
-}
-.state {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-}
-.state strong {
-  font-size: 12px;
-  letter-spacing: .06em;
-}
-.state p {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.55;
-}
+.market-copy { max-width: 600px; margin-top: 13px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.state { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.state strong { font-size: 12px; letter-spacing: .06em; color: var(--accent); }
+.state p { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .actions { margin-top: 18px; }
 button {
   appearance: none;
@@ -159,12 +102,7 @@ button {
 }
 button:hover { border-color: var(--accent); }
 button:disabled { opacity: .35; cursor: not-allowed; }
-.scenario {
-  display: none;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-}
+.scenario { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
 .scenario.open { display: block; }
 .control {
   display: grid;
@@ -174,10 +112,7 @@ button:disabled { opacity: .35; cursor: not-allowed; }
   padding: 8px 0;
 }
 .control label,
-.control output {
-  color: var(--muted);
-  font-size: 11px;
-}
+.control output { color: var(--muted); font-size: 11px; }
 .control output { text-align: right; }
 input[type="range"] { width: 100%; accent-color: var(--accent); }
 .scenario-result {
@@ -188,10 +123,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   padding-top: 14px;
   border-top: 1px solid var(--line);
 }
-.scenario-result strong {
-  font-size: 30px;
-  letter-spacing: -.04em;
-}
+.scenario-result strong { font-size: 30px; letter-spacing: -.04em; }
 .sensitivity {
   width: 100%;
   margin-top: 14px;
@@ -206,24 +138,19 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   font-size: 11px;
 }
 .sensitivity th:first-child { text-align: left; }
-.sensitivity thead th {
-  color: var(--muted);
-  font-weight: 500;
-}
+.sensitivity thead th { color: var(--muted); font-weight: 500; }
 .caution {
   margin-top: 15px;
   padding: 12px 13px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--accent);
   border-radius: 12px;
+  background: var(--accent-soft);
   color: var(--muted);
   font-size: 11px;
   line-height: 1.5;
 }
-.bridge-grid {
-  display: grid;
-  grid-template-columns: .9fr 1.1fr;
-  gap: 12px;
-}
+.caution strong { color: var(--text); }
+.bridge-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 12px; }
 .bridge-summary {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -236,11 +163,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   border-radius: 12px;
   background: var(--surface-2);
 }
-.mini strong {
-  display: block;
-  margin-top: 7px;
-  font-size: 18px;
-}
+.mini strong { display: block; margin-top: 7px; font-size: 18px; }
 .bridge-row {
   display: flex;
   justify-content: space-between;
@@ -252,28 +175,11 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .bridge-row:last-child { border-bottom: 0; }
 .bridge-row span { color: var(--muted); }
 .bridge-row strong { font-variant-numeric: tabular-nums; }
-.note {
-  margin-top: 12px;
-  color: var(--muted);
-  font-size: 10px;
-  line-height: 1.55;
-}
-.columns {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-.copy {
-  margin-top: 13px;
-  font-size: 15px;
-  line-height: 1.65;
-}
+.note { margin-top: 12px; color: var(--muted); font-size: 10px; line-height: 1.55; }
+.columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.copy { margin-top: 13px; font-size: 15px; line-height: 1.65; }
 .copy.muted { color: #b9b7b1; }
-.clean {
-  list-style: none;
-  margin: 12px 0 0;
-  padding: 0;
-}
+.clean { list-style: none; margin: 12px 0 0; padding: 0; }
 .clean li {
   padding: 10px 0;
   border-bottom: 1px solid var(--line);
@@ -282,16 +188,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 }
 .clean li:last-child { border-bottom: 0; }
 .empty { color: var(--muted); font-size: 11px; margin-top: 12px; }
-.foot {
-  padding-top: 24px;
-  color: var(--muted);
-  font-size: 9px;
-  line-height: 1.65;
-}
+.foot { padding-top: 24px; color: var(--muted); font-size: 9px; line-height: 1.65; }
 .foot span { color: #bbb9b3; }
-@media (max-width: 900px) {
-  .metric-grid { grid-template-columns: 1fr 1fr; }
-}
+@media (max-width: 900px) { .metric-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 720px) {
   main { padding: 22px 16px 42px; }
   .hero,
@@ -335,9 +234,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
     <div class="metric-sub">__MARKET_CAP_SOURCE__</div>
   </article>
   <article class="metric-card">
-    <div class="label">Normalized cash power</div>
-    <div class="metric-value">__NORMALIZED_CASH__</div>
-    <div class="metric-sub">__NORMALIZATION_STATE__ · annualized analytical run-rate</div>
+    <div class="label">Analytical cash basis</div>
+    <div class="metric-value">__CASH_BASIS__</div>
+    <div class="metric-sub">__BASIS_KIND__ · annualized · cycle not validated</div>
   </article>
   <article class="metric-card">
     <div class="label">Market requires</div>
@@ -351,8 +250,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
     <div class="label">Market requires</div>
     <div class="market-hurdle" id="hero-hurdle">__HURDLE__</div>
     <div class="market-copy">
-      Constant annual growth required from the current normalized cash-power base over __YEARS__
-      years. This is an expectations hurdle, not a forecast, rating, or target price.
+      Constant annual growth required from the current run-rate cash basis over __YEARS__ years.
+      This is an expectations hurdle, not a forecast, rating, or target price.
     </div>
     <div class="state">
       <strong>__STATUS__</strong>
@@ -383,38 +282,38 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
     <div class="label">Sensitivity · implied 10Y growth</div>
     __SENSITIVITY_TABLE__
     <div class="caution">
-      Qhapaq intentionally does not claim that the business can support this hurdle yet.
-      A forward support range requires separate cycle-aware evidence.
+      <strong>RUN-RATE BASIS ONLY.</strong> Working-capital and timing adjustments do not normalize
+      the business cycle. Qhapaq does not yet claim that the business can sustain this hurdle.
     </div>
   </aside>
 </section>
 
 <section class="section bridge-grid">
   <article class="panel">
-    <div class="label">Normalized Cash Power</div>
+    <div class="label">Analytical cash basis · __BASIS_KIND__</div>
     <div class="bridge-summary">
       <div class="mini">
         <div class="label">Reported period FCF</div>
         <strong>__REPORTED_PERIOD_FCF__</strong>
       </div>
       <div class="mini">
-        <div class="label">Normalized period FCF</div>
-        <strong>__NORMALIZED_PERIOD_FCF__</strong>
+        <div class="label">Run-rate period cash</div>
+        <strong>__RUN_RATE_PERIOD_CASH__</strong>
       </div>
       <div class="mini">
         <div class="label">Period</div>
-        <strong style="font-size:13px">__NORMALIZATION_PERIOD__</strong>
+        <strong style="font-size:13px">__BASIS_PERIOD__</strong>
       </div>
       <div class="mini">
         <div class="label">Annualization</div>
         <strong>__ANNUALIZATION__</strong>
       </div>
     </div>
-    <div class="note">__NORMALIZATION_NOTE__</div>
+    <div class="note">__CASH_BASIS_NOTE__</div>
   </article>
   <article class="panel">
-    <div class="label">Normalization bridge · period values</div>
-    __NORMALIZATION_BRIDGE__
+    <div class="label">Run-rate bridge · period values</div>
+    __CASH_BASIS_BRIDGE__
   </article>
 </section>
 
@@ -444,8 +343,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   Price observation: <span>__OBSERVED__</span> · retrieved <span>__RETRIEVED__</span> · source
   <span>__SOURCE__</span>.<br>
   Qhapaq One separates live market observations from checksum-gated evidence and an explicit
-  normalization policy. The reverse DCF uses equity cash flow and therefore interprets the discount
-  rate as cost of equity, not WACC. This page is research software, not investment advice.
+  run-rate cash-basis policy. The current basis is not a through-cycle normalization. The reverse
+  DCF uses equity cash flow and therefore interprets the discount rate as cost of equity, not WACC.
+  This page is research software, not investment advice.
 </footer>
 </main>
 
