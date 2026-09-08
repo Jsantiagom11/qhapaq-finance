@@ -1,5 +1,6 @@
 import argparse
 import sys
+import webbrowser
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from .market import (
     snapshot_age,
     write_market_snapshot,
 )
+from .one import build_one_model, render_one_html
 from .research import load_research_record
 from .research_report import render_research_report
 from .tearsheet import build_tearsheet_model, png_dimensions, render_tearsheet
@@ -126,6 +128,8 @@ def _market(arguments: list[str]) -> None:
     print(f"market_state={snapshot.market_state.value}")
     print(f"age_seconds={age_seconds:.0f}")
     print(f"freshness={freshness.value}")
+    if snapshot.market_cap is not None:
+        print(f"market_cap={snapshot.market_cap:.12g}")
     if snapshot.previous_close is not None:
         print(f"previous_close={snapshot.previous_close:.8g}")
         change = snapshot.change_from_previous_close
@@ -164,6 +168,60 @@ def _reverse_dcf(arguments: list[str]) -> None:
     print(f"solved_present_value={result.solved_present_value:.12g}")
 
 
+def _one(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(
+        description="Render Qhapaq One: market expectations and validated research in one view"
+    )
+    parser.add_argument("ticker")
+    parser.add_argument("--snapshot", type=Path, help="use a previously frozen market snapshot")
+    parser.add_argument("--output", type=Path)
+    parser.add_argument("--market-snapshot-output", type=Path)
+    parser.add_argument("--max-age-minutes", type=float, default=30.0)
+    parser.add_argument("--discount-rate", type=float, default=0.09)
+    parser.add_argument("--terminal-growth", type=float, default=0.03)
+    parser.add_argument("--years", type=int, default=10)
+    parser.add_argument("--no-open", action="store_true", help="render without opening a browser")
+    args = parser.parse_args(arguments)
+    if args.max_age_minutes <= 0:
+        parser.error("--max-age-minutes must be positive")
+
+    ticker = args.ticker.strip().upper()
+    now = datetime.now(timezone.utc)
+    snapshot = (
+        load_market_snapshot(args.snapshot)
+        if args.snapshot is not None
+        else fetch_yfinance_snapshot(ticker, now=now)
+    )
+    if snapshot.ticker != ticker:
+        parser.error(f"snapshot ticker {snapshot.ticker} does not match requested ticker {ticker}")
+
+    output = args.output or Path("output/qhapaq-one") / f"{ticker.lower()}.html"
+    snapshot_output = (
+        args.market_snapshot_output or Path("output/qhapaq-one") / f"{ticker.lower()}.market.json"
+    )
+    write_market_snapshot(snapshot, snapshot_output)
+    model = build_one_model(
+        snapshot=snapshot,
+        repository_root=Path("."),
+        max_age=timedelta(minutes=args.max_age_minutes),
+        now=now,
+        discount_rate=args.discount_rate,
+        terminal_growth=args.terminal_growth,
+        years=args.years,
+    )
+    rendered = render_one_html(model, output)
+
+    print(f"ticker={model.ticker}")
+    print(f"status={model.status}")
+    print(f"freshness={model.freshness.value}")
+    if model.implied_fcf_growth is not None:
+        print(f"implied_fcf_growth_pct={model.implied_fcf_growth * 100:.4f}")
+    print(f"market_snapshot={snapshot_output}")
+    print(f"output={rendered}")
+    if not args.no_open:
+        webbrowser.open(rendered.resolve().as_uri())
+
+
 def main(argv: list[str] | None = None) -> None:
     arguments = sys.argv[1:] if argv is None else argv
     if arguments and arguments[0] == "tearsheet":
@@ -174,6 +232,8 @@ def main(argv: list[str] | None = None) -> None:
         _market(arguments[1:])
     elif arguments and arguments[0] == "reverse-dcf":
         _reverse_dcf(arguments[1:])
+    elif arguments and not arguments[0].startswith("-"):
+        _one(arguments)
     else:
         _baseline(arguments)
 

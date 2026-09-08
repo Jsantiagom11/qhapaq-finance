@@ -25,6 +25,7 @@ def _snapshot(*, observed_at: datetime, retrieved_at: datetime) -> MarketSnapsho
         source="fixture",
         market_state=MarketState.CLOSED,
         previous_close=228.10,
+        market_cap=5_500_000_000_000.0,
     )
 
 
@@ -38,6 +39,7 @@ def test_snapshot_round_trip_preserves_observation_identity(tmp_path) -> None:
 
     assert loaded.ticker == "NVDA"
     assert loaded.price == pytest.approx(230.36)
+    assert loaded.market_cap == pytest.approx(5_500_000_000_000.0)
     assert loaded.observed_at == observed
     assert loaded.retrieved_at == retrieved
     assert loaded.market_state is MarketState.CLOSED

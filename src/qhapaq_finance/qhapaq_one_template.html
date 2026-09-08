@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Qhapaq One · __TICKER__</title>
+<style>
+:root {
+  --bg: #0a0a0b;
+  --panel: #111113;
+  --line: #252528;
+  --text: #f2f0ea;
+  --muted: #8b8a87;
+  --accent: #d8c49a;
+  --max: 1180px;
+}
+* { box-sizing: border-box; }
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 70% -20%, #242019 0, transparent 34rem),
+    var(--bg);
+}
+main {
+  max-width: var(--max);
+  margin: auto;
+  padding: 42px 32px 72px;
+}
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 18px;
+}
+.brand {
+  font-size: 12px;
+  letter-spacing: .24em;
+  font-weight: 700;
+}
+.live {
+  font-size: 11px;
+  letter-spacing: .14em;
+  color: var(--accent);
+}
+.hero {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: end;
+  padding: 62px 0 38px;
+}
+.eyebrow {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+}
+.ticker {
+  font-size: clamp(48px, 8vw, 96px);
+  letter-spacing: -.065em;
+  line-height: .9;
+  margin: 12px 0;
+}
+.company {
+  color: var(--muted);
+  font-size: 16px;
+}
+.quote { text-align: right; }
+.price {
+  font-size: clamp(40px, 6vw, 72px);
+  letter-spacing: -.055em;
+}
+.change {
+  margin-top: 8px;
+  color: var(--accent);
+  font-size: 14px;
+}
+.grid3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.metric { padding: 24px 20px 24px 0; }
+.metric + .metric {
+  border-left: 1px solid var(--line);
+  padding-left: 24px;
+}
+.metric-label {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.metric-value {
+  font-size: 20px;
+  margin-top: 10px;
+}
+.metric-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 7px;
+  line-height: 1.5;
+}
+.section {
+  padding: 52px 0;
+  border-bottom: 1px solid var(--line);
+}
+.section-title {
+  font-size: 11px;
+  letter-spacing: .16em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+.expect {
+  display: grid;
+  grid-template-columns: 1.2fr .8fr;
+  gap: 56px;
+}
+.hurdle {
+  font-size: clamp(54px, 8vw, 92px);
+  letter-spacing: -.055em;
+  line-height: 1;
+}
+.hurdle-caption {
+  max-width: 560px;
+  color: var(--muted);
+  line-height: 1.65;
+  margin-top: 16px;
+}
+.status {
+  border-left: 1px solid var(--line);
+  padding-left: 32px;
+}
+.status strong {
+  display: block;
+  color: var(--accent);
+  font-size: 17px;
+  letter-spacing: .04em;
+}
+.status p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+.columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+}
+.copy {
+  font-size: 18px;
+  line-height: 1.72;
+  letter-spacing: -.01em;
+}
+.copy.muted { color: #b0afab; }
+.clean {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.clean li {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line);
+  line-height: 1.5;
+}
+.clean li:first-child { padding-top: 0; }
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 28px;
+}
+button {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  padding: 11px 16px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button:disabled {
+  opacity: .35;
+  cursor: not-allowed;
+}
+.scenario {
+  display: none;
+  margin-top: 28px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+}
+.scenario.open { display: block; }
+.control {
+  display: grid;
+  grid-template-columns: 180px 1fr 80px;
+  gap: 20px;
+  align-items: center;
+  padding: 12px 0;
+}
+.control label {
+  font-size: 13px;
+  color: var(--muted);
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+.control output {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.scenario-result {
+  margin-top: 18px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+.scenario-result strong {
+  font-size: 36px;
+  letter-spacing: -.04em;
+}
+.foot {
+  padding-top: 28px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.foot span { color: #bbb9b3; }
+@media (max-width: 760px) {
+  main { padding: 26px 20px 56px; }
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 42px 0 30px;
+  }
+  .quote { text-align: left; }
+  .grid3 { grid-template-columns: 1fr; }
+  .metric + .metric {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding-left: 0;
+  }
+  .expect,
+  .columns {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+  .status {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 24px 0 0;
+  }
+  .control {
+    grid-template-columns: 1fr 64px;
+    gap: 10px;
+  }
+  .control input { grid-column: 1 / -1; }
+  .scenario-result {
+    align-items: flex-start;
+    gap: 20px;
+    flex-direction: column;
+  }
+}
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+  <div class="brand">QHAPAQ ONE</div>
+  <div class="live">__FRESHNESS__ · __MARKET_STATE__</div>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="eyebrow">Market expectations · research evidence</div>
+    <div class="ticker">__TICKER__</div>
+    <div class="company">__COMPANY__</div>
+  </div>
+  <div class="quote">
+    <div class="price">__CURRENCY____PRICE__</div>
+    <div class="change">__CHANGE__ · observed __OBSERVED_SHORT__</div>
+  </div>
+</section>
+
+<section class="grid3">
+  <div class="metric">
+    <div class="metric-label">Evidence</div>
+    <div class="metric-value">__EVIDENCE_STATE__</div>
+    <div class="metric-sub">As of __EVIDENCE_AS_OF__</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Market cap</div>
+    <div class="metric-value">__MARKET_CAP__</div>
+    <div class="metric-sub">Snapshot source · __SOURCE__</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">10Y FCF hurdle</div>
+    <div class="metric-value" id="top-hurdle">__HURDLE__</div>
+    <div class="metric-sub">__DR_PCT__ discount · __TG_PCT__ terminal growth</div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-title">Market expects</div>
+  <div class="expect">
+    <div>
+      <div class="hurdle" id="hero-hurdle">__HURDLE__</div>
+      <div class="hurdle-caption">
+        Constant annual FCF growth implied by the observed equity value over __YEARS__ years under
+        the current scenario. It is a hurdle, not a forecast or target price.
+      </div>
+      <div class="actions">
+        <button id="scenario-toggle"__SCENARIO_DISABLED__>Scenario</button>
+      </div>
+      <div id="scenario" class="scenario">
+        <div class="control">
+          <label for="discount">Discount rate</label>
+          <input id="discount" type="range" min="6" max="14" step="0.1" value="__DR_VALUE__">
+          <output id="discount-out">__DR_PCT__</output>
+        </div>
+        <div class="control">
+          <label for="terminal">Terminal growth</label>
+          <input id="terminal" type="range" min="0" max="5" step="0.1" value="__TG_VALUE__">
+          <output id="terminal-out">__TG_PCT__</output>
+        </div>
+        <div class="scenario-result">
+          <span>Implied FCF growth</span>
+          <strong id="scenario-hurdle">__HURDLE__</strong>
+        </div>
+      </div>
+    </div>
+    <div class="status">
+      <div class="section-title">State</div>
+      <strong>__STATUS__</strong>
+      <p>__STATUS_DETAIL__</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="columns">
+    <div>
+      <div class="section-title">Thesis</div>
+      <div class="copy">__THESIS__</div>
+    </div>
+    <div>
+      <div class="section-title">Counterthesis</div>
+      <div class="copy muted">__COUNTER__</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="columns">
+    <div>
+      <div class="section-title">What matters now</div>
+      <ul class="clean">__MATTERS__</ul>
+    </div>
+    <div>
+      <div class="section-title">Invalidates</div>
+      <ul class="clean">__INVALIDATION__</ul>
+    </div>
+  </div>
+</section>
+
+<footer class="foot">
+  Price observation: <span>__OBSERVED__</span> · retrieved <span>__RETRIEVED__</span> · source
+  <span>__SOURCE__</span>.<br>
+  Qhapaq One separates live market observations from frozen primary-source research. Missing
+  evidence remains missing; this page is research software, not investment advice.
+</footer>
+</main>
+<script>
+const scenario = __SCENARIO_JSON__;
+const toggle = document.getElementById('scenario-toggle');
+const panel = document.getElementById('scenario');
+if (toggle) {
+  toggle.addEventListener('click', () => panel.classList.toggle('open'));
+}
+function pv(g, r, tg, years, fcf) {
+  let value = 0;
+  let cashFlow = fcf;
+  let discountFactor = 1;
+  for (let i = 0; i < years; i += 1) {
+    cashFlow *= 1 + g;
+    discountFactor *= 1 + r;
+    value += cashFlow / discountFactor;
+  }
+  const terminal = cashFlow * (1 + tg) / (r - tg);
+  return value + terminal / discountFactor;
+}
+function solve(r, tg) {
+  if (scenario.marketCap === null || scenario.startingFcf === null || r <= tg) return null;
+  let lo = -.95;
+  let hi = .5;
+  while (pv(hi, r, tg, scenario.years, scenario.startingFcf) < scenario.marketCap && hi < 10) {
+    hi = hi * 2 + .1;
+  }
+  for (let i = 0; i < 160; i += 1) {
+    const mid = (lo + hi) / 2;
+    if (pv(mid, r, tg, scenario.years, scenario.startingFcf) < scenario.marketCap) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+function update() {
+  const discount = document.getElementById('discount');
+  const terminal = document.getElementById('terminal');
+  if (!discount || !terminal) return;
+  const r = Number(discount.value) / 100;
+  const tg = Number(terminal.value) / 100;
+  document.getElementById('discount-out').textContent = discount.value + '%';
+  document.getElementById('terminal-out').textContent = terminal.value + '%';
+  const growth = solve(r, tg);
+  const label = growth === null ? '—' : (growth * 100).toFixed(1) + '%';
+  document.getElementById('scenario-hurdle').textContent = label;
+  document.getElementById('hero-hurdle').textContent = label;
+  document.getElementById('top-hurdle').textContent = label;
+}
+for (const id of ['discount', 'terminal']) {
+  const element = document.getElementById(id);
+  if (element) element.addEventListener('input', update);
+}
+</script>
+</body>
+</html>
