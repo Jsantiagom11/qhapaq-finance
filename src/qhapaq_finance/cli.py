@@ -197,8 +197,7 @@ def _one(arguments: list[str]) -> None:
 
     output = args.output or Path("output/qhapaq-one") / f"{ticker.lower()}.html"
     snapshot_output = (
-        args.market_snapshot_output
-        or Path("output/qhapaq-one") / f"{ticker.lower()}.market.json"
+        args.market_snapshot_output or Path("output/qhapaq-one") / f"{ticker.lower()}.market.json"
     )
     write_market_snapshot(snapshot, snapshot_output)
     model = build_one_model(
