@@ -1,11 +1,20 @@
 import argparse
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from .backtest import run_backtest
 from .config import ResearchConfig
 from .data import download_adjusted_close, file_sha256
+from .expectations import ReverseDcfInputs, solve_implied_fcf_growth
+from .market import (
+    FreshnessPolicy,
+    classify_freshness,
+    fetch_yfinance_snapshot,
+    load_market_snapshot,
+    snapshot_age,
+    write_market_snapshot,
+)
 from .research import load_research_record
 from .research_report import render_research_report
 from .tearsheet import build_tearsheet_model, png_dimensions, render_tearsheet
@@ -82,12 +91,89 @@ def _research(arguments: list[str]) -> None:
     print(f"html_sha256={file_sha256(output)}")
 
 
+def _market(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(
+        description="Inspect a timestamped market observation without changing frozen research"
+    )
+    parser.add_argument("ticker", nargs="?")
+    parser.add_argument("--snapshot", type=Path, help="load a previously frozen market snapshot")
+    parser.add_argument("--output", type=Path, help="freeze the observation as deterministic JSON")
+    parser.add_argument("--max-age-minutes", type=float, default=30.0)
+    args = parser.parse_args(arguments)
+    if (args.ticker is None) == (args.snapshot is None):
+        parser.error("provide exactly one of ticker or --snapshot")
+    if args.max_age_minutes <= 0:
+        parser.error("--max-age-minutes must be positive")
+
+    now = datetime.now(timezone.utc)
+    snapshot = (
+        load_market_snapshot(args.snapshot)
+        if args.snapshot is not None
+        else fetch_yfinance_snapshot(args.ticker, now=now)
+    )
+    policy = FreshnessPolicy(max_age=timedelta(minutes=args.max_age_minutes))
+    freshness = classify_freshness(snapshot, policy=policy, now=now)
+    age_seconds = snapshot_age(snapshot, now=now).total_seconds()
+    if args.output is not None:
+        write_market_snapshot(snapshot, args.output)
+
+    print(f"ticker={snapshot.ticker}")
+    print(f"price={snapshot.price:.8g}")
+    print(f"currency={snapshot.currency}")
+    print(f"observed_at={snapshot.observed_at.isoformat()}")
+    print(f"retrieved_at={snapshot.retrieved_at.isoformat()}")
+    print(f"source={snapshot.source}")
+    print(f"market_state={snapshot.market_state.value}")
+    print(f"age_seconds={age_seconds:.0f}")
+    print(f"freshness={freshness.value}")
+    if snapshot.previous_close is not None:
+        print(f"previous_close={snapshot.previous_close:.8g}")
+        change = snapshot.change_from_previous_close
+        if change is not None:
+            print(f"change_from_previous_close={change:.8f}")
+    if args.output is not None:
+        print(f"snapshot_output={args.output}")
+
+
+def _reverse_dcf(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(
+        description="Solve the constant FCF growth implied by an observed equity value"
+    )
+    parser.add_argument("--equity-value", type=float, required=True)
+    parser.add_argument("--starting-fcf", type=float, required=True)
+    parser.add_argument("--discount-rate", type=float, required=True)
+    parser.add_argument("--terminal-growth", type=float, required=True)
+    parser.add_argument("--years", type=int, default=10)
+    args = parser.parse_args(arguments)
+    result = solve_implied_fcf_growth(
+        ReverseDcfInputs(
+            equity_value=args.equity_value,
+            starting_fcf=args.starting_fcf,
+            discount_rate=args.discount_rate,
+            terminal_growth=args.terminal_growth,
+            years=args.years,
+        )
+    )
+    print(f"equity_value={result.equity_value:.12g}")
+    print(f"starting_fcf={result.starting_fcf:.12g}")
+    print(f"years={result.years}")
+    print(f"discount_rate={result.discount_rate:.8f}")
+    print(f"terminal_growth={result.terminal_growth:.8f}")
+    print(f"implied_fcf_growth={result.implied_fcf_growth:.8f}")
+    print(f"implied_fcf_growth_pct={result.implied_fcf_growth * 100:.4f}")
+    print(f"solved_present_value={result.solved_present_value:.12g}")
+
+
 def main(argv: list[str] | None = None) -> None:
     arguments = sys.argv[1:] if argv is None else argv
     if arguments and arguments[0] == "tearsheet":
         _tearsheet(arguments[1:])
     elif arguments and arguments[0] == "research":
         _research(arguments[1:])
+    elif arguments and arguments[0] == "market":
+        _market(arguments[1:])
+    elif arguments and arguments[0] == "reverse-dcf":
+        _reverse_dcf(arguments[1:])
     else:
         _baseline(arguments)
 
