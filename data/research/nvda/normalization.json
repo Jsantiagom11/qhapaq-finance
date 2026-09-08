@@ -1,0 +1,56 @@
+{
+  "schema_version": "0.1",
+  "ticker": "NVDA",
+  "as_of": "2026-08-26",
+  "period": "Six months ended 2026-07-26",
+  "annualization_factor": 2.0,
+  "reported_fcf": {
+    "operating_cash_flow": {
+      "id": "ocf",
+      "label": "Operating cash flow",
+      "value": 74421,
+      "unit": "USD million",
+      "source_id": "nvda-2026-q2-10q-capsule",
+      "locator": "Form 10-Q cash flows, six months ended 2026-07-26"
+    },
+    "capex": {
+      "id": "capex",
+      "label": "Property/equipment/intangible purchases",
+      "value": 4434,
+      "unit": "USD million",
+      "source_id": "nvda-2026-q2-10q-capsule",
+      "locator": "Form 10-Q cash flows, investing activities, six months ended 2026-07-26"
+    }
+  },
+  "working_capital": {
+    "policy": "comparative_delta",
+    "current": [
+      {"id": "accounts_receivable", "label": "Accounts receivable cash effect", "value": -24590, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q cash flows, six months ended 2026-07-26"},
+      {"id": "inventories", "label": "Inventories cash effect", "value": -10204, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q cash flows, six months ended 2026-07-26"},
+      {"id": "prepaids_other_assets", "label": "Prepaid and other assets cash effect", "value": -6480, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q cash flows, six months ended 2026-07-26"},
+      {"id": "accounts_payable", "label": "Accounts payable cash effect", "value": 4125, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q cash flows, six months ended 2026-07-26"},
+      {"id": "accrued_current_liabilities", "label": "Accrued/current liabilities cash effect", "value": 8015, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q cash flows, six months ended 2026-07-26"},
+      {"id": "other_long_term_liabilities", "label": "Other long-term liabilities cash effect", "value": 1970, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q cash flows, six months ended 2026-07-26"}
+    ],
+    "prior": [
+      {"id": "accounts_receivable", "label": "Accounts receivable cash effect", "value": -4743, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q comparative cash flows, six months ended 2025-07-27"},
+      {"id": "inventories", "label": "Inventories cash effect", "value": -4880, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q comparative cash flows, six months ended 2025-07-27"},
+      {"id": "prepaids_other_assets", "label": "Prepaid and other assets cash effect", "value": 946, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q comparative cash flows, six months ended 2025-07-27"},
+      {"id": "accounts_payable", "label": "Accounts payable cash effect", "value": 2255, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q comparative cash flows, six months ended 2025-07-27"},
+      {"id": "accrued_current_liabilities", "label": "Accrued/current liabilities cash effect", "value": 3075, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q comparative cash flows, six months ended 2025-07-27"},
+      {"id": "other_long_term_liabilities", "label": "Other long-term liabilities cash effect", "value": 979, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q comparative cash flows, six months ended 2025-07-27"}
+    ]
+  },
+  "sbc": {
+    "policy": "deduct_economic_cost",
+    "current": {"id": "stock_based_compensation", "label": "Stock-based compensation expense", "value": 3954, "unit": "USD million", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q cash flows, six months ended 2026-07-26"}
+  },
+  "timing_adjustments": [],
+  "shares_outstanding": {"id": "shares_outstanding", "label": "Common shares outstanding", "value": 24100000000, "unit": "count", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q cover page, as of 2026-08-21"},
+  "policy_notes": [
+    "Normalized Cash Power is an analytical run-rate diagnostic, not reported FCF, FCFF, a forecast, or fair value.",
+    "Working capital uses a comparative-delta policy: retain the prior comparable cash pattern and normalize only the incremental current-period deviation.",
+    "Stock-based compensation is deducted as an economic cost in this model; no equivalent dilution charge may be applied again.",
+    "Annualization is mechanical and does not assert that second-half cash generation will equal first-half cash generation."
+  ]
+}
