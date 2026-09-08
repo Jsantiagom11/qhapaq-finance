@@ -1,5 +1,6 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
+  "basis_kind": "run_rate",
   "ticker": "QCOM",
   "as_of": "2026-09-01",
   "period": "Nine months ended 2026-06-28",
@@ -40,7 +41,7 @@
   ],
   "shares_outstanding": {"id": "shares_outstanding", "label": "Common shares outstanding", "value": 1050000000, "unit": "count", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q cover page, as of 2026-07-27"},
   "policy_notes": [
-    "Normalized Cash Power is an analytical run-rate diagnostic, not reported FCF, FCFF, a forecast, or fair value.",
+    "This is a RUN-RATE analytical cash basis. It normalizes selected timing effects but does not claim to normalize the semiconductor or handset cycle.",
     "Working capital uses a comparative-delta policy and therefore preserves the prior comparable working-capital cash pattern instead of assuming zero working-capital needs.",
     "The cash-tax timing adjustment normalizes only the current-vs-prior comparable delta; it does not add back all cash taxes.",
     "Stock-based compensation is deducted as an economic cost in this model; no equivalent dilution charge may be applied again.",
