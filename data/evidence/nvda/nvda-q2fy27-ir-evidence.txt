@@ -1,0 +1,19 @@
+QHAPAQ EVIDENCE CAPSULE
+source_mode=derived_evidence_capsule
+primary_source=NVIDIA Announces Financial Results for Second Quarter Fiscal 2027
+canonical_url=https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/default.aspx
+publication_date=2026-08-26
+retrieved_for_qhapaq=2026-09-08T04:10:00Z
+
+This capsule is a concise Qhapaq-authored factual extraction from NVIDIA Investor Relations.
+It is not represented as a byte-for-byte mirror of the original release.
+
+FACT INDEX
+- Q2 FY2027 revenue: USD 96,221 million, +18% quarter over quarter and +106% year over year.
+- Q2 FY2027 GAAP gross margin: 75.0%.
+- Q2 FY2027 GAAP operating income: USD 63,734 million.
+- Q2 FY2027 GAAP net income: USD 59,688 million.
+- Q2 FY2027 Data Center revenue: approximately USD 89.0 billion, +18% quarter over quarter and +117% year over year.
+- Q3 FY2027 company outlook: revenue USD 108.0 billion plus or minus 2%.
+- Q3 FY2027 company outlook: GAAP gross margin approximately 74.0% plus or minus 50 basis points.
+- The Q3 outlook assumes no Data Center compute revenue from China.
