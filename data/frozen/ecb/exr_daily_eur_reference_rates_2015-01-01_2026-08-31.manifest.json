@@ -1,0 +1,59 @@
+{
+  "actual_window": {
+    "end": "2026-08-31",
+    "start": "2015-01-02"
+  },
+  "artifact": {
+    "byte_count": 2541412,
+    "path": "data/frozen/ecb/exr_daily_eur_reference_rates_2015-01-01_2026-08-31.csv",
+    "sha256": "9233e2547b72171b8b007e1056e09482e360a765b843330532b2a0e9a05a199e",
+    "source_bytes": "unmodified"
+  },
+  "dataset_id": "ecb-exr-daily-eur-reference-rates-2015-01-01_2026-08-31",
+  "frequency": "daily",
+  "observation_count": 11940,
+  "primary_series": "D.USD.EUR.SP00.A",
+  "provenance": {
+    "acquired_on": "2026-09-01",
+    "attribution": "Source: ECB statistics.",
+    "reuse_policy_url": "https://www.ecb.europa.eu/stats/ecb_statistics/governance_and_quality_framework/html/usage_policy.en.html",
+    "source_url": "https://data-api.ecb.europa.eu/service/data/EXR/D.USD+GBP+JPY+CHF.EUR.SP00.A?startPeriod=2015-01-01&endPeriod=2026-08-31&format=csvdata"
+  },
+  "quote_convention": {
+    "base_currency": "EUR",
+    "description": "Units of each quoted currency per one euro",
+    "quoted_currencies": [
+      "CHF",
+      "GBP",
+      "JPY",
+      "USD"
+    ]
+  },
+  "requested_window": {
+    "end": "2026-08-31",
+    "start": "2015-01-01"
+  },
+  "schema_version": "1.0",
+  "series": [
+    {
+      "currency": "CHF",
+      "observation_count": 2985,
+      "series_id": "D.CHF.EUR.SP00.A"
+    },
+    {
+      "currency": "GBP",
+      "observation_count": 2985,
+      "series_id": "D.GBP.EUR.SP00.A"
+    },
+    {
+      "currency": "JPY",
+      "observation_count": 2985,
+      "series_id": "D.JPY.EUR.SP00.A"
+    },
+    {
+      "currency": "USD",
+      "observation_count": 2985,
+      "series_id": "D.USD.EUR.SP00.A"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "issuer": {"name": "QUALCOMM Incorporated", "ticker": "QCOM", "cik": "0000804328", "exchange": "Nasdaq"},
+  "retrieved_at": "2026-09-02T15:02:17-05:00",
+  "sources": [
+    {
+      "id": "qcom-2025-10k",
+      "publisher": "QUALCOMM Incorporated / SEC filing",
+      "title": "Form 10-K for fiscal year ended September 28, 2025",
+      "canonical_url": "https://www.sec.gov/Archives/edgar/data/804328/000080432825000085/qcom-20250928.htm",
+      "download_url": "https://s204.q4cdn.com/645488518/files/doc_financials/2025/q4/QCOM-09-28-25-FY2025-10-K-Final.pdf",
+      "discovery_url": "https://investor.qualcomm.com/financial-info-sec-filings/sec-filings/sec-filings-details/default.aspx?FilingId=18895576",
+      "local_path": "data/evidence/qcom/qcom-fy2025-10k.pdf",
+      "publication_date": "2025-11-05",
+      "availability_evidence": "SEC accession 0000804328-25-000085 filing index: filed and accepted 2025-11-05; Qualcomm IR filing detail dated 2025-11-05.",
+      "reporting_period": "FY ended 2025-09-28",
+      "media_type": "application/pdf",
+      "byte_count": 805072,
+      "sha256": "90852abbb69e24e6c4a2a1ca8fc3ca9cd458f1a23fe3cf7765a4b0fad5ba14a5"
+    },
+    {
+      "id": "qcom-2026-q3-10q",
+      "publisher": "QUALCOMM Incorporated / SEC filing",
+      "title": "Form 10-Q for quarter ended June 28, 2026",
+      "canonical_url": "https://www.sec.gov/Archives/edgar/data/804328/000080432826000086/qcom-20260628.htm",
+      "download_url": "https://s204.q4cdn.com/645488518/files/doc_financials/2026/q3/QCOM-Q3FY26-10-Q_Final.pdf",
+      "discovery_url": "https://investor.qualcomm.com/financial-info-sec-filings/sec-filings/default.aspx",
+      "local_path": "data/evidence/qcom/qcom-q3fy2026-10q.pdf",
+      "publication_date": "2026-07-29",
+      "availability_evidence": "SEC accession 0000804328-26-000086 filing index: filed and accepted 2026-07-29; period 2026-06-28.",
+      "reporting_period": "Q3 and nine months ended 2026-06-28",
+      "media_type": "application/pdf",
+      "byte_count": 556413,
+      "sha256": "8472e0772f47495b3b982a18f31ff7d6beb74e050916c248912365c068e2c40d"
+    },
+    {
+      "id": "qcom-2026-q3-release",
+      "publisher": "QUALCOMM Incorporated",
+      "title": "Qualcomm Announces Third Quarter Fiscal 2026 Results",
+      "canonical_url": "https://investor.qualcomm.com/news-events/press-releases/news-details/2026/Qualcomm-Earnings-Release-Available-on-Companys-Investor-Relations-Website-67f54b885/default.aspx",
+      "download_url": "https://s204.q4cdn.com/645488518/files/doc_financials/2026/q3/FY2026-3rd-Quarter-Earnings-Release.pdf",
+      "discovery_url": "https://investor.qualcomm.com/",
+      "local_path": "data/evidence/qcom/qcom-q3fy2026-earnings-release.pdf",
+      "publication_date": "2026-07-29",
+      "availability_evidence": "Qualcomm IR dated press release states Q3 FY2026 results were released on 2026-07-29.",
+      "reporting_period": "Q3 ended 2026-06-28",
+      "media_type": "application/pdf",
+      "byte_count": 222446,
+      "sha256": "06ed949865b5e2a5b7645b409090d91584f698ffcfa20d19e0badeeee01c62bf"
+    }
+  ]
+}
