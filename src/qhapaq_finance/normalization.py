@@ -133,9 +133,7 @@ def calculate_run_rate_cash_basis(
     reported_fcf = ocf - capex_value
     working_capital_adjustment = wc_prior - wc_current
     sbc_adjustment = -sbc
-    run_rate_period_cash = (
-        reported_fcf + working_capital_adjustment + timing + sbc_adjustment
-    )
+    run_rate_period_cash = reported_fcf + working_capital_adjustment + timing + sbc_adjustment
     return RunRateCashComputation(
         reported_period_fcf=reported_fcf,
         working_capital_adjustment=working_capital_adjustment,
