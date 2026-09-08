@@ -56,7 +56,7 @@ def test_missing_research_stays_explicit_for_nvda(tmp_path: Path) -> None:
     assert model.implied_fcf_growth is None
     assert "INSUFFICIENT DATA" in rendered
     assert "Build and validate a primary-evidence research pack" in rendered
-    assert "scenario-toggle\" disabled" in rendered
+    assert 'scenario-toggle" disabled' in rendered
 
 
 def test_one_render_is_byte_deterministic_for_same_model(tmp_path: Path) -> None:
