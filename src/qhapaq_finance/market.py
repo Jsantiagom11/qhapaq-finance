@@ -41,6 +41,7 @@ class MarketSnapshot:
     source: str
     market_state: MarketState = MarketState.UNKNOWN
     previous_close: float | None = None
+    market_cap: float | None = None
 
     @property
     def change_from_previous_close(self) -> float | None:
@@ -94,6 +95,8 @@ def _validate_snapshot(snapshot: MarketSnapshot) -> MarketSnapshot:
     _positive_number(snapshot.price, "price")
     if snapshot.previous_close is not None:
         _positive_number(snapshot.previous_close, "previous_close")
+    if snapshot.market_cap is not None:
+        _positive_number(snapshot.market_cap, "market_cap")
     if not snapshot.currency.strip():
         raise MarketDataError("currency must be non-empty")
     if not snapshot.source.strip():
@@ -169,6 +172,7 @@ def fetch_yfinance_snapshot(ticker: str, *, now: datetime | None = None) -> Mark
 
     currency = "UNKNOWN"
     previous_close: float | None = None
+    market_cap: float | None = None
     try:
         fast_info = instrument.fast_info
         raw_currency = fast_info.get("currency")
@@ -177,6 +181,9 @@ def fetch_yfinance_snapshot(ticker: str, *, now: datetime | None = None) -> Mark
         raw_previous = fast_info.get("previous_close")
         if raw_previous is not None:
             previous_close = _positive_number(raw_previous, "previous_close")
+        raw_market_cap = fast_info.get("market_cap")
+        if raw_market_cap is not None:
+            market_cap = _positive_number(raw_market_cap, "market_cap")
     except Exception:  # pragma: no cover - optional provider metadata
         pass
 
@@ -196,6 +203,7 @@ def fetch_yfinance_snapshot(ticker: str, *, now: datetime | None = None) -> Mark
         source="yfinance",
         market_state=state,
         previous_close=previous_close,
+        market_cap=market_cap,
     )
     return _validate_snapshot(snapshot)
 
@@ -213,6 +221,7 @@ def snapshot_payload(snapshot: MarketSnapshot) -> dict[str, object]:
         "source": validated.source,
         "market_state": validated.market_state.value,
         "previous_close": validated.previous_close,
+        "market_cap": validated.market_cap,
     }
 
 
@@ -252,6 +261,7 @@ def load_market_snapshot(path: str | Path) -> MarketSnapshot:
     except (TypeError, ValueError) as exc:
         raise MarketDataError("invalid market_state") from exc
     previous = payload.get("previous_close")
+    market_cap = payload.get("market_cap")
     snapshot = MarketSnapshot(
         ticker=_ticker(str(payload.get("ticker", ""))),
         price=_positive_number(payload.get("price"), "price"),
@@ -261,5 +271,6 @@ def load_market_snapshot(path: str | Path) -> MarketSnapshot:
         source=str(payload.get("source", "")).strip(),
         market_state=state,
         previous_close=None if previous is None else _positive_number(previous, "previous_close"),
+        market_cap=None if market_cap is None else _positive_number(market_cap, "market_cap"),
     )
     return _validate_snapshot(snapshot)
