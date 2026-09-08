@@ -20,8 +20,8 @@
       "availability_evidence": "SEC accession 0001045810-26-000075 was filed 2026-08-26 for the period ended 2026-07-26. Local file is a checksum-gated Qhapaq factual capsule, not a byte-for-byte filing mirror.",
       "reporting_period": "Q2 and six months ended 2026-07-26",
       "media_type": "text/plain",
-      "byte_count": 2351,
-      "sha256": "b12f0d2f9a26de35704ebc42e3403cbdf6cf97038b67de6b135a2f0754732e14"
+      "byte_count": 3410,
+      "sha256": "41815aa9d8d3cd78c4d4afea4ed0ad6407387df567186170200415815f157e45"
     },
     {
       "id": "nvda-2026-q2-ir-capsule",
