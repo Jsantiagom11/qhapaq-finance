@@ -5,28 +5,29 @@ Last verified: 2026-09-08
 | Area | Status | Current fact |
 | --- | --- | --- |
 | Project identity | GO | Human name: **Qhapaq Finance**; repository/distribution: `qhapaq-finance`; Python package: `qhapaq_finance`; CLI: `qhapaq`. |
-| Main baseline | GO | `origin/main` is `d9f9e95901d9a1cceb2c07611175b27bf8ddbb3a` (`d9f9e95`), containing the integrated QCOM research workflow and live-market overlay from PRs #3 and #4. |
-| Current review branch | GO | `feat/qhapaq-one-v0.1` is published through PR #5. Feature HEAD `1115260458047a412a3b4be98e906db76376796b` (`1115260`) passed CI before this governance refresh. |
-| Quality | GO | CI run #55 passed on Python 3.10 and 3.12: frozen sync, lock check, Ruff format/lint, cold mypy, full pytest, deterministic offline QCOM render, and artifact upload. |
-| Audit review | PASS | QCOM finding F1 in `_metric_value` remains resolved and regression-covered. |
-| Packaging | GO | Hatchling builds `src/qhapaq_finance`; project version remains `0.2.0`. Qhapaq One keeps its self-contained HTML presentation as a packaged resource separate from model logic. |
-| CLI | GO (candidate) | Existing advanced paths remain available; PR #5 makes `qhapaq <TICKER>` the primary human-facing workflow, generating a timestamped market snapshot and one concise decision surface. |
-| Dependencies | GO | `uv.lock` is unchanged by Qhapaq One. `yfinance` remains an optional data dependency isolated to network adapters. No framework or server dependency was added. |
-| Frozen dataset | GO | The byte-frozen ECB daily EUR reference-rate snapshot remains checksum-validated and loadable offline for 2015-01-02 through 2026-08-31. |
-| Research reproducibility | GO | The QCOM path retains frozen evidence, typed facts/calculations, relative context, deterministic offline HTML, result-manifest identity, canonical SHA-256 verification, tests, and recorded visual QA. |
-| Company research | GO (one-company path) | QCOM is the validated company case. NVDA has no committed primary-evidence pack yet; Qhapaq One therefore reports `INSUFFICIENT DATA` rather than manufacturing a thesis or valuation state. |
-| Market observations | GO | `FROZEN`, `SNAPSHOT`, and `LIVE` data speeds are integrated on `main`. Freshness is based on `observed_at`, not retrieval time, and live observations can be frozen to deterministic JSON. |
-| Expectations engine | GO | Reverse DCF solves constant explicit-period equity-FCF growth implied by supplied equity value. It remains provider-agnostic and does not produce a target price or expected return. |
-| Qhapaq One | GO (candidate) | PR #5 composes market state, validated research, reverse DCF, thesis/counterthesis, key risks and invalidation into one responsive offline HTML view. QCOM can reach `UNDERWRITING`; missing layers remain `INSUFFICIENT DATA`. |
+| Main baseline | GO | `origin/main` is `35f77e9667e0055c6f41dc6e7d538bb34fb91af7` (`35f77e9`), containing QCOM research, the live-market overlay, and integrated Qhapaq One v0.1 from PRs #3–#5. |
+| Current review branch | GO | `feat/nvda-evidence-gap-v0.1` is published through PR #6. Candidate HEAD `abdf8a291ff6e5ed6b7e4702d4fdbb62ff4a85d3` (`abdf8a2`) passed functional CI before this governance refresh. |
+| Quality | GO | CI run #73 passed on Python 3.10 and 3.12 through frozen sync, lock check, Ruff format/lint, cold mypy, full pytest, deterministic offline QCOM render, and artifact upload. |
+| Audit review | PASS | QCOM finding F1 in `_metric_value` remains resolved and regression-covered. NVDA missing-data behavior remains fail-closed for unknown/unvalidated tickers. |
+| Packaging | GO | Hatchling builds `src/qhapaq_finance`; project version remains `0.2.0`. Qhapaq One keeps presentation separate from model logic in a packaged self-contained HTML resource. |
+| CLI | GO | `qhapaq <TICKER>` is the primary human-facing workflow. Existing advanced research, market, and reverse-DCF commands remain available. |
+| Dependencies | GO | `uv.lock` is unchanged. `yfinance` remains an optional data dependency isolated to the market adapter; no server or frontend framework was added. |
+| Research reproducibility | GO | QCOM retains byte-frozen primary evidence and deterministic report verification. NVDA adds checksum-gated local Qhapaq evidence capsules with explicit SEC/NVIDIA IR provenance; the capsules are explicitly not represented as byte-for-byte source mirrors. |
+| Company research | GO (two bounded cases) | QCOM and NVDA are now validated bounded research cases. NVDA Q2 FY2027 facts, calculations, assumptions, thesis/counterthesis, three material risks, and three invalidation conditions are represented under the shared research contract. |
+| Market observations | GO | `FROZEN`, `SNAPSHOT`, and `LIVE` data speeds remain separated. Freshness is based on `observed_at`, not retrieval time. |
+| Equity-value input | GO (candidate) | Provider market capitalization is preferred. When omitted, Qhapaq One can derive effective equity value from observed price × evidence-backed filing shares and displays that provenance explicitly. |
+| Expectations engine | GO | Reverse DCF remains provider-independent and outputs an implied constant FCF growth hurdle, not a target price or expected return. |
+| Expectations Gap | GO (candidate) | PR #6 compares recent evidence-backed FCF-proxy growth with the market-implied hurdle. `CLEARING HURDLE` / `BELOW HURDLE` describe that diagnostic only; they are not valuation recommendations or forecasts. |
+| Qhapaq One | GO (candidate) | NVDA can now reach `UNDERWRITING` with VERIFIED evidence, effective equity value, 10Y FCF hurdle, recent FCF growth, Expectations Gap, thesis/counterthesis, risks, invalidation, and live Scenario recomputation in one responsive offline view. |
 
 ## Open loops
 
-- **PR #5 INTEGRATION:** Review and integrate `feat/qhapaq-one-v0.1` after this governance refresh passes CI.
-- **NVDA EVIDENCE PACK:** Add a bounded NVIDIA primary-evidence record as the next company increment. Keep filing evidence separate from timestamped market observations and reuse Qhapaq One rather than creating another report surface.
-- **EXPECTATIONS GAP:** Only after NVDA evidence is validated, define a normalized evidence-backed business expectation to compare against the reverse-DCF hurdle. Do not introduce `FAIR`, `STRETCHED`, or `BROKEN` labels before this comparison is defensible.
-- **UNRESOLVED INVESTOR INPUTS:** Portfolio horizon, reference currency, liquidity needs, risk tolerance, constraints, comparison benchmark, cost model, and uncertainty method remain required before investor-specific portfolio outputs.
-- **DEFERRED:** Portfolio optimization, predictive models, streaming daemons, alerts, broker execution, technical-indicator dashboards, arbitrary scores, target prices, and performance claims remain outside the current bounded acceptance scope.
+- **PR #6 INTEGRATION:** Integrate `feat/nvda-evidence-gap-v0.1` after this governance-refresh HEAD passes CI and no blocking review thread remains.
+- **VISUAL QA:** After integration, render `qhapaq NVDA` locally and inspect the real browser output at desktop width. Product DoD is not visually closed until the 30-second hierarchy is confirmed from the rendered page.
+- **NORMALIZED FORWARD EXPECTATION:** Do not introduce `FAIR`, `STRETCHED`, or `BROKEN` from the current Expectations Gap. Those labels require a defensible normalized forward business expectation, not recent observed FCF growth.
+- **UNRESOLVED INVESTOR INPUTS:** Portfolio horizon, reference currency, liquidity needs, risk tolerance, constraints, benchmark, costs, and uncertainty method remain required before investor-specific outputs.
+- **DEFERRED:** Portfolio optimization, predictive models, streaming daemons, alerts, broker execution, technical-indicator dashboards, arbitrary scores, target prices, and performance claims remain outside the bounded acceptance scope.
 
 ## Strategic state
 
-Qhapaq now separates slow audit-grade evidence from fast market observations and exposes those layers through one deliberately small decision product. The product contract is to make the market hurdle, evidence state, thesis, counterthesis, risks and invalidation understandable in roughly 30 seconds while preserving the ability to inspect deeper evidence and scenarios. The next value-producing increment is NVIDIA primary evidence, not additional interface complexity.
+Qhapaq One now has the substantive layers needed for the intended 30-second product: current market observation, auditable research provenance, implied expectations, recent business delivery, an explicit gap, thesis/counterthesis, and invalidation. The next product gate is visual truth in the user's browser, not additional architecture or dashboard features.
