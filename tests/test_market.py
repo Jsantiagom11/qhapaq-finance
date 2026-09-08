@@ -8,6 +8,7 @@ from qhapaq_finance.market import (
     MarketDataError,
     MarketSnapshot,
     MarketState,
+    _market_cap_from_provider_metadata,
     classify_freshness,
     load_market_snapshot,
     snapshot_age,
@@ -44,6 +45,36 @@ def test_snapshot_round_trip_preserves_observation_identity(tmp_path) -> None:
     assert loaded.retrieved_at == retrieved
     assert loaded.market_state is MarketState.CLOSED
     assert loaded.change_from_previous_close == pytest.approx(230.36 / 228.10 - 1)
+
+
+def test_provider_market_cap_prefers_fast_info() -> None:
+    market_cap = _market_cap_from_provider_metadata(
+        price=168.64,
+        fast_info={"market_cap": 177_000_000_000.0},
+        info={"marketCap": 176_000_000_000.0, "sharesOutstanding": 1_050_000_000},
+    )
+
+    assert market_cap == pytest.approx(177_000_000_000.0)
+
+
+def test_provider_market_cap_falls_back_to_info_market_cap() -> None:
+    market_cap = _market_cap_from_provider_metadata(
+        price=168.64,
+        fast_info={"market_cap": None},
+        info={"marketCap": 176_000_000_000.0},
+    )
+
+    assert market_cap == pytest.approx(176_000_000_000.0)
+
+
+def test_provider_market_cap_falls_back_to_shares_times_observed_price() -> None:
+    market_cap = _market_cap_from_provider_metadata(
+        price=168.64,
+        fast_info={"market_cap": None},
+        info={"marketCap": None, "sharesOutstanding": 1_050_000_000},
+    )
+
+    assert market_cap == pytest.approx(177_072_000_000.0)
 
 
 def test_freshness_uses_market_observation_not_retrieval_time() -> None:
