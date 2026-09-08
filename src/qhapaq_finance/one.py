@@ -184,7 +184,9 @@ def build_one_model(
         status_detail = "Market state is available, but no validated research evidence pack exists."
     elif cash_basis is None:
         status = "INSUFFICIENT DATA"
-        status_detail = "Research is validated, but no evidence-backed analytical cash basis exists."
+        status_detail = (
+            "Research is validated, but no evidence-backed analytical cash basis exists."
+        )
     elif effective_market_cap is None:
         status = "INSUFFICIENT DATA"
         status_detail = "Research is validated, but no usable equity-value input is available."
