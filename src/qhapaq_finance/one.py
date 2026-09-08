@@ -195,9 +195,7 @@ def build_one_model(
 
     if record is None:
         status = "INSUFFICIENT DATA"
-        status_detail = (
-            "Market state is available, but no validated research evidence pack exists."
-        )
+        status_detail = "Market state is available, but no validated research evidence pack exists."
     elif starting_fcf is None:
         status = "INSUFFICIENT DATA"
         status_detail = "Research is validated, but no compatible equity-FCF proxy is available."
