@@ -1,31 +1,31 @@
 # Next actions
 
-Queue reviewed: 2026-09-07. `DOING` is limited to two items; `NEXT` is limited to three.
+Queue reviewed: 2026-09-08. `DOING` is limited to two items; `NEXT` is limited to three.
 
 ## DOING
 
-### Integrate live market overlay v0.1
+### Integrate Qhapaq One v0.1
 
-- **Objective:** Integrate PR #4 for `feat/live-market-overlay-v0.1` after the refreshed governance state passes CI.
-- **Why it matters:** Qhapaq needs fast-changing market observations without weakening the frozen evidence contract used for company research.
-- **Definition of Done:** CI passes on Python 3.10 and 3.12; no blocking review thread remains; `FROZEN`, `SNAPSHOT`, and `LIVE` semantics are documented; merge into `main` is explicit and traceable.
-- **Dependencies / blockers:** No known code blocker. CI run #30 passed before the governance refresh.
+- **Objective:** Integrate PR #5 for `feat/qhapaq-one-v0.1` after the governance refresh passes CI.
+- **Why it matters:** Qhapaq needs one primary human-facing product that compresses market state, evidence, implied expectations, thesis, counterthesis, risks and invalidation into a roughly 30-second read without weakening reproducibility.
+- **Definition of Done:** CI passes on Python 3.10 and 3.12; no blocking review thread remains; `qhapaq <TICKER>` renders the self-contained decision surface; QCOM reaches `UNDERWRITING` with complete inputs; missing NVDA evidence remains explicitly `INSUFFICIENT DATA`; merge into `main` is explicit and traceable.
+- **Dependencies / blockers:** No known code blocker. Feature HEAD `1115260` passed CI run #55 before this governance refresh.
 
 ## NEXT
 
-### Build bounded NVDA research case
+### Build bounded NVDA primary-evidence pack
 
-- **Objective:** Add NVIDIA as the second company case using primary evidence, timestamped market observations, and the reverse-DCF expectations layer.
-- **Why it matters:** NVDA validates that the QCOM workflow is reusable while testing a company whose valuation changes materially faster than its filing evidence.
-- **Definition of Done:** Primary sources are frozen/checksum-gated; research facts and calculations are typed; a market snapshot is separately timestamped; reverse-DCF assumptions are explicit; an offline report renders deterministically with visible evidence and freshness semantics.
-- **Dependencies / blockers:** PR #4 integrated. Current NVDA market and valuation inputs must not be hard-coded as timeless facts.
+- **Objective:** Add NVIDIA as the second validated company case using primary evidence while reusing the integrated market and Qhapaq One layers.
+- **Why it matters:** NVDA is the intended high-velocity valuation case and tests whether Qhapaq can update market expectations continuously without pretending that slow-moving filing evidence is equally fresh.
+- **Definition of Done:** Primary sources are frozen/checksum-gated; facts/calculations/assumptions/interpretations remain distinct; a compatible normalized FCF basis is explicit; Qhapaq One can combine the evidence pack with a separately timestamped market snapshot without hard-coded timeless market values.
+- **Dependencies / blockers:** PR #5 integrated. Current NVDA market observations must remain separate from audit-grade evidence.
 
-### Compose research + market overlay in the HTML report
+### Define evidence-backed Expectations Gap
 
-- **Objective:** Allow a company report to consume an optional market snapshot without mutating the underlying research record.
-- **Why it matters:** A report should refresh price-sensitive interpretation without re-freezing filings or losing reproducibility.
-- **Definition of Done:** The report shows filing cutoff, market `observed_at`, retrieval time, provider, freshness status, and reverse-DCF assumptions as separate provenance layers; stale/future observations are visible and test-covered.
-- **Dependencies / blockers:** Stable market snapshot contract and one completed NVDA case.
+- **Objective:** Compare the reverse-DCF market hurdle with a normalized, evidence-backed business expectation without manufacturing a forecast.
+- **Why it matters:** This is the missing foundation for later state labels such as `FAIR`, `STRETCHED`, or `BROKEN`; without it those labels would be arbitrary scores.
+- **Definition of Done:** Business-expectation inputs have explicit provenance or assumption status; comparison horizon and normalization rules are documented; sensitivity is visible; missing inputs yield `INSUFFICIENT DATA`; no target price or expected return is inferred.
+- **Dependencies / blockers:** At least one validated case with both market hurdle and defensible normalized business expectation, preferably NVDA.
 
 ### Define portfolio-input contract before optimization
 
@@ -40,16 +40,19 @@ Investor-specific valuation, allocation, and portfolio optimization remain depen
 
 ## DEFERRED
 
-- **Streaming daemon / sub-minute polling:** Add only when a concrete monitoring use case justifies continuous infrastructure. Current live access is on demand.
+- **Streaming daemon / sub-minute polling:** Add only when a concrete monitoring use case justifies continuous infrastructure. Current live access is on demand through `qhapaq <TICKER>`.
 - **Provider redundancy:** Add a second provider when reliability or data coverage demonstrates the need; the adapter boundary already permits it.
+- **Additional UI/dashboard surfaces:** Qhapaq One is the product surface; add interface complexity only when the 30-second read or deeper analysis demonstrably requires it.
+- **Technical indicators / arbitrary AI scores / target prices:** Outside the current product contract.
 - **Predictive models or momentum strategy expansion:** Defer until reproducible, benchmark-relative out-of-sample evidence supports a defined need.
 - **Trading/performance claims:** Outside the current evidence boundary.
 
 ## DONE RECENTLY
 
-- 2026-09-07: PR #3 merged into `main` as `d276ae4`, making the bounded QCOM evidence-to-report workflow the stable baseline.
-- 2026-09-07: Implemented PR #4 candidate with typed timestamped market snapshots, caller-owned freshness policy, optional yfinance live adapter, deterministic snapshot freezing/replay, provider-independent reverse DCF, CLI paths, documentation, and tests.
-- 2026-09-07: CI run #30 passed on Python 3.10 and 3.12 through frozen sync, lock check, Ruff format/lint, cold mypy, full pytest, deterministic QCOM render, and artifact upload before the governance refresh.
+- 2026-09-08: Implemented Qhapaq One v0.1 candidate with `qhapaq <TICKER>`, automatic market-snapshot freezing, market-cap-aware reverse DCF, responsive self-contained HTML, local scenario controls, honest state semantics, and deterministic product tests.
+- 2026-09-08: Refactored Qhapaq One presentation into a packaged HTML resource so financial model logic remains separate from visual design.
+- 2026-09-08: Feature HEAD `1115260` passed CI run #55 on Python 3.10 and 3.12 through frozen sync, lock check, Ruff format/lint, cold mypy, full pytest, deterministic QCOM render, and artifact upload before the governance refresh.
+- 2026-09-08: PR #4 merged into `main` as `d9f9e95`, integrating timestamped market snapshots, FROZEN/SNAPSHOT/LIVE semantics, deterministic replay, and provider-independent reverse DCF.
+- 2026-09-07: PR #3 merged into `main` as `d276ae4`, making the bounded QCOM evidence-to-report workflow the stable research baseline.
 - 2026-09-07: Reconciled and fixed audit finding F1 in `_metric_value`, added regression coverage, and completed independent Gemini review: PASS; F1: RESOLVED.
 - 2026-09-03: Completed automated QCOM release validation with deterministic offline rendering and canonical SHA-256 verification.
-- 2026-09-01: Froze and checksum-validated the official ECB daily EUR FX reference-rate snapshot.
