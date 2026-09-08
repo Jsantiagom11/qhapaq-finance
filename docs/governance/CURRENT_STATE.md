@@ -5,29 +5,38 @@ Last verified: 2026-09-08
 | Area | Status | Current fact |
 | --- | --- | --- |
 | Project identity | GO | Human name: **Qhapaq Finance**; repository/distribution: `qhapaq-finance`; Python package: `qhapaq_finance`; CLI: `qhapaq`. |
-| Main baseline | GO | `origin/main` is `35f77e9667e0055c6f41dc6e7d538bb34fb91af7` (`35f77e9`), containing QCOM research, the live-market overlay, and integrated Qhapaq One v0.1 from PRs #3–#5. |
-| Current review branch | GO | `feat/nvda-evidence-gap-v0.1` is published through PR #6. Candidate HEAD `abdf8a291ff6e5ed6b7e4702d4fdbb62ff4a85d3` (`abdf8a2`) passed functional CI before this governance refresh. |
-| Quality | GO | CI run #73 passed on Python 3.10 and 3.12 through frozen sync, lock check, Ruff format/lint, cold mypy, full pytest, deterministic offline QCOM render, and artifact upload. |
-| Audit review | PASS | QCOM finding F1 in `_metric_value` remains resolved and regression-covered. NVDA missing-data behavior remains fail-closed for unknown/unvalidated tickers. |
-| Packaging | GO | Hatchling builds `src/qhapaq_finance`; project version remains `0.2.0`. Qhapaq One keeps presentation separate from model logic in a packaged self-contained HTML resource. |
-| CLI | GO | `qhapaq <TICKER>` is the primary human-facing workflow. Existing advanced research, market, and reverse-DCF commands remain available. |
-| Dependencies | GO | `uv.lock` is unchanged. `yfinance` remains an optional data dependency isolated to the market adapter; no server or frontend framework was added. |
-| Research reproducibility | GO | QCOM retains byte-frozen primary evidence and deterministic report verification. NVDA adds checksum-gated local Qhapaq evidence capsules with explicit SEC/NVIDIA IR provenance; the capsules are explicitly not represented as byte-for-byte source mirrors. |
-| Company research | GO (two bounded cases) | QCOM and NVDA are now validated bounded research cases. NVDA Q2 FY2027 facts, calculations, assumptions, thesis/counterthesis, three material risks, and three invalidation conditions are represented under the shared research contract. |
-| Market observations | GO | `FROZEN`, `SNAPSHOT`, and `LIVE` data speeds remain separated. Freshness is based on `observed_at`, not retrieval time. |
-| Equity-value input | GO (candidate) | Provider market capitalization is preferred. When omitted, Qhapaq One can derive effective equity value from observed price × evidence-backed filing shares and displays that provenance explicitly. |
-| Expectations engine | GO | Reverse DCF remains provider-independent and outputs an implied constant FCF growth hurdle, not a target price or expected return. |
-| Expectations Gap | GO (candidate) | PR #6 compares recent evidence-backed FCF-proxy growth with the market-implied hurdle. `CLEARING HURDLE` / `BELOW HURDLE` describe that diagnostic only; they are not valuation recommendations or forecasts. |
-| Qhapaq One | GO (candidate) | NVDA can now reach `UNDERWRITING` with VERIFIED evidence, effective equity value, 10Y FCF hurdle, recent FCF growth, Expectations Gap, thesis/counterthesis, risks, invalidation, and live Scenario recomputation in one responsive offline view. |
+| Main baseline | GO | `origin/main` is `cb493f3d48f799814b36da095199f4b40e2f7d7a` (`cb493f3`), containing QCOM and NVDA research, Qhapaq One, live-market fallbacks, and PRs #3–#7. |
+| Current review branch | GO | `feat/normalized-cash-power-v0.1` is the sole Qhapaq development candidate. It replaces the raw recent-FCF Expectations Gap rather than extending it. |
+| Quality | PENDING | PR #7 passed the full Python 3.10/3.12 gate. The Normalized Cash Power candidate must pass frozen sync, lock check, Ruff format/lint, cold mypy, full pytest, and deterministic QCOM render before integration. |
+| Audit posture | FAIL-CLOSED | Unknown research, missing normalization, missing equity value, and unsolved reverse-DCF cases remain `INSUFFICIENT DATA`. A normalization file with invalid provenance or inconsistent inputs raises instead of silently falling back. |
+| Packaging | GO | Qhapaq One remains a Python model plus packaged self-contained HTML resource; no server or frontend framework is required. |
+| CLI | GO | `qhapaq <TICKER>` remains the primary human-facing workflow. Advanced market/research/reverse-DCF paths remain available. |
+| Dependencies | GO | No new runtime framework or network dependency is introduced by cash normalization. |
+| Research reproducibility | GO | QCOM retains byte-frozen primary evidence. NVDA retains checksum-gated SEC/IR evidence capsules with explicit provenance and no claim that the capsules are byte-for-byte source mirrors. |
+| Company research | GO (two bounded cases) | QCOM and NVDA remain the two curated company cases. Broad automated company coverage is not a current product objective. |
+| Market observations | GO | `FROZEN`, `SNAPSHOT`, and `LIVE` data speeds remain separated; freshness depends on `observed_at`, not retrieval time. |
+| Equity-value input | GO | Provider market cap is preferred. If unavailable, Qhapaq can derive equity value from observed price × evidence-backed filing shares and display the provenance. |
+| Reverse DCF | GO | The model uses equity cash flow and equity value. `discount_rate` is explicitly interpreted as **cost of equity**, not WACC. Default sensitivity is 8/9/10% cost of equity × 2/3/4% terminal growth. |
+| Raw Expectations Gap | RETIRED | `recent FCF growth - implied 10Y FCF CAGR`, `CLEARING HURDLE`, and `BELOW HURDLE` are removed from the candidate because the comparison can manufacture false signals from working-capital, capex, tax timing, and cyclicality. |
+| Normalized Cash Power | CANDIDATE | A separate evidence-linked normalization artifact bridges reported FCF proxy to analytical cash power using comparative working-capital deltas, explicit timing adjustments where justified, and an explicit SBC economic-cost policy. |
+| Qhapaq One | CANDIDATE | The primary screen now emphasizes Evidence → Equity Value → Normalized Cash Power → Market Requires → Sensitivity → Thesis/Counterthesis → Risks/Invalidation. It does not claim that current business performance can sustain the hurdle. |
+
+## Methodological limitations that remain open
+
+- **Cycle risk:** comparative-delta normalization can still be wrong if the prior comparable period was itself abnormal or the business changed structurally.
+- **SBC policy:** v0.1 deducts SBC as an economic cost and forbids an equivalent second dilution charge. This is explicit but not a complete per-share dilution model.
+- **Annualization:** H1 × 2 and 9M × 4/3 are mechanical diagnostics, not forecasts or normalized full-cycle earnings power.
+- **Forward support:** Qhapaq does not yet estimate a defensible sustainable-growth range. Therefore it does not output `FAIR`, `STRETCHED`, `BROKEN`, `CLEARING`, or an expected return.
+- **Maintenance burden:** thesis, counterthesis, normalization policy, risks, and invalidation still require human review. Scalability has not been demonstrated.
 
 ## Open loops
 
-- **PR #6 INTEGRATION:** Integrate `feat/nvda-evidence-gap-v0.1` after this governance-refresh HEAD passes CI and no blocking review thread remains.
-- **VISUAL QA:** After integration, render `qhapaq NVDA` locally and inspect the real browser output at desktop width. Product DoD is not visually closed until the 30-second hierarchy is confirmed from the rendered page.
-- **NORMALIZED FORWARD EXPECTATION:** Do not introduce `FAIR`, `STRETCHED`, or `BROKEN` from the current Expectations Gap. Those labels require a defensible normalized forward business expectation, not recent observed FCF growth.
-- **UNRESOLVED INVESTOR INPUTS:** Portfolio horizon, reference currency, liquidity needs, risk tolerance, constraints, benchmark, costs, and uncertainty method remain required before investor-specific outputs.
-- **DEFERRED:** Portfolio optimization, predictive models, streaming daemons, alerts, broker execution, technical-indicator dashboards, arbitrary scores, target prices, and performance claims remain outside the bounded acceptance scope.
+- **NORMALIZED CASH POWER CI:** Run the full repository gate on `feat/normalized-cash-power-v0.1` and fix every failure without broadening scope.
+- **CYCLICAL STRESS TEST:** After integration, test the method on a clearly cyclical semiconductor such as Micron at peak and trough conditions. If peak cash is normalized into false comfort, the methodology fails.
+- **VISUAL QA:** Render QCOM and NVDA from integrated `main` and confirm the 30-second hierarchy without reintroducing dashboard clutter.
+- **MAINTENANCE TRIAL:** Time a real post-earnings update across a small company set before increasing the curated universe.
+- **DEFERRED:** SaaS infrastructure, hundreds-of-tickers coverage, portfolio optimization, predictive models, streaming daemons, alerts, broker execution, technical indicators, arbitrary scores, and target prices remain outside scope.
 
 ## Strategic state
 
-Qhapaq One now has the substantive layers needed for the intended 30-second product: current market observation, auditable research provenance, implied expectations, recent business delivery, an explicit gap, thesis/counterthesis, and invalidation. The next product gate is visual truth in the user's browser, not additional architecture or dashboard features.
+The product thesis is stronger than the retired metric. Qhapaq is being treated as a curated reverse-engineering workstation: expose the cash base, show what the price mathematically requires, make assumption sensitivity obvious, and force explicit invalidation. Engineering sophistication does not count as product validation; the next evidence must come from cyclical stress testing, maintenance time, and real morning-use visual QA.

@@ -18,6 +18,10 @@ FACT INDEX
 - H1 FY2026 operating cash flow: USD 42,779 million. Filing page 8 / comparative cash flows.
 - H1 FY2027 purchases related to property, equipment and intangibles: USD 4,434 million. Filing page 8.
 - H1 FY2026 purchases related to property, equipment and intangibles: USD 3,122 million. Filing page 8.
+- H1 FY2027 stock-based compensation expense: USD 3,954 million. Filing page 8.
+- H1 FY2026 stock-based compensation expense: USD 3,099 million. Filing page 8.
+- H1 FY2027 changes in operating assets/liabilities: accounts receivable -24,590; inventories -10,204; prepaid/other assets -6,480; accounts payable +4,125; accrued/current liabilities +8,015; other long-term liabilities +1,970. USD million. Filing page 8.
+- H1 FY2026 comparative changes in operating assets/liabilities: accounts receivable -4,743; inventories -4,880; prepaid/other assets +946; accounts payable +2,255; accrued/current liabilities +3,075; other long-term liabilities +979. USD million. Filing page 8.
 - Q2 FY2027 Data Center revenue: USD 89,023 million. Filing page 27 / revenue by market platform.
 - Common shares outstanding as of 2026-08-21: approximately 24.1 billion. Filing cover page.
 - Accounts receivable as of 2026-07-26: USD 63,059 million; as of 2026-01-25: USD 38,466 million. Filing page 5.
@@ -27,3 +31,6 @@ FACT INDEX
 - Supply and capacity commitments totaled USD 279 billion as of 2026-07-26, up from USD 119 billion in the prior quarter. Note 10 / commitments.
 - NVIDIA stated it was effectively foreclosed from competing in China's data-center compute market at quarter end under the prevailing regulatory landscape. Risk factors.
 - H200 shipments under the licensing program represented less than 1% of Data Center revenue in the most recent quarter. Risk factors / MD&A.
+
+NORMALIZATION BOUNDARY
+Qhapaq may compare current working-capital cash effects with the prior comparable period and normalize only the incremental difference. This is an analytical assumption, not a reported company metric. Stock-based compensation may be deducted as an explicit economic-cost policy only when the model does not separately apply an equivalent dilution charge.

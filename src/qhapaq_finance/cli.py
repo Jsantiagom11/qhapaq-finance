@@ -141,11 +141,19 @@ def _market(arguments: list[str]) -> None:
 
 def _reverse_dcf(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(
-        description="Solve the constant FCF growth implied by an observed equity value"
+        description=(
+            "Solve constant equity-FCF growth implied by an observed equity value; "
+            "--discount-rate is cost of equity, not WACC"
+        )
     )
     parser.add_argument("--equity-value", type=float, required=True)
     parser.add_argument("--starting-fcf", type=float, required=True)
-    parser.add_argument("--discount-rate", type=float, required=True)
+    parser.add_argument(
+        "--discount-rate",
+        type=float,
+        required=True,
+        help="cost of equity for the equity-FCF / equity-value model",
+    )
     parser.add_argument("--terminal-growth", type=float, required=True)
     parser.add_argument("--years", type=int, default=10)
     args = parser.parse_args(arguments)
@@ -161,7 +169,7 @@ def _reverse_dcf(arguments: list[str]) -> None:
     print(f"equity_value={result.equity_value:.12g}")
     print(f"starting_fcf={result.starting_fcf:.12g}")
     print(f"years={result.years}")
-    print(f"discount_rate={result.discount_rate:.8f}")
+    print(f"cost_of_equity={result.discount_rate:.8f}")
     print(f"terminal_growth={result.terminal_growth:.8f}")
     print(f"implied_fcf_growth={result.implied_fcf_growth:.8f}")
     print(f"implied_fcf_growth_pct={result.implied_fcf_growth * 100:.4f}")
@@ -170,14 +178,19 @@ def _reverse_dcf(arguments: list[str]) -> None:
 
 def _one(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(
-        description="Render Qhapaq One: market expectations and validated research in one view"
+        description="Render Qhapaq One: normalized cash and market expectations in one view"
     )
     parser.add_argument("ticker")
     parser.add_argument("--snapshot", type=Path, help="use a previously frozen market snapshot")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--market-snapshot-output", type=Path)
     parser.add_argument("--max-age-minutes", type=float, default=30.0)
-    parser.add_argument("--discount-rate", type=float, default=0.09)
+    parser.add_argument(
+        "--discount-rate",
+        type=float,
+        default=0.09,
+        help="cost of equity for the equity-FCF reverse DCF",
+    )
     parser.add_argument("--terminal-growth", type=float, default=0.03)
     parser.add_argument("--years", type=int, default=10)
     parser.add_argument("--no-open", action="store_true", help="render without opening a browser")
@@ -214,6 +227,8 @@ def _one(arguments: list[str]) -> None:
     print(f"ticker={model.ticker}")
     print(f"status={model.status}")
     print(f"freshness={model.freshness.value}")
+    if model.normalized_cash_power is not None:
+        print(f"normalized_cash_power={model.normalized_cash_power:.12g}")
     if model.implied_fcf_growth is not None:
         print(f"implied_fcf_growth_pct={model.implied_fcf_growth * 100:.4f}")
     print(f"market_snapshot={snapshot_output}")

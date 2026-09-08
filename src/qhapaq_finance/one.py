@@ -9,8 +9,15 @@ from datetime import date, datetime, timedelta, timezone
 from importlib.resources import files
 from pathlib import Path
 
-from .expectations import ExpectationsError, ReverseDcfInputs, solve_implied_fcf_growth
+from .expectations import (
+    ExpectationsError,
+    ReverseDcfInputs,
+    SensitivityPoint,
+    reverse_dcf_sensitivity,
+    solve_implied_fcf_growth,
+)
 from .market import Freshness, FreshnessPolicy, MarketSnapshot, classify_freshness
+from .normalization import CashBridgeItem, NormalizedCashResult, load_normalized_cash
 from .research import ResearchRecord, load_research_record
 
 
@@ -22,13 +29,12 @@ class OneModel:
     freshness: Freshness
     evidence_as_of: date | None
     research_ready: bool
-    starting_fcf: float | None
+    normalized_cash: NormalizedCashResult | None
+    normalized_cash_power: float | None
     effective_market_cap: float | None
     market_cap_provenance: str
     implied_fcf_growth: float | None
-    observed_fcf_growth: float | None
-    expectations_gap: float | None
-    gap_state: str
+    sensitivity: tuple[SensitivityPoint, ...]
     discount_rate: float
     terminal_growth: float
     years: int
@@ -43,6 +49,10 @@ class OneModel:
 def _research_paths(root: Path, ticker: str) -> tuple[Path, Path]:
     directory = root / "data" / "research" / ticker.lower()
     return directory / "research.json", directory / "manifest.json"
+
+
+def _normalization_path(root: Path, ticker: str) -> Path:
+    return root / "data" / "research" / ticker.lower() / "normalization.json"
 
 
 def _research_as_of(record_path: Path) -> date:
@@ -70,15 +80,6 @@ def _load_research(root: Path, ticker: str) -> ResearchRecord | None:
     )
 
 
-def _metric_value(record: ResearchRecord, metric_id: str | None) -> float | None:
-    if not metric_id:
-        return None
-    for metric in record.metrics:
-        if metric.id == metric_id:
-            return metric.value
-    return None
-
-
 def _fact_value(record: ResearchRecord, fact_id: str | None) -> float | None:
     if not fact_id:
         return None
@@ -88,43 +89,29 @@ def _fact_value(record: ResearchRecord, fact_id: str | None) -> float | None:
     return None
 
 
-def _starting_fcf(record: ResearchRecord) -> float | None:
-    configured_metric = record.valuation.get("starting_fcf_metric_id")
-    if configured_metric:
-        value = _metric_value(record, configured_metric)
-        if value is None:
-            return None
-        try:
-            factor = float(record.valuation.get("starting_fcf_annualization_factor", "1.0"))
-        except ValueError:
-            return None
-        annualized = value * factor * 1_000_000.0
-        return annualized if annualized > 0 else None
-
-    candidates = [
-        metric
-        for metric in record.metrics
-        if metric.id.lower().startswith("m-fcf") and metric.unit == "USD million"
-    ]
-    if not candidates:
+def _load_normalization(
+    root: Path, ticker: str, record: ResearchRecord | None
+) -> NormalizedCashResult | None:
+    if record is None:
         return None
-    value = candidates[-1].value * 1_000_000.0
-    return value if value > 0 else None
-
-
-def _observed_fcf_growth(record: ResearchRecord) -> float | None:
-    current = _metric_value(record, record.valuation.get("observed_fcf_current_metric_id"))
-    prior = _metric_value(record, record.valuation.get("observed_fcf_prior_metric_id"))
-    if current is None or prior is None or current <= 0 or prior <= 0:
+    path = _normalization_path(root, ticker)
+    if not path.is_file():
         return None
-    return current / prior - 1.0
+    return load_normalized_cash(record=record, path=path)
 
 
 def _effective_market_cap(
-    snapshot: MarketSnapshot, record: ResearchRecord | None
+    snapshot: MarketSnapshot,
+    record: ResearchRecord | None,
+    normalized_cash: NormalizedCashResult | None,
 ) -> tuple[float | None, str]:
     if snapshot.market_cap is not None:
         return snapshot.market_cap, f"provider market cap · {snapshot.source}"
+    if normalized_cash and normalized_cash.shares_outstanding:
+        return (
+            snapshot.price * normalized_cash.shares_outstanding,
+            "derived · observed price × filing shares",
+        )
     if record is None:
         return None, "unavailable"
     shares = _fact_value(record, record.valuation.get("shares_outstanding_fact_id"))
@@ -152,7 +139,7 @@ def build_one_model(
     terminal_growth: float = 0.03,
     years: int = 10,
 ) -> OneModel:
-    """Build one concise decision model without inventing missing research."""
+    """Build a concise decision model while failing closed on missing normalization."""
     root = Path(repository_root).resolve()
     reference = now or datetime.now(timezone.utc)
     freshness = classify_freshness(
@@ -161,63 +148,63 @@ def build_one_model(
         now=reference,
     )
     record = _load_research(root, snapshot.ticker)
+    normalized_cash = _load_normalization(root, snapshot.ticker, record)
     company_name = record.issuer.get("name", snapshot.ticker) if record else snapshot.ticker
-    starting_fcf = _starting_fcf(record) if record else None
-    observed_growth = _observed_fcf_growth(record) if record else None
-    effective_market_cap, market_cap_provenance = _effective_market_cap(snapshot, record)
-    implied_growth: float | None = None
+    normalized_cash_power = (
+        normalized_cash.normalized_annualized_fcf * 1_000_000.0
+        if normalized_cash is not None
+        else None
+    )
+    effective_market_cap, market_cap_provenance = _effective_market_cap(
+        snapshot, record, normalized_cash
+    )
 
-    if record and starting_fcf is not None and effective_market_cap is not None:
+    implied_growth: float | None = None
+    sensitivity: tuple[SensitivityPoint, ...] = ()
+    if normalized_cash_power is not None and effective_market_cap is not None:
         try:
             implied_growth = solve_implied_fcf_growth(
                 ReverseDcfInputs(
                     equity_value=effective_market_cap,
-                    starting_fcf=starting_fcf,
+                    starting_fcf=normalized_cash_power,
                     discount_rate=discount_rate,
                     terminal_growth=terminal_growth,
                     years=years,
                 )
             ).implied_fcf_growth
+            sensitivity = reverse_dcf_sensitivity(
+                equity_value=effective_market_cap,
+                starting_fcf=normalized_cash_power,
+                years=years,
+            )
         except ExpectationsError:
             implied_growth = None
-
-    expectations_gap = (
-        observed_growth - implied_growth
-        if observed_growth is not None and implied_growth is not None
-        else None
-    )
-    if expectations_gap is None:
-        gap_state = "NOT COMPARABLE"
-    elif expectations_gap >= 0:
-        gap_state = "CLEARING HURDLE"
-    else:
-        gap_state = "BELOW HURDLE"
+            sensitivity = ()
 
     if record is None:
         status = "INSUFFICIENT DATA"
         status_detail = "Market state is available, but no validated research evidence pack exists."
-    elif starting_fcf is None:
+    elif normalized_cash is None:
         status = "INSUFFICIENT DATA"
-        status_detail = "Research is validated, but no compatible equity-FCF proxy is available."
+        status_detail = (
+            "Research is validated, but no evidence-backed Normalized Cash Power record exists."
+        )
     elif effective_market_cap is None:
         status = "INSUFFICIENT DATA"
         status_detail = "Research is validated, but no usable equity-value input is available."
     elif implied_growth is None:
         status = "INSUFFICIENT DATA"
         status_detail = (
-            "Inputs exist, but the reverse-DCF hurdle could not be solved under this scenario."
-        )
-    elif expectations_gap is None:
-        status = "UNDERWRITING"
-        status_detail = (
-            "The market's FCF growth hurdle is explicit, but recent FCF growth is not comparable."
+            "Normalized cash and equity value exist, but the reverse-DCF hurdle could not "
+            "be solved under this scenario."
         )
     else:
         status = "UNDERWRITING"
-        direction = "above" if expectations_gap >= 0 else "below"
         status_detail = (
-            f"Recent FCF-proxy growth is {abs(expectations_gap) * 100:.1f} pp {direction} "
-            "the market-implied hurdle. The key question is duration, not the latest quarter."
+            f"At {discount_rate * 100:.1f}% cost of equity and {terminal_growth * 100:.1f}% "
+            f"terminal growth, the observed equity value requires {implied_growth * 100:.1f}% "
+            f"annual growth from normalized cash power over {years} years. "
+            "No forward business-support range or valuation recommendation is asserted."
         )
 
     thesis = _interpretation(record, "thesis") if record else None
@@ -232,13 +219,12 @@ def build_one_model(
         freshness=freshness,
         evidence_as_of=record.as_of if record else None,
         research_ready=record is not None,
-        starting_fcf=starting_fcf,
+        normalized_cash=normalized_cash,
+        normalized_cash_power=normalized_cash_power,
         effective_market_cap=effective_market_cap,
         market_cap_provenance=market_cap_provenance,
         implied_fcf_growth=implied_growth,
-        observed_fcf_growth=observed_growth,
-        expectations_gap=expectations_gap,
-        gap_state=gap_state,
+        sensitivity=sensitivity,
         discount_rate=discount_rate,
         terminal_growth=terminal_growth,
         years=years,
@@ -264,14 +250,12 @@ def _money(value: float | None, currency: str = "USD") -> str:
     return f"{prefix}{value:,.2f}"
 
 
+def _money_millions(value: float | None) -> str:
+    return _money(None if value is None else value * 1_000_000.0, "USD")
+
+
 def _percent(value: float | None, digits: int = 1) -> str:
     return "—" if value is None else f"{value * 100:.{digits}f}%"
-
-
-def _percentage_points(value: float | None) -> str:
-    if value is None:
-        return "—"
-    return f"{value * 100:+.1f} pp"
 
 
 def _safe(value: str | None) -> str:
@@ -283,8 +267,47 @@ def _template() -> str:
     return resource.read_text(encoding="utf-8")
 
 
+def _bridge_html(items: tuple[CashBridgeItem, ...]) -> str:
+    if not items:
+        return '<div class="empty">Normalization unavailable.</div>'
+    rows = []
+    for item in items:
+        sign = "+" if item.amount > 0 else ""
+        rows.append(
+            '<div class="bridge-row">'
+            f"<span>{html.escape(item.label)}</span>"
+            f"<strong>{sign}{_money_millions(item.amount)}</strong>"
+            "</div>"
+        )
+    return "".join(rows)
+
+
+def _sensitivity_html(points: tuple[SensitivityPoint, ...]) -> str:
+    if not points:
+        return '<div class="empty">Sensitivity unavailable.</div>'
+    discounts = sorted({point.discount_rate for point in points})
+    terminals = sorted({point.terminal_growth for point in points})
+    lookup = {
+        (point.discount_rate, point.terminal_growth): point.implied_fcf_growth for point in points
+    }
+    header = "".join(f"<th>{terminal * 100:.0f}% TG</th>" for terminal in terminals)
+    rows = []
+    for discount in discounts:
+        cells = "".join(
+            f"<td>{_percent(lookup[(discount, terminal)])}</td>" for terminal in terminals
+        )
+        rows.append(f"<tr><th>{discount * 100:.0f}% CoE</th>{cells}</tr>")
+    return (
+        '<table class="sensitivity"><thead><tr><th></th>'
+        + header
+        + "</tr></thead><tbody>"
+        + "".join(rows)
+        + "</tbody></table>"
+    )
+
+
 def render_one_html(model: OneModel, output_path: str | Path) -> Path:
-    """Render a deterministic, self-contained, high-end HTML decision surface."""
+    """Render a deterministic, self-contained decision surface."""
     output = Path(output_path)
     output.parent.mkdir(parents=True, exist_ok=True)
     snapshot = model.snapshot
@@ -301,16 +324,23 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
     if not invalidation:
         invalidation = "<li>Build and validate a research evidence pack before underwriting.</li>"
 
+    normalized = model.normalized_cash
+    reported_period = normalized.reported_period_fcf if normalized else None
+    normalized_period = normalized.normalized_period_fcf if normalized else None
+    normalization_period = normalized.period if normalized else "Not available"
+    annualization = normalized.annualization_factor if normalized else None
+    policy_note = normalized.policy_notes[0] if normalized else "Normalization unavailable."
     scenario = {
         "marketCap": model.effective_market_cap,
-        "startingFcf": model.starting_fcf,
-        "observedGrowth": model.observed_fcf_growth,
+        "startingFcf": model.normalized_cash_power,
         "discountRate": model.discount_rate,
         "terminalGrowth": model.terminal_growth,
         "years": model.years,
     }
     scenario_json = json.dumps(scenario, sort_keys=True, separators=(",", ":"))
-    scenario_enabled = model.starting_fcf is not None and model.effective_market_cap is not None
+    scenario_enabled = (
+        model.normalized_cash_power is not None and model.effective_market_cap is not None
+    )
     scenario_disabled = "" if scenario_enabled else " disabled"
     currency = "$" if snapshot.currency.upper() == "USD" else html.escape(snapshot.currency) + " "
 
@@ -327,15 +357,20 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
         "__EVIDENCE_AS_OF__": evidence,
         "__MARKET_CAP__": _money(model.effective_market_cap, snapshot.currency),
         "__MARKET_CAP_SOURCE__": html.escape(model.market_cap_provenance),
+        "__NORMALIZED_CASH__": _money(model.normalized_cash_power, snapshot.currency),
+        "__REPORTED_PERIOD_FCF__": _money_millions(reported_period),
+        "__NORMALIZED_PERIOD_FCF__": _money_millions(normalized_period),
+        "__NORMALIZATION_PERIOD__": html.escape(normalization_period),
+        "__ANNUALIZATION__": "—" if annualization is None else f"{annualization:.2f}×",
+        "__NORMALIZATION_STATE__": "ANALYTICAL" if normalized else "MISSING",
+        "__NORMALIZATION_BRIDGE__": _bridge_html(normalized.bridge if normalized else ()),
+        "__NORMALIZATION_NOTE__": html.escape(policy_note),
+        "__SENSITIVITY_TABLE__": _sensitivity_html(model.sensitivity),
         "__SOURCE__": source,
         "__HURDLE__": hurdle,
-        "__OBSERVED_FCF_GROWTH__": _percent(model.observed_fcf_growth),
-        "__EXPECTATIONS_GAP__": _percentage_points(model.expectations_gap),
-        "__GAP_STATE__": html.escape(model.gap_state),
         "__DR_PCT__": _percent(model.discount_rate),
         "__TG_PCT__": _percent(model.terminal_growth),
         "__YEARS__": str(model.years),
-        "__STARTING_FCF__": _money(model.starting_fcf, snapshot.currency),
         "__SCENARIO_DISABLED__": scenario_disabled,
         "__DR_VALUE__": f"{model.discount_rate * 100:.1f}",
         "__TG_VALUE__": f"{model.terminal_growth * 100:.1f}",
