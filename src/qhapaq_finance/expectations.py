@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import Iterable
 
 
 class ExpectationsError(ValueError):
@@ -14,9 +15,9 @@ class ExpectationsError(ValueError):
 class ReverseDcfInputs:
     """Equity-FCF reverse DCF assumptions.
 
-    `starting_fcf` is a current annualized/run-rate equity FCF proxy. The model projects
-    the next year's FCF as starting_fcf * (1 + growth). Equity value must therefore be
-    compared with an equity-cash-flow measure rather than FCFF/enterprise value.
+    `starting_fcf` is an equity-cash-flow measure and `equity_value` is an equity value.
+    `discount_rate` must therefore be interpreted as a cost of equity for this model,
+    not WACC. The next year's FCF is starting_fcf * (1 + growth).
     """
 
     equity_value: float
@@ -35,6 +36,13 @@ class ReverseDcfResult:
     discount_rate: float
     terminal_growth: float
     years: int
+
+
+@dataclass(frozen=True)
+class SensitivityPoint:
+    discount_rate: float
+    terminal_growth: float
+    implied_fcf_growth: float
 
 
 def _finite(value: float, field: str) -> float:
@@ -149,3 +157,38 @@ def solve_implied_fcf_growth(
         terminal_growth=inputs.terminal_growth,
         years=inputs.years,
     )
+
+
+def reverse_dcf_sensitivity(
+    *,
+    equity_value: float,
+    starting_fcf: float,
+    years: int = 10,
+    discount_rates: Iterable[float] = (0.08, 0.09, 0.10),
+    terminal_growth_rates: Iterable[float] = (0.02, 0.03, 0.04),
+) -> tuple[SensitivityPoint, ...]:
+    """Return a deterministic hurdle grid across cost-of-equity and terminal assumptions."""
+    rates = tuple(float(value) for value in discount_rates)
+    terminal_rates = tuple(float(value) for value in terminal_growth_rates)
+    if not rates or not terminal_rates:
+        raise ExpectationsError("sensitivity grids must be non-empty")
+    points: list[SensitivityPoint] = []
+    for discount_rate in rates:
+        for terminal_growth in terminal_rates:
+            result = solve_implied_fcf_growth(
+                ReverseDcfInputs(
+                    equity_value=equity_value,
+                    starting_fcf=starting_fcf,
+                    discount_rate=discount_rate,
+                    terminal_growth=terminal_growth,
+                    years=years,
+                )
+            )
+            points.append(
+                SensitivityPoint(
+                    discount_rate=discount_rate,
+                    terminal_growth=terminal_growth,
+                    implied_fcf_growth=result.implied_fcf_growth,
+                )
+            )
+    return tuple(points)
