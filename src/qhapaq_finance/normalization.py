@@ -107,9 +107,7 @@ def _cash_input(
     return CashInput(identifier, label, value, unit, source_id, locator)
 
 
-def _component_map(
-    raw: Any, *, field: str, source_ids: set[str]
-) -> dict[str, CashInput]:
+def _component_map(raw: Any, *, field: str, source_ids: set[str]) -> dict[str, CashInput]:
     if not isinstance(raw, list) or not raw:
         raise NormalizationError(f"{field} must be a non-empty array")
     result: dict[str, CashInput] = {}
@@ -217,16 +215,12 @@ def load_normalized_cash(
         raise NormalizationError("sbc must be an object")
     if sbc.get("policy") != "deduct_economic_cost":
         raise NormalizationError("sbc policy must be deduct_economic_cost")
-    sbc_current = _cash_input(
-        sbc.get("current"), field="sbc.current", source_ids=source_ids
-    )
+    sbc_current = _cash_input(sbc.get("current"), field="sbc.current", source_ids=source_ids)
     if sbc_current.value < 0:
         raise NormalizationError("SBC expense must be non-negative")
     sbc_adjustment = -sbc_current.value
 
-    normalized_period_fcf = (
-        reported_period_fcf + wc_adjustment + timing_adjustment + sbc_adjustment
-    )
+    normalized_period_fcf = reported_period_fcf + wc_adjustment + timing_adjustment + sbc_adjustment
     normalized_annualized_fcf = normalized_period_fcf * annualization_factor
     if normalized_period_fcf <= 0 or normalized_annualized_fcf <= 0:
         raise NormalizationError("normalized cash power must remain positive")
@@ -245,8 +239,10 @@ def load_normalized_cash(
         shares_outstanding = shares.value
 
     notes = payload.get("policy_notes")
-    if not isinstance(notes, list) or not notes or any(
-        not isinstance(note, str) or not note.strip() for note in notes
+    if (
+        not isinstance(notes, list)
+        or not notes
+        or any(not isinstance(note, str) or not note.strip() for note in notes)
     ):
         raise NormalizationError("policy_notes must be a non-empty array of strings")
 
