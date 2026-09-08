@@ -1,0 +1,49 @@
+{
+  "schema_version": "0.1",
+  "ticker": "QCOM",
+  "as_of": "2026-09-01",
+  "period": "Nine months ended 2026-06-28",
+  "annualization_factor": 1.3333333333333333,
+  "reported_fcf": {
+    "operating_cash_flow": {"id": "ocf", "label": "Operating cash flow", "value": 8405, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, nine months ended 2026-06-28"},
+    "capex": {"id": "capex", "label": "Capital expenditures", "value": 1578, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, nine months ended 2026-06-28"}
+  },
+  "working_capital": {
+    "policy": "comparative_delta",
+    "current": [
+      {"id": "accounts_receivable", "label": "Accounts receivable cash effect", "value": -264, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, nine months ended 2026-06-28"},
+      {"id": "inventories", "label": "Inventories cash effect", "value": -1798, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, nine months ended 2026-06-28"},
+      {"id": "other_assets", "label": "Other assets cash effect", "value": 777, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, nine months ended 2026-06-28"},
+      {"id": "accounts_payable", "label": "Trade accounts payable cash effect", "value": 149, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, nine months ended 2026-06-28"},
+      {"id": "payroll_other_liabilities", "label": "Payroll, benefits and other liabilities cash effect", "value": 231, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, nine months ended 2026-06-28"},
+      {"id": "unearned_revenue", "label": "Unearned revenue cash effect", "value": -225, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, nine months ended 2026-06-28"}
+    ],
+    "prior": [
+      {"id": "accounts_receivable", "label": "Accounts receivable cash effect", "value": 535, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, comparative nine months ended 2025-06-29"},
+      {"id": "inventories", "label": "Inventories cash effect", "value": 33, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, comparative nine months ended 2025-06-29"},
+      {"id": "other_assets", "label": "Other assets cash effect", "value": 361, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, comparative nine months ended 2025-06-29"},
+      {"id": "accounts_payable", "label": "Trade accounts payable cash effect", "value": -220, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, comparative nine months ended 2025-06-29"},
+      {"id": "payroll_other_liabilities", "label": "Payroll, benefits and other liabilities cash effect", "value": -943, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, comparative nine months ended 2025-06-29"},
+      {"id": "unearned_revenue", "label": "Unearned revenue cash effect", "value": 3, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, comparative nine months ended 2025-06-29"}
+    ]
+  },
+  "sbc": {
+    "policy": "deduct_economic_cost",
+    "current": {"id": "stock_based_compensation", "label": "Share-based compensation expense", "value": 2579, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, nine months ended 2026-06-28"}
+  },
+  "timing_adjustments": [
+    {
+      "policy": "comparative_delta",
+      "current": {"id": "cash_tax_timing", "label": "Income-tax payment timing adjustment", "value": -5550, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, income tax payments in excess of income tax provision, nine months ended 2026-06-28"},
+      "prior": {"id": "cash_tax_timing", "label": "Income-tax payment timing adjustment", "value": -1535, "unit": "USD million", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q p. 7, comparative nine months ended 2025-06-29"}
+    }
+  ],
+  "shares_outstanding": {"id": "shares_outstanding", "label": "Common shares outstanding", "value": 1050000000, "unit": "count", "source_id": "qcom-2026-q3-10q", "locator": "Form 10-Q cover page, as of 2026-07-27"},
+  "policy_notes": [
+    "Normalized Cash Power is an analytical run-rate diagnostic, not reported FCF, FCFF, a forecast, or fair value.",
+    "Working capital uses a comparative-delta policy and therefore preserves the prior comparable working-capital cash pattern instead of assuming zero working-capital needs.",
+    "The cash-tax timing adjustment normalizes only the current-vs-prior comparable delta; it does not add back all cash taxes.",
+    "Stock-based compensation is deducted as an economic cost in this model; no equivalent dilution charge may be applied again.",
+    "Annualization is mechanical and does not assert a full-year outcome."
+  ]
+}
