@@ -6,13 +6,14 @@
 <title>Qhapaq One · __TICKER__</title>
 <style>
 :root {
-  --bg: #0a0a0b;
+  --bg: #09090a;
   --panel: #111113;
-  --line: #252528;
-  --text: #f2f0ea;
-  --muted: #8b8a87;
+  --panel-soft: #0d0d0f;
+  --line: #262629;
+  --text: #f3f1eb;
+  --muted: #92918c;
   --accent: #d8c49a;
-  --max: 1180px;
+  --max: 1120px;
 }
 * { box-sizing: border-box; }
 html {
@@ -23,28 +24,28 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(circle at 70% -20%, #242019 0, transparent 34rem),
+    radial-gradient(circle at 74% -18%, #252019 0, transparent 32rem),
     var(--bg);
 }
 main {
   max-width: var(--max);
   margin: auto;
-  padding: 42px 32px 72px;
+  padding: 34px 30px 64px;
 }
 .top {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--line);
-  padding-bottom: 18px;
+  padding-bottom: 16px;
 }
 .brand {
-  font-size: 12px;
-  letter-spacing: .24em;
-  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .25em;
+  font-weight: 750;
 }
 .live {
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: .14em;
   color: var(--accent);
 }
@@ -53,33 +54,36 @@ main {
   grid-template-columns: 1fr auto;
   gap: 32px;
   align-items: end;
-  padding: 62px 0 38px;
+  padding: 48px 0 30px;
 }
-.eyebrow {
-  font-size: 12px;
+.eyebrow,
+.section-title,
+.metric-label,
+.gap-kicker {
+  font-size: 10px;
   color: var(--muted);
   text-transform: uppercase;
-  letter-spacing: .14em;
+  letter-spacing: .16em;
 }
 .ticker {
-  font-size: clamp(48px, 8vw, 96px);
-  letter-spacing: -.065em;
-  line-height: .9;
-  margin: 12px 0;
+  font-size: clamp(54px, 8vw, 92px);
+  letter-spacing: -.06em;
+  line-height: .92;
+  margin: 10px 0;
 }
 .company {
   color: var(--muted);
-  font-size: 16px;
+  font-size: 14px;
 }
 .quote { text-align: right; }
 .price {
-  font-size: clamp(40px, 6vw, 72px);
-  letter-spacing: -.055em;
+  font-size: clamp(40px, 6vw, 66px);
+  letter-spacing: -.052em;
 }
 .change {
   margin-top: 8px;
   color: var(--accent);
-  font-size: 14px;
+  font-size: 12px;
 }
 .grid3 {
   display: grid;
@@ -87,104 +91,123 @@ main {
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
-.metric { padding: 24px 20px 24px 0; }
+.metric { padding: 20px 20px 20px 0; }
 .metric + .metric {
   border-left: 1px solid var(--line);
-  padding-left: 24px;
-}
-.metric-label {
-  color: var(--muted);
-  font-size: 11px;
-  letter-spacing: .14em;
-  text-transform: uppercase;
+  padding-left: 22px;
 }
 .metric-value {
   font-size: 20px;
-  margin-top: 10px;
+  margin-top: 9px;
 }
 .metric-sub {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
-  margin-top: 7px;
-  line-height: 1.5;
+  margin-top: 6px;
+  line-height: 1.55;
 }
 .section {
-  padding: 52px 0;
+  padding: 42px 0;
   border-bottom: 1px solid var(--line);
 }
-.section-title {
-  font-size: 11px;
-  letter-spacing: .16em;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 22px;
-}
+.section-title { margin-bottom: 18px; }
 .expect {
   display: grid;
-  grid-template-columns: 1.2fr .8fr;
-  gap: 56px;
+  grid-template-columns: 1.15fr .85fr;
+  gap: 42px;
+  align-items: stretch;
 }
 .hurdle {
-  font-size: clamp(54px, 8vw, 92px);
+  font-size: clamp(58px, 8vw, 88px);
   letter-spacing: -.055em;
   line-height: 1;
 }
 .hurdle-caption {
-  max-width: 560px;
+  max-width: 520px;
   color: var(--muted);
-  line-height: 1.65;
-  margin-top: 16px;
+  line-height: 1.6;
+  margin-top: 14px;
+  font-size: 13px;
 }
-.status {
-  border-left: 1px solid var(--line);
-  padding-left: 32px;
+.gap-card {
+  border: 1px solid var(--line);
+  background: linear-gradient(145deg, rgba(216,196,154,.055), transparent 55%), var(--panel-soft);
+  border-radius: 20px;
+  padding: 26px;
+  min-height: 100%;
 }
-.status strong {
-  display: block;
+.gap-value {
+  font-size: clamp(42px, 5vw, 62px);
+  letter-spacing: -.05em;
+  margin-top: 14px;
+}
+.gap-state {
+  margin-top: 8px;
   color: var(--accent);
-  font-size: 17px;
-  letter-spacing: .04em;
+  font-size: 13px;
+  letter-spacing: .07em;
+  font-weight: 700;
 }
-.status p {
+.gap-detail {
   color: var(--muted);
-  line-height: 1.65;
+  line-height: 1.6;
+  font-size: 12px;
+  margin-top: 18px;
+}
+.state-line {
+  border-top: 1px solid var(--line);
+  margin-top: 20px;
+  padding-top: 18px;
+}
+.state-line strong {
+  display: block;
+  font-size: 12px;
+  letter-spacing: .06em;
+  color: var(--text);
+}
+.state-line p {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 12px;
+  margin-bottom: 0;
 }
 .columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 56px;
+  gap: 48px;
 }
 .copy {
-  font-size: 18px;
-  line-height: 1.72;
-  letter-spacing: -.01em;
+  font-size: 16px;
+  line-height: 1.68;
+  letter-spacing: -.008em;
 }
-.copy.muted { color: #b0afab; }
+.copy.muted { color: #b3b2ad; }
 .clean {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 .clean li {
-  padding: 13px 0;
+  padding: 12px 0;
   border-bottom: 1px solid var(--line);
-  line-height: 1.5;
+  line-height: 1.48;
+  font-size: 13px;
 }
 .clean li:first-child { padding-top: 0; }
 .actions {
   display: flex;
   gap: 10px;
-  margin-top: 28px;
+  margin-top: 24px;
 }
 button {
   appearance: none;
   border: 1px solid var(--line);
   background: transparent;
   color: var(--text);
-  padding: 11px 16px;
+  padding: 10px 15px;
   border-radius: 999px;
   font: inherit;
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
 }
 button:hover { border-color: var(--accent); }
@@ -194,8 +217,8 @@ button:disabled {
 }
 .scenario {
   display: none;
-  margin-top: 28px;
-  padding: 24px;
+  margin-top: 22px;
+  padding: 22px;
   border: 1px solid var(--line);
   border-radius: 18px;
   background: var(--panel);
@@ -203,13 +226,13 @@ button:disabled {
 .scenario.open { display: block; }
 .control {
   display: grid;
-  grid-template-columns: 180px 1fr 80px;
-  gap: 20px;
+  grid-template-columns: 160px 1fr 72px;
+  gap: 18px;
   align-items: center;
-  padding: 12px 0;
+  padding: 10px 0;
 }
 .control label {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
 }
 input[type="range"] {
@@ -219,31 +242,32 @@ input[type="range"] {
 .control output {
   text-align: right;
   font-variant-numeric: tabular-nums;
+  font-size: 12px;
 }
 .scenario-result {
-  margin-top: 18px;
-  padding-top: 20px;
+  margin-top: 16px;
+  padding-top: 18px;
   border-top: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
   align-items: end;
 }
 .scenario-result strong {
-  font-size: 36px;
+  font-size: 34px;
   letter-spacing: -.04em;
 }
 .foot {
-  padding-top: 28px;
+  padding-top: 24px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.7;
 }
 .foot span { color: #bbb9b3; }
 @media (max-width: 760px) {
-  main { padding: 26px 20px 56px; }
+  main { padding: 24px 18px 50px; }
   .hero {
     grid-template-columns: 1fr;
-    padding: 42px 0 30px;
+    padding: 36px 0 26px;
   }
   .quote { text-align: left; }
   .grid3 { grid-template-columns: 1fr; }
@@ -255,21 +279,16 @@ input[type="range"] {
   .expect,
   .columns {
     grid-template-columns: 1fr;
-    gap: 34px;
-  }
-  .status {
-    border-left: 0;
-    border-top: 1px solid var(--line);
-    padding: 24px 0 0;
+    gap: 28px;
   }
   .control {
-    grid-template-columns: 1fr 64px;
+    grid-template-columns: 1fr 62px;
     gap: 10px;
   }
   .control input { grid-column: 1 / -1; }
   .scenario-result {
     align-items: flex-start;
-    gap: 20px;
+    gap: 18px;
     flex-direction: column;
   }
 }
@@ -298,17 +317,17 @@ input[type="range"] {
   <div class="metric">
     <div class="metric-label">Evidence</div>
     <div class="metric-value">__EVIDENCE_STATE__</div>
-    <div class="metric-sub">As of __EVIDENCE_AS_OF__</div>
+    <div class="metric-sub">Cutoff · __EVIDENCE_AS_OF__</div>
   </div>
   <div class="metric">
-    <div class="metric-label">Market cap</div>
+    <div class="metric-label">Equity value</div>
     <div class="metric-value">__MARKET_CAP__</div>
-    <div class="metric-sub">Snapshot source · __SOURCE__</div>
+    <div class="metric-sub">__MARKET_CAP_SOURCE__</div>
   </div>
   <div class="metric">
     <div class="metric-label">10Y FCF hurdle</div>
     <div class="metric-value" id="top-hurdle">__HURDLE__</div>
-    <div class="metric-sub">__DR_PCT__ discount · __TG_PCT__ terminal growth</div>
+    <div class="metric-sub">Start __STARTING_FCF__ · __DR_PCT__ discount · __TG_PCT__ terminal</div>
   </div>
 </section>
 
@@ -318,8 +337,8 @@ input[type="range"] {
     <div>
       <div class="hurdle" id="hero-hurdle">__HURDLE__</div>
       <div class="hurdle-caption">
-        Constant annual FCF growth implied by the observed equity value over __YEARS__ years under
-        the current scenario. It is a hurdle, not a forecast or target price.
+        Constant annual FCF growth implied by the observed equity value over __YEARS__ years.
+        This is a hurdle, not a forecast or target price.
       </div>
       <div class="actions">
         <button id="scenario-toggle"__SCENARIO_DISABLED__>Scenario</button>
@@ -341,11 +360,20 @@ input[type="range"] {
         </div>
       </div>
     </div>
-    <div class="status">
-      <div class="section-title">State</div>
-      <strong>__STATUS__</strong>
-      <p>__STATUS_DETAIL__</p>
-    </div>
+
+    <aside class="gap-card">
+      <div class="gap-kicker">Expectations gap</div>
+      <div class="gap-value" id="gap-value">__EXPECTATIONS_GAP__</div>
+      <div class="gap-state" id="gap-state">__GAP_STATE__</div>
+      <div class="gap-detail">
+        Recent H1 FCF proxy growth <strong>__OBSERVED_FCF_GROWTH__</strong> versus a market hurdle
+        of <strong id="gap-hurdle">__HURDLE__</strong>. Recent growth is an observation, not a forecast.
+      </div>
+      <div class="state-line">
+        <strong>__STATUS__</strong>
+        <p>__STATUS_DETAIL__</p>
+      </div>
+    </aside>
   </div>
 </section>
 
@@ -378,8 +406,9 @@ input[type="range"] {
 <footer class="foot">
   Price observation: <span>__OBSERVED__</span> · retrieved <span>__RETRIEVED__</span> · source
   <span>__SOURCE__</span>.<br>
-  Qhapaq One separates live market observations from frozen primary-source research. Missing
-  evidence remains missing; this page is research software, not investment advice.
+  Qhapaq One separates live market observations from checksum-gated local research evidence and
+  explicit primary-source provenance. Derived evidence capsules are not byte-for-byte source mirrors.
+  This page is research software, not investment advice.
 </footer>
 </main>
 <script>
@@ -424,10 +453,17 @@ function update() {
   document.getElementById('discount-out').textContent = discount.value + '%';
   document.getElementById('terminal-out').textContent = terminal.value + '%';
   const growth = solve(r, tg);
-  const label = growth === null ? '—' : (growth * 100).toFixed(1) + '%';
-  document.getElementById('scenario-hurdle').textContent = label;
-  document.getElementById('hero-hurdle').textContent = label;
-  document.getElementById('top-hurdle').textContent = label;
+  const hurdleLabel = growth === null ? '—' : (growth * 100).toFixed(1) + '%';
+  document.getElementById('scenario-hurdle').textContent = hurdleLabel;
+  document.getElementById('hero-hurdle').textContent = hurdleLabel;
+  document.getElementById('top-hurdle').textContent = hurdleLabel;
+  document.getElementById('gap-hurdle').textContent = hurdleLabel;
+  if (growth !== null && scenario.observedGrowth !== null) {
+    const gap = scenario.observedGrowth - growth;
+    const gapLabel = (gap >= 0 ? '+' : '') + (gap * 100).toFixed(1) + ' pp';
+    document.getElementById('gap-value').textContent = gapLabel;
+    document.getElementById('gap-state').textContent = gap >= 0 ? 'CLEARING HURDLE' : 'BELOW HURDLE';
+  }
 }
 for (const id of ['discount', 'terminal']) {
   const element = document.getElementById(id);
