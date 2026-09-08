@@ -90,6 +90,36 @@ def _positive_number(value: Any, field: str) -> float:
     return numeric
 
 
+def _metadata_get(metadata: Any, key: str) -> Any:
+    try:
+        return metadata.get(key)
+    except (AttributeError, KeyError, TypeError):
+        return None
+
+
+def _market_cap_from_provider_metadata(
+    *, price: float, fast_info: Any = None, info: Any = None
+) -> float | None:
+    """Resolve equity value from provider metadata without making it research evidence."""
+    for metadata, key in ((fast_info, "market_cap"), (info, "marketCap")):
+        raw = _metadata_get(metadata, key)
+        if raw is None:
+            continue
+        try:
+            return _positive_number(raw, "market_cap")
+        except MarketDataError:
+            continue
+
+    raw_shares = _metadata_get(info, "sharesOutstanding")
+    if raw_shares is None:
+        return None
+    try:
+        shares = _positive_number(raw_shares, "shares_outstanding")
+        return shares * _positive_number(price, "price")
+    except MarketDataError:
+        return None
+
+
 def _validate_snapshot(snapshot: MarketSnapshot) -> MarketSnapshot:
     _ticker(snapshot.ticker)
     _positive_number(snapshot.price, "price")
@@ -169,23 +199,42 @@ def fetch_yfinance_snapshot(ticker: str, *, now: datetime | None = None) -> Mark
     observed_raw = closes.index[-1].to_pydatetime()
     if observed_raw.tzinfo is None or observed_raw.utcoffset() is None:
         raise RuntimeError("market provider returned a timezone-naive observation")
+    price = _positive_number(closes.iloc[-1], "price")
 
     currency = "UNKNOWN"
     previous_close: float | None = None
     market_cap: float | None = None
+    fast_info: Any = None
     try:
         fast_info = instrument.fast_info
-        raw_currency = fast_info.get("currency")
+        raw_currency = _metadata_get(fast_info, "currency")
         if isinstance(raw_currency, str) and raw_currency.strip():
             currency = raw_currency.strip().upper()
-        raw_previous = fast_info.get("previous_close")
+        raw_previous = _metadata_get(fast_info, "previous_close")
         if raw_previous is not None:
             previous_close = _positive_number(raw_previous, "previous_close")
-        raw_market_cap = fast_info.get("market_cap")
-        if raw_market_cap is not None:
-            market_cap = _positive_number(raw_market_cap, "market_cap")
+        market_cap = _market_cap_from_provider_metadata(price=price, fast_info=fast_info)
     except Exception:  # pragma: no cover - optional provider metadata
         pass
+
+    if market_cap is None:
+        try:
+            info = instrument.info
+            market_cap = _market_cap_from_provider_metadata(
+                price=price,
+                fast_info=fast_info,
+                info=info,
+            )
+            if currency == "UNKNOWN":
+                raw_currency = _metadata_get(info, "currency")
+                if isinstance(raw_currency, str) and raw_currency.strip():
+                    currency = raw_currency.strip().upper()
+            if previous_close is None:
+                raw_previous = _metadata_get(info, "previousClose")
+                if raw_previous is not None:
+                    previous_close = _positive_number(raw_previous, "previous_close")
+        except Exception:  # pragma: no cover - optional provider metadata
+            pass
 
     state = MarketState.UNKNOWN
     try:
@@ -196,7 +245,7 @@ def fetch_yfinance_snapshot(ticker: str, *, now: datetime | None = None) -> Mark
 
     snapshot = MarketSnapshot(
         ticker=symbol,
-        price=_positive_number(closes.iloc[-1], "price"),
+        price=price,
         currency=currency,
         observed_at=observed_raw,
         retrieved_at=retrieved_at,
