@@ -23,7 +23,12 @@ class OneModel:
     evidence_as_of: date | None
     research_ready: bool
     starting_fcf: float | None
+    effective_market_cap: float | None
+    market_cap_provenance: str
     implied_fcf_growth: float | None
+    observed_fcf_growth: float | None
+    expectations_gap: float | None
+    gap_state: str
     discount_rate: float
     terminal_growth: float
     years: int
@@ -65,7 +70,37 @@ def _load_research(root: Path, ticker: str) -> ResearchRecord | None:
     )
 
 
+def _metric_value(record: ResearchRecord, metric_id: str | None) -> float | None:
+    if not metric_id:
+        return None
+    for metric in record.metrics:
+        if metric.id == metric_id:
+            return metric.value
+    return None
+
+
+def _fact_value(record: ResearchRecord, fact_id: str | None) -> float | None:
+    if not fact_id:
+        return None
+    for fact in record.facts:
+        if fact.id == fact_id:
+            return fact.value
+    return None
+
+
 def _starting_fcf(record: ResearchRecord) -> float | None:
+    configured_metric = record.valuation.get("starting_fcf_metric_id")
+    if configured_metric:
+        value = _metric_value(record, configured_metric)
+        if value is None:
+            return None
+        try:
+            factor = float(record.valuation.get("starting_fcf_annualization_factor", "1.0"))
+        except ValueError:
+            return None
+        annualized = value * factor * 1_000_000.0
+        return annualized if annualized > 0 else None
+
     candidates = [
         metric
         for metric in record.metrics
@@ -75,6 +110,27 @@ def _starting_fcf(record: ResearchRecord) -> float | None:
         return None
     value = candidates[-1].value * 1_000_000.0
     return value if value > 0 else None
+
+
+def _observed_fcf_growth(record: ResearchRecord) -> float | None:
+    current = _metric_value(record, record.valuation.get("observed_fcf_current_metric_id"))
+    prior = _metric_value(record, record.valuation.get("observed_fcf_prior_metric_id"))
+    if current is None or prior is None or current <= 0 or prior <= 0:
+        return None
+    return current / prior - 1.0
+
+
+def _effective_market_cap(
+    snapshot: MarketSnapshot, record: ResearchRecord | None
+) -> tuple[float | None, str]:
+    if snapshot.market_cap is not None:
+        return snapshot.market_cap, f"provider market cap · {snapshot.source}"
+    if record is None:
+        return None, "unavailable"
+    shares = _fact_value(record, record.valuation.get("shares_outstanding_fact_id"))
+    if shares is None or shares <= 0:
+        return None, "unavailable"
+    return snapshot.price * shares, "derived · observed price × filing shares"
 
 
 def _interpretation(record: ResearchRecord, kind: str) -> str | None:
@@ -107,13 +163,15 @@ def build_one_model(
     record = _load_research(root, snapshot.ticker)
     company_name = record.issuer.get("name", snapshot.ticker) if record else snapshot.ticker
     starting_fcf = _starting_fcf(record) if record else None
+    observed_growth = _observed_fcf_growth(record) if record else None
+    effective_market_cap, market_cap_provenance = _effective_market_cap(snapshot, record)
     implied_growth: float | None = None
 
-    if record and starting_fcf is not None and snapshot.market_cap is not None:
+    if record and starting_fcf is not None and effective_market_cap is not None:
         try:
             implied_growth = solve_implied_fcf_growth(
                 ReverseDcfInputs(
-                    equity_value=snapshot.market_cap,
+                    equity_value=effective_market_cap,
                     starting_fcf=starting_fcf,
                     discount_rate=discount_rate,
                     terminal_growth=terminal_growth,
@@ -123,29 +181,43 @@ def build_one_model(
         except ExpectationsError:
             implied_growth = None
 
+    expectations_gap = (
+        observed_growth - implied_growth
+        if observed_growth is not None and implied_growth is not None
+        else None
+    )
+    if expectations_gap is None:
+        gap_state = "NOT COMPARABLE"
+    elif expectations_gap >= 0:
+        gap_state = "CLEARING HURDLE"
+    else:
+        gap_state = "BELOW HURDLE"
+
     if record is None:
         status = "INSUFFICIENT DATA"
-        status_detail = (
-            "Market state is available, but no validated primary-evidence research pack exists."
-        )
+        status_detail = "Market state is available, but no validated research evidence pack exists."
     elif starting_fcf is None:
         status = "INSUFFICIENT DATA"
         status_detail = "Research is validated, but no compatible equity-FCF proxy is available."
-    elif snapshot.market_cap is None:
+    elif effective_market_cap is None:
         status = "INSUFFICIENT DATA"
-        status_detail = (
-            "Research is validated, but the market snapshot has no usable market capitalization."
-        )
+        status_detail = "Research is validated, but no usable equity-value input is available."
     elif implied_growth is None:
         status = "INSUFFICIENT DATA"
         status_detail = (
             "Inputs exist, but the reverse-DCF hurdle could not be solved under this scenario."
         )
-    else:
+    elif expectations_gap is None:
         status = "UNDERWRITING"
         status_detail = (
-            "The market's FCF growth hurdle is explicit. "
-            "Qhapaq does not convert it into a buy/sell call."
+            "The market's FCF growth hurdle is explicit, but recent FCF growth is not comparable."
+        )
+    else:
+        status = "UNDERWRITING"
+        direction = "above" if expectations_gap >= 0 else "below"
+        status_detail = (
+            f"Recent FCF-proxy growth is {abs(expectations_gap) * 100:.1f} pp {direction} "
+            "the market-implied hurdle. The key question is duration, not the latest quarter."
         )
 
     thesis = _interpretation(record, "thesis") if record else None
@@ -161,7 +233,12 @@ def build_one_model(
         evidence_as_of=record.as_of if record else None,
         research_ready=record is not None,
         starting_fcf=starting_fcf,
+        effective_market_cap=effective_market_cap,
+        market_cap_provenance=market_cap_provenance,
         implied_fcf_growth=implied_growth,
+        observed_fcf_growth=observed_growth,
+        expectations_gap=expectations_gap,
+        gap_state=gap_state,
         discount_rate=discount_rate,
         terminal_growth=terminal_growth,
         years=years,
@@ -191,6 +268,12 @@ def _percent(value: float | None, digits: int = 1) -> str:
     return "—" if value is None else f"{value * 100:.{digits}f}%"
 
 
+def _percentage_points(value: float | None) -> str:
+    if value is None:
+        return "—"
+    return f"{value * 100:+.1f} pp"
+
+
 def _safe(value: str | None) -> str:
     return html.escape(value or "—")
 
@@ -216,19 +299,18 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
     if not matters:
         matters = "<li>No validated research risks available.</li>"
     if not invalidation:
-        invalidation = (
-            "<li>Build and validate a primary-evidence research pack before underwriting.</li>"
-        )
+        invalidation = "<li>Build and validate a research evidence pack before underwriting.</li>"
 
     scenario = {
-        "marketCap": snapshot.market_cap,
+        "marketCap": model.effective_market_cap,
         "startingFcf": model.starting_fcf,
+        "observedGrowth": model.observed_fcf_growth,
         "discountRate": model.discount_rate,
         "terminalGrowth": model.terminal_growth,
         "years": model.years,
     }
     scenario_json = json.dumps(scenario, sort_keys=True, separators=(",", ":"))
-    scenario_enabled = model.starting_fcf is not None and snapshot.market_cap is not None
+    scenario_enabled = model.starting_fcf is not None and model.effective_market_cap is not None
     scenario_disabled = "" if scenario_enabled else " disabled"
     currency = "$" if snapshot.currency.upper() == "USD" else html.escape(snapshot.currency) + " "
 
@@ -243,12 +325,17 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
         "__OBSERVED_SHORT__": html.escape(snapshot.observed_at.strftime("%Y-%m-%d %H:%M %Z")),
         "__EVIDENCE_STATE__": "VERIFIED" if model.research_ready else "MISSING",
         "__EVIDENCE_AS_OF__": evidence,
-        "__MARKET_CAP__": _money(snapshot.market_cap, snapshot.currency),
+        "__MARKET_CAP__": _money(model.effective_market_cap, snapshot.currency),
+        "__MARKET_CAP_SOURCE__": html.escape(model.market_cap_provenance),
         "__SOURCE__": source,
         "__HURDLE__": hurdle,
+        "__OBSERVED_FCF_GROWTH__": _percent(model.observed_fcf_growth),
+        "__EXPECTATIONS_GAP__": _percentage_points(model.expectations_gap),
+        "__GAP_STATE__": html.escape(model.gap_state),
         "__DR_PCT__": _percent(model.discount_rate),
         "__TG_PCT__": _percent(model.terminal_growth),
         "__YEARS__": str(model.years),
+        "__STARTING_FCF__": _money(model.starting_fcf, snapshot.currency),
         "__SCENARIO_DISABLED__": scenario_disabled,
         "__DR_VALUE__": f"{model.discount_rate * 100:.1f}",
         "__TG_VALUE__": f"{model.terminal_growth * 100:.1f}",

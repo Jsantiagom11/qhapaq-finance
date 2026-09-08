@@ -1,0 +1,29 @@
+QHAPAQ EVIDENCE CAPSULE
+source_mode=derived_evidence_capsule
+primary_source=NVIDIA Corporation Form 10-Q for quarter ended 2026-07-26
+canonical_url=https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm
+filing_date=2026-08-26
+accession=0001045810-26-000075
+retrieved_for_qhapaq=2026-09-08T04:10:00Z
+
+This capsule is a concise Qhapaq-authored factual extraction from the official SEC filing.
+It is not represented as a byte-for-byte mirror of the original filing.
+
+FACT INDEX
+- Q2 FY2027 revenue: USD 96,221 million. Filing page 3 / statement of income.
+- Q2 FY2026 revenue: USD 46,743 million. Filing page 3 / comparative statement of income.
+- Q2 FY2027 operating income: USD 63,734 million. Filing page 3.
+- Q2 FY2026 operating income: USD 28,440 million. Filing page 3.
+- H1 FY2027 operating cash flow: USD 74,421 million. Filing page 8 / cash flows.
+- H1 FY2026 operating cash flow: USD 42,779 million. Filing page 8 / comparative cash flows.
+- H1 FY2027 purchases related to property, equipment and intangibles: USD 4,434 million. Filing page 8.
+- H1 FY2026 purchases related to property, equipment and intangibles: USD 3,122 million. Filing page 8.
+- Q2 FY2027 Data Center revenue: USD 89,023 million. Filing page 27 / revenue by market platform.
+- Common shares outstanding as of 2026-08-21: approximately 24.1 billion. Filing cover page.
+- Accounts receivable as of 2026-07-26: USD 63,059 million; as of 2026-01-25: USD 38,466 million. Filing page 5.
+- Inventory as of 2026-07-26: USD 31,575 million; as of 2026-01-25: USD 21,403 million. Filing page 5.
+- Five direct customers represented 22%, 14%, 13%, 11%, and 10% of accounts receivable as of 2026-07-26. Note disclosure around filing page 13.
+- Certain investment-grade customer payment terms can range from 90 days up to one year for large data-center builds. Note disclosure around filing page 13.
+- Supply and capacity commitments totaled USD 279 billion as of 2026-07-26, up from USD 119 billion in the prior quarter. Note 10 / commitments.
+- NVIDIA stated it was effectively foreclosed from competing in China's data-center compute market at quarter end under the prevailing regulatory landscape. Risk factors.
+- H200 shipments under the licensing program represented less than 1% of Data Center revenue in the most recent quarter. Risk factors / MD&A.
