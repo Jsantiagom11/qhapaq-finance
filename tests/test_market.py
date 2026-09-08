@@ -51,9 +51,10 @@ def test_freshness_uses_market_observation_not_retrieval_time() -> None:
         retrieved_at=now - timedelta(seconds=5),
     )
 
-    assert classify_freshness(
-        snapshot, policy=FreshnessPolicy(max_age=timedelta(hours=36)), now=now
-    ) is Freshness.STALE
+    assert (
+        classify_freshness(snapshot, policy=FreshnessPolicy(max_age=timedelta(hours=36)), now=now)
+        is Freshness.STALE
+    )
     assert snapshot_age(snapshot, now=now) == timedelta(hours=73)
 
 
@@ -64,12 +65,14 @@ def test_freshness_policy_is_use_case_specific() -> None:
         retrieved_at=now - timedelta(minutes=1),
     )
 
-    assert classify_freshness(
-        snapshot, policy=FreshnessPolicy(max_age=timedelta(minutes=5)), now=now
-    ) is Freshness.STALE
-    assert classify_freshness(
-        snapshot, policy=FreshnessPolicy(max_age=timedelta(hours=1)), now=now
-    ) is Freshness.FRESH
+    assert (
+        classify_freshness(snapshot, policy=FreshnessPolicy(max_age=timedelta(minutes=5)), now=now)
+        is Freshness.STALE
+    )
+    assert (
+        classify_freshness(snapshot, policy=FreshnessPolicy(max_age=timedelta(hours=1)), now=now)
+        is Freshness.FRESH
+    )
 
 
 def test_future_observation_is_explicit() -> None:
@@ -78,9 +81,10 @@ def test_future_observation_is_explicit() -> None:
         observed_at=now + timedelta(minutes=10),
         retrieved_at=now,
     )
-    assert classify_freshness(
-        snapshot, policy=FreshnessPolicy(max_age=timedelta(hours=1)), now=now
-    ) is Freshness.FUTURE
+    assert (
+        classify_freshness(snapshot, policy=FreshnessPolicy(max_age=timedelta(hours=1)), now=now)
+        is Freshness.FUTURE
+    )
 
 
 def test_naive_timestamp_fails() -> None:
