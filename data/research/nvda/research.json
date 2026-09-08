@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "issuer": {
+    "name": "NVIDIA Corporation",
+    "ticker": "NVDA",
+    "cik": "0001045810",
+    "exchange": "Nasdaq"
+  },
+  "universe_path": "data/research/nvda/universe.json",
+  "as_of": "2026-08-26",
+  "status": "research-only",
+  "summary": "NVIDIA is delivering exceptional AI-infrastructure growth and margins, but the valuation question is duration: whether current cash generation, customer funding, supply commitments and competitive advantages can remain strong enough to clear the growth hurdle embedded in the market price.",
+  "business": [
+    "NVIDIA is a data-center-scale accelerated-computing company. Its economics are currently dominated by AI infrastructure demand, with Data Center representing the large majority of quarterly revenue.",
+    "The business combines GPUs and systems with networking, software and platform integration. Its current strength is unusually high revenue growth and operating profitability; its risk is that customers, financing conditions, supply commitments or regulation shorten the duration of those economics.",
+    "Qhapaq treats current market price as a fast observation and filings as slower evidence. The decision question is whether observed business performance can plausibly clear the market's implied long-duration FCF hurdle."
+  ],
+  "facts": [
+    {"id":"f-revenue-q2-2027","label":"Revenue Q2 FY2027","value":96221,"unit":"USD million","period":"Three months ended 2026-07-26","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 3, Condensed Consolidated Statements of Income"},
+    {"id":"f-revenue-q2-2026","label":"Revenue Q2 FY2026","value":46743,"unit":"USD million","period":"Three months ended 2025-07-27","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 3, comparative column"},
+    {"id":"f-opinc-q2-2027","label":"Operating income Q2 FY2027","value":63734,"unit":"USD million","period":"Three months ended 2026-07-26","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 3, Condensed Consolidated Statements of Income"},
+    {"id":"f-opinc-q2-2026","label":"Operating income Q2 FY2026","value":28440,"unit":"USD million","period":"Three months ended 2025-07-27","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 3, comparative column"},
+    {"id":"f-ocf-h1-2027","label":"Operating cash flow H1 FY2027","value":74421,"unit":"USD million","period":"Six months ended 2026-07-26","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 8, Condensed Consolidated Statements of Cash Flows"},
+    {"id":"f-capex-h1-2027","label":"Purchases related to property, equipment and intangibles H1 FY2027","value":4434,"unit":"USD million","period":"Six months ended 2026-07-26","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 8, investing cash flows; absolute cash outflow"},
+    {"id":"f-ocf-h1-2026","label":"Operating cash flow H1 FY2026","value":42779,"unit":"USD million","period":"Six months ended 2025-07-27","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 8, comparative cash flows"},
+    {"id":"f-capex-h1-2026","label":"Purchases related to property, equipment and intangibles H1 FY2026","value":3122,"unit":"USD million","period":"Six months ended 2025-07-27","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 8, comparative investing cash flows; absolute cash outflow"},
+    {"id":"f-data-center-q2-2027","label":"Data Center revenue Q2 FY2027","value":89023,"unit":"USD million","period":"Three months ended 2026-07-26","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 27, revenue by market platform"},
+    {"id":"f-shares-outstanding-2026-08-21","label":"Common shares outstanding","value":24100000000,"unit":"count","period":"As of 2026-08-21","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q cover page"},
+    {"id":"f-ar-2026-07-26","label":"Accounts receivable","value":63059,"unit":"USD million","period":"As of 2026-07-26","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 5, balance sheet"},
+    {"id":"f-ar-2026-01-25","label":"Accounts receivable","value":38466,"unit":"USD million","period":"As of 2026-01-25","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 5, comparative balance sheet"},
+    {"id":"f-inventory-2026-07-26","label":"Inventory","value":31575,"unit":"USD million","period":"As of 2026-07-26","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 5, balance sheet"},
+    {"id":"f-inventory-2026-01-25","label":"Inventory","value":21403,"unit":"USD million","period":"As of 2026-01-25","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q page 5, comparative balance sheet"},
+    {"id":"f-supply-commitments","label":"Supply and capacity commitments","value":279000,"unit":"USD million","period":"As of 2026-07-26","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q Note 10, commitments"},
+    {"id":"f-customer-concentration","label":"Direct-customer receivables concentration","value":null,"text":"Five direct customers represented 22%, 14%, 13%, 11% and 10% of accounts receivable as of July 26, 2026; some large investment-grade customer terms can extend from 90 days up to one year.","unit":null,"period":"As of 2026-07-26","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q note disclosure around customer concentration and payment terms"},
+    {"id":"f-china-foreclosure","label":"China data-center compute access risk","value":null,"text":"NVIDIA disclosed that it was effectively foreclosed from competing in China's data-center compute market at quarter end under the prevailing export-control and regulatory landscape.","unit":null,"period":"Q2 FY2027 filing","source_id":"nvda-2026-q2-10q-capsule","locator":"Form 10-Q Part II Item 1A, export controls and China risk"},
+    {"id":"f-q3-guidance","label":"Q3 FY2027 revenue outlook","value":108000,"unit":"USD million","period":"Q3 FY2027 outlook","source_id":"nvda-2026-q2-ir-capsule","locator":"NVIDIA Q2 FY2027 results, Outlook"},
+    {"id":"f-q3-guidance-gm","label":"Q3 FY2027 GAAP gross-margin outlook","value":74.0,"unit":"percent","period":"Q3 FY2027 outlook","source_id":"nvda-2026-q2-ir-capsule","locator":"NVIDIA Q2 FY2027 results, Outlook"}
+  ],
+  "metrics": [
+    {"id":"m-revenue-growth-q2","label":"Revenue growth Q2 FY2027","formula":"(f-revenue-q2-2027 / f-revenue-q2-2026) - 1","inputs":["f-revenue-q2-2027","f-revenue-q2-2026"],"unit":"percent"},
+    {"id":"m-op-margin-q2","label":"GAAP operating margin Q2 FY2027","formula":"f-opinc-q2-2027 / f-revenue-q2-2027","inputs":["f-opinc-q2-2027","f-revenue-q2-2027"],"unit":"percent"},
+    {"id":"m-fcf-h1-2027","label":"Analytical FCF proxy H1 FY2027","formula":"f-ocf-h1-2027 - f-capex-h1-2027","inputs":["f-ocf-h1-2027","f-capex-h1-2027"],"unit":"USD million"},
+    {"id":"m-fcf-h1-2026","label":"Analytical FCF proxy H1 FY2026","formula":"f-ocf-h1-2026 - f-capex-h1-2026","inputs":["f-ocf-h1-2026","f-capex-h1-2026"],"unit":"USD million"},
+    {"id":"m-data-center-share-q2","label":"Data Center share of Q2 FY2027 revenue","formula":"f-data-center-q2-2027 / f-revenue-q2-2027","inputs":["f-data-center-q2-2027","f-revenue-q2-2027"],"unit":"percent"},
+    {"id":"m-ar-growth-h1","label":"Accounts receivable growth since FY2026 year-end","formula":"(f-ar-2026-07-26 / f-ar-2026-01-25) - 1","inputs":["f-ar-2026-07-26","f-ar-2026-01-25"],"unit":"percent"},
+    {"id":"m-inventory-growth-h1","label":"Inventory growth since FY2026 year-end","formula":"(f-inventory-2026-07-26 / f-inventory-2026-01-25) - 1","inputs":["f-inventory-2026-07-26","f-inventory-2026-01-25"],"unit":"percent"}
+  ],
+  "assumptions": [
+    {"id":"a-fcf-run-rate","text":"For Qhapaq One's reverse-DCF diagnostic, H1 analytical FCF proxy is mechanically annualized by 2.0. This is a run-rate diagnostic, not normalized FCFF and not a forecast."},
+    {"id":"a-market-cap-fallback","text":"If the live provider omits market capitalization, Qhapaq One may derive an effective equity value from observed price multiplied by the filing's disclosed shares outstanding; the provenance is displayed."}
+  ],
+  "interpretations": [
+    {"id":"i-thesis","kind":"thesis","text":"NVIDIA's current economics are strong enough to clear a demanding market hurdle today: Q2 revenue more than doubled year over year, operating margin exceeded 60%, Data Center represented over 90% of revenue, and H1 analytical FCF expanded sharply.","supports":["f-revenue-q2-2027","f-revenue-q2-2026","f-opinc-q2-2027","f-data-center-q2-2027","f-ocf-h1-2027","f-capex-h1-2027"],"contradicts":["f-customer-concentration","f-supply-commitments"]},
+    {"id":"i-counter","kind":"counterthesis","text":"The valuation depends on duration, not just current growth. Receivables and inventory rose materially, customer financing terms can extend substantially, supply commitments reached $279 billion, and China data-center access remains constrained.","supports":["f-ar-2026-07-26","f-ar-2026-01-25","f-inventory-2026-07-26","f-inventory-2026-01-25","f-customer-concentration","f-supply-commitments","f-china-foreclosure"],"contradicts":["f-revenue-q2-2027","f-opinc-q2-2027"]}
+  ],
+  "risks": [
+    {"title":"Cash conversion & customer concentration","mechanism":"Receivables grew rapidly and five direct customers represent large portions of receivables; extended payment terms on large data-center builds can shift cash conversion even when reported revenue remains strong.","evidence":["f-ar-2026-07-26","f-ar-2026-01-25","f-customer-concentration"],"review":"Track receivables growth, operating cash flow and any further extension of customer payment terms against revenue growth."},
+    {"title":"Demand duration vs supply commitments","mechanism":"NVIDIA has committed very large amounts of supply and capacity to future data-center demand. If customer deployments or financing slow, those commitments can amplify inventory, provision and cash-flow risk.","evidence":["f-supply-commitments","f-inventory-2026-07-26","f-inventory-2026-01-25"],"review":"Compare supply commitments, inventory growth, provisions and customer deployment commentary each quarter."},
+    {"title":"China & competitive ecosystem","mechanism":"Current export-control and regulatory conditions effectively limit NVIDIA's participation in China's data-center compute market and can strengthen competitor ecosystems outside NVIDIA's reach.","evidence":["f-china-foreclosure"],"review":"Track export-control changes, China shipment disclosures and evidence of durable competitive substitution."}
+  ],
+  "invalidation": [
+    "Reconsider the positive underwriting case if recent FCF-proxy growth falls below the market-implied hurdle while operating margins also compress structurally.",
+    "Reconsider if receivables and financing support continue to expand faster than revenue and operating cash flow for multiple reporting periods.",
+    "Reconsider if supply commitments, inventory or provisions rise while end-demand growth slows enough to challenge the expected duration of current AI-infrastructure economics."
+  ],
+  "valuation": {
+    "status": "analytical",
+    "starting_fcf_metric_id": "m-fcf-h1-2027",
+    "starting_fcf_annualization_factor": "2.0",
+    "observed_fcf_current_metric_id": "m-fcf-h1-2027",
+    "observed_fcf_prior_metric_id": "m-fcf-h1-2026",
+    "shares_outstanding_fact_id": "f-shares-outstanding-2026-08-21",
+    "note": "Reverse DCF uses an annualized H1 equity-FCF proxy only as an expectations diagnostic. It is not a fair-value target."
+  }
+}
