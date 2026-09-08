@@ -230,9 +230,7 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
     scenario_json = json.dumps(scenario, sort_keys=True, separators=(",", ":"))
     scenario_enabled = model.starting_fcf is not None and snapshot.market_cap is not None
     scenario_disabled = "" if scenario_enabled else " disabled"
-    currency = (
-        "$" if snapshot.currency.upper() == "USD" else html.escape(snapshot.currency) + " "
-    )
+    currency = "$" if snapshot.currency.upper() == "USD" else html.escape(snapshot.currency) + " "
 
     replacements = {
         "__TICKER__": html.escape(model.ticker),
