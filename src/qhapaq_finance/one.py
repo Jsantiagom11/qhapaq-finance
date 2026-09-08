@@ -124,21 +124,25 @@ def build_one_model(
 
     if record is None:
         status = "INSUFFICIENT DATA"
-        status_detail = "Market state is available, but no validated primary-evidence research pack exists."
+        status_detail = (
+            "Market state is available, but no validated primary-evidence research pack exists."
+        )
     elif starting_fcf is None:
         status = "INSUFFICIENT DATA"
         status_detail = "Research is validated, but no compatible equity-FCF proxy is available."
     elif snapshot.market_cap is None:
         status = "INSUFFICIENT DATA"
-        status_detail = "Research is validated, but the market snapshot has no usable market capitalization."
+        status_detail = (
+            "Research is validated, but the market snapshot has no usable market capitalization."
+        )
     elif implied_growth is None:
         status = "INSUFFICIENT DATA"
-        status_detail = "Inputs exist, but the reverse-DCF hurdle could not be solved under this scenario."
+        status_detail = (
+            "Inputs exist, but the reverse-DCF hurdle could not be solved under this scenario."
+        )
     else:
         status = "UNDERWRITING"
-        status_detail = (
-            "The market's FCF growth hurdle is explicit. Qhapaq does not convert it into a buy/sell call."
-        )
+        status_detail = "The market's FCF growth hurdle is explicit. Qhapaq does not convert it into a buy/sell call."
 
     thesis = _interpretation(record, "thesis") if record else None
     counterthesis = _interpretation(record, "counterthesis") if record else None
@@ -204,7 +208,9 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
     if not matters:
         matters = "<li>No validated research risks available.</li>"
     if not invalidation:
-        invalidation = "<li>Build and validate a primary-evidence research pack before underwriting.</li>"
+        invalidation = (
+            "<li>Build and validate a primary-evidence research pack before underwriting.</li>"
+        )
 
     scenario = {
         "marketCap": snapshot.market_cap,
@@ -264,7 +270,9 @@ for(const id of ['discount','terminal']){const el=document.getElementById(id);if
         "__COMPANY__": html.escape(model.company_name),
         "__FRESHNESS__": model.freshness.value.upper(),
         "__MARKET_STATE__": snapshot.market_state.value.upper(),
-        "__CURRENCY__": "$" if snapshot.currency.upper() == "USD" else html.escape(snapshot.currency) + " ",
+        "__CURRENCY__": "$"
+        if snapshot.currency.upper() == "USD"
+        else html.escape(snapshot.currency) + " ",
         "__PRICE__": price,
         "__CHANGE__": change_label,
         "__OBSERVED_SHORT__": html.escape(snapshot.observed_at.strftime("%Y-%m-%d %H:%M %Z")),
