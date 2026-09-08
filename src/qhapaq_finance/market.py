@@ -71,7 +71,11 @@ def _aware(value: datetime, field: str) -> datetime:
 
 def _ticker(value: str) -> str:
     normalized = value.strip().upper()
-    if not normalized or len(normalized) > 32 or any(character.isspace() for character in normalized):
+    if (
+        not normalized
+        or len(normalized) > 32
+        or any(character.isspace() for character in normalized)
+    ):
         raise MarketDataError("ticker must be a non-empty symbol without whitespace")
     return normalized
 
