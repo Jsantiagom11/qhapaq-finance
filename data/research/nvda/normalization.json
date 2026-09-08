@@ -1,5 +1,6 @@
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
+  "basis_kind": "run_rate",
   "ticker": "NVDA",
   "as_of": "2026-08-26",
   "period": "Six months ended 2026-07-26",
@@ -48,8 +49,8 @@
   "timing_adjustments": [],
   "shares_outstanding": {"id": "shares_outstanding", "label": "Common shares outstanding", "value": 24100000000, "unit": "count", "source_id": "nvda-2026-q2-10q-capsule", "locator": "Form 10-Q cover page, as of 2026-08-21"},
   "policy_notes": [
-    "Normalized Cash Power is an analytical run-rate diagnostic, not reported FCF, FCFF, a forecast, or fair value.",
-    "Working capital uses a comparative-delta policy: retain the prior comparable cash pattern and normalize only the incremental current-period deviation.",
+    "This is a RUN-RATE analytical cash basis. It normalizes selected timing effects but does not claim to normalize the AI or semiconductor cycle.",
+    "Working capital uses a comparative-delta policy: retain the prior comparable cash pattern and adjust only the incremental current-period deviation.",
     "Stock-based compensation is deducted as an economic cost in this model; no equivalent dilution charge may be applied again.",
     "Annualization is mechanical and does not assert that second-half cash generation will equal first-half cash generation."
   ]
