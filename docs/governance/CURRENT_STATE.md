@@ -1,33 +1,32 @@
 # Current state
 
-Last verified: 2026-09-07
+Last verified: 2026-09-08
 
 | Area | Status | Current fact |
 | --- | --- | --- |
 | Project identity | GO | Human name: **Qhapaq Finance**; repository/distribution: `qhapaq-finance`; Python package: `qhapaq_finance`; CLI: `qhapaq`. |
-| Main baseline | GO | `origin/main` is `d276ae4f198c7b57df6a0e6340fb3ec5fca89d10` (`d276ae4`), containing the integrated QCOM evidence-to-report workflow from PR #3. |
-| Current review branch | GO | `feat/live-market-overlay-v0.1` is published through PR #4. Candidate HEAD `d790d1fa063efa539483a2d03f291f69e925053d` (`d790d1f`) passed CI before this governance refresh. |
-| Quality | GO | CI run #30 passed on Python 3.10 and 3.12: frozen sync, lock check, Ruff format/lint, cold mypy, full pytest, deterministic offline QCOM render, and artifact upload. |
+| Main baseline | GO | `origin/main` is `d9f9e95901d9a1cceb2c07611175b27bf8ddbb3a` (`d9f9e95`), containing the integrated QCOM research workflow and live-market overlay from PRs #3 and #4. |
+| Current review branch | GO | `feat/qhapaq-one-v0.1` is published through PR #5. Feature HEAD `1115260458047a412a3b4be98e906db76376796b` (`1115260`) passed CI before this governance refresh. |
+| Quality | GO | CI run #55 passed on Python 3.10 and 3.12: frozen sync, lock check, Ruff format/lint, cold mypy, full pytest, deterministic offline QCOM render, and artifact upload. |
 | Audit review | PASS | QCOM finding F1 in `_metric_value` remains resolved and regression-covered. |
-| Packaging | GO | Hatchling builds `src/qhapaq_finance`; project version remains `0.2.0`. |
-| CLI | GO (candidate) | Existing research and tearsheet paths remain; PR #4 adds `qhapaq market` for timestamped live/snapshot observations and `qhapaq reverse-dcf` for provider-independent implied-growth analysis. |
-| Dependencies | GO | `uv.lock` is committed and unchanged by PR #4. `yfinance` remains an optional data dependency and is isolated to network adapters. |
+| Packaging | GO | Hatchling builds `src/qhapaq_finance`; project version remains `0.2.0`. Qhapaq One keeps its self-contained HTML presentation as a packaged resource separate from model logic. |
+| CLI | GO (candidate) | Existing advanced paths remain available; PR #5 makes `qhapaq <TICKER>` the primary human-facing workflow, generating a timestamped market snapshot and one concise decision surface. |
+| Dependencies | GO | `uv.lock` is unchanged by Qhapaq One. `yfinance` remains an optional data dependency isolated to network adapters. No framework or server dependency was added. |
 | Frozen dataset | GO | The byte-frozen ECB daily EUR reference-rate snapshot remains checksum-validated and loadable offline for 2015-01-02 through 2026-08-31. |
-| Research reproducibility | GO | The QCOM path has frozen evidence, typed facts/calculations, relative context, deterministic offline HTML, result-manifest identity, canonical SHA-256 verification, tests, and recorded visual QA. |
-| Company research | GO (one-company path) | QCOM is the validated company case. NVDA research evidence has not yet been added; no NVDA report or recommendation is claimed. |
-| Market observations | GO (candidate) | PR #4 introduces separate `FROZEN`, `SNAPSHOT`, and `LIVE` data speeds. Market freshness is based on `observed_at`, not retrieval time, and live observations can be frozen to deterministic JSON. |
-| Expectations engine | GO (candidate) | Reverse DCF solves constant explicit-period equity-FCF growth implied by supplied equity value. It is provider-agnostic and does not produce a target price or expected return. |
+| Research reproducibility | GO | The QCOM path retains frozen evidence, typed facts/calculations, relative context, deterministic offline HTML, result-manifest identity, canonical SHA-256 verification, tests, and recorded visual QA. |
+| Company research | GO (one-company path) | QCOM is the validated company case. NVDA has no committed primary-evidence pack yet; Qhapaq One therefore reports `INSUFFICIENT DATA` rather than manufacturing a thesis or valuation state. |
+| Market observations | GO | `FROZEN`, `SNAPSHOT`, and `LIVE` data speeds are integrated on `main`. Freshness is based on `observed_at`, not retrieval time, and live observations can be frozen to deterministic JSON. |
+| Expectations engine | GO | Reverse DCF solves constant explicit-period equity-FCF growth implied by supplied equity value. It remains provider-agnostic and does not produce a target price or expected return. |
+| Qhapaq One | GO (candidate) | PR #5 composes market state, validated research, reverse DCF, thesis/counterthesis, key risks and invalidation into one responsive offline HTML view. QCOM can reach `UNDERWRITING`; missing layers remain `INSUFFICIENT DATA`. |
 
 ## Open loops
 
-- **PR #4 INTEGRATION:** Review and integrate `feat/live-market-overlay-v0.1` after the refreshed governance state passes CI.
-- **NVDA CASE:** Add a bounded NVIDIA primary-evidence record only after the market-overlay increment is integrated. Keep filing evidence separate from timestamped market observations.
+- **PR #5 INTEGRATION:** Review and integrate `feat/qhapaq-one-v0.1` after this governance refresh passes CI.
+- **NVDA EVIDENCE PACK:** Add a bounded NVIDIA primary-evidence record as the next company increment. Keep filing evidence separate from timestamped market observations and reuse Qhapaq One rather than creating another report surface.
+- **EXPECTATIONS GAP:** Only after NVDA evidence is validated, define a normalized evidence-backed business expectation to compare against the reverse-DCF hurdle. Do not introduce `FAIR`, `STRETCHED`, or `BROKEN` labels before this comparison is defensible.
 - **UNRESOLVED INVESTOR INPUTS:** Portfolio horizon, reference currency, liquidity needs, risk tolerance, constraints, comparison benchmark, cost model, and uncertainty method remain required before investor-specific portfolio outputs.
-- **DEFERRED:** Portfolio optimization, predictive models, streaming daemons, alerts, broker execution, and performance claims remain outside the current bounded acceptance scope.
+- **DEFERRED:** Portfolio optimization, predictive models, streaming daemons, alerts, broker execution, technical-indicator dashboards, arbitrary scores, target prices, and performance claims remain outside the current bounded acceptance scope.
 
 ## Strategic state
 
-Qhapaq now has a stable reproducible company-research baseline on `main`. The current candidate adds a
-multi-speed market-data layer so fast-changing observations can update independently of slow-moving,
-audit-grade evidence. The next bounded company increment is NVDA, using the same evidence contract plus
-the new market snapshot and expectations layers rather than duplicating the QCOM implementation.
+Qhapaq now separates slow audit-grade evidence from fast market observations and exposes those layers through one deliberately small decision product. The product contract is to make the market hurdle, evidence state, thesis, counterthesis, risks and invalidation understandable in roughly 30 seconds while preserving the ability to inspect deeper evidence and scenarios. The next value-producing increment is NVIDIA primary evidence, not additional interface complexity.
