@@ -54,8 +54,7 @@ def test_sensitivity_grid_exposes_cost_of_equity_and_terminal_assumptions() -> N
 
     assert len(points) == 9
     lookup = {
-        (point.discount_rate, point.terminal_growth): point.implied_fcf_growth
-        for point in points
+        (point.discount_rate, point.terminal_growth): point.implied_fcf_growth for point in points
     }
     assert lookup[(0.08, 0.03)] == pytest.approx(0.07980, abs=1e-4)
     assert lookup[(0.09, 0.03)] == pytest.approx(0.10535, abs=1e-4)
