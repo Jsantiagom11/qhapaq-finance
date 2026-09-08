@@ -178,7 +178,7 @@ def _reverse_dcf(arguments: list[str]) -> None:
 
 def _one(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(
-        description="Render Qhapaq One: normalized cash and market expectations in one view"
+        description="Render Qhapaq One: analytical run-rate cash basis and market expectations"
     )
     parser.add_argument("ticker")
     parser.add_argument("--snapshot", type=Path, help="use a previously frozen market snapshot")
@@ -227,8 +227,8 @@ def _one(arguments: list[str]) -> None:
     print(f"ticker={model.ticker}")
     print(f"status={model.status}")
     print(f"freshness={model.freshness.value}")
-    if model.normalized_cash_power is not None:
-        print(f"normalized_cash_power={model.normalized_cash_power:.12g}")
+    if model.cash_basis_value is not None:
+        print(f"cash_basis_value={model.cash_basis_value:.12g}")
     if model.implied_fcf_growth is not None:
         print(f"implied_fcf_growth_pct={model.implied_fcf_growth * 100:.4f}")
     print(f"market_snapshot={snapshot_output}")
