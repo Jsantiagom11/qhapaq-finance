@@ -1,7 +1,8 @@
-"""Evidence-backed cash normalization for Qhapaq underwriting.
+"""Evidence-backed analytical cash bases for Qhapaq underwriting.
 
-The module deliberately does not forecast. It transforms a reported-period FCF proxy
-into an analytical cash-power run rate using explicit, source-linked adjustments.
+The current implementation is deliberately limited to a *run-rate* cash basis. It
+normalizes selected timing effects in a reported period, but it does not normalize an
+industry or business cycle. The distinction is part of the product contract.
 """
 
 from __future__ import annotations
@@ -9,6 +10,7 @@ from __future__ import annotations
 import json
 import math
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -17,7 +19,17 @@ from .research import ResearchRecord
 
 
 class NormalizationError(ValueError):
-    """Raised when a normalization record is incomplete or internally inconsistent."""
+    """Raised when an analytical cash-basis record is incomplete or inconsistent."""
+
+
+class CashBasisKind(str, Enum):
+    """Supported analytical cash-basis methods.
+
+    Only RUN_RATE is implemented. A future through-cycle basis must have a distinct
+    calculation contract rather than re-labeling the current formula.
+    """
+
+    RUN_RATE = "run_rate"
 
 
 @dataclass(frozen=True)
@@ -39,10 +51,23 @@ class CashBridgeItem:
 
 
 @dataclass(frozen=True)
-class NormalizedCashResult:
+class RunRateCashComputation:
+    """Pure result of the current-period run-rate bridge, in source units."""
+
+    reported_period_fcf: float
+    working_capital_adjustment: float
+    timing_adjustment: float
+    sbc_adjustment: float
+    run_rate_period_cash: float
+    run_rate_annualized_cash: float
+
+
+@dataclass(frozen=True)
+class CashBasisResult:
     ticker: str
     as_of: str
     period: str
+    basis_kind: CashBasisKind
     reported_period_fcf: float
     annualization_factor: float
     working_capital_current: float
@@ -50,8 +75,8 @@ class NormalizedCashResult:
     working_capital_adjustment: float
     timing_adjustment: float
     sbc_adjustment: float
-    normalized_period_fcf: float
-    normalized_annualized_fcf: float
+    run_rate_period_cash: float
+    run_rate_annualized_cash: float
     shares_outstanding: float | None
     bridge: tuple[CashBridgeItem, ...]
     policy_notes: tuple[str, ...]
@@ -73,15 +98,63 @@ def _text(value: Any, field: str) -> str:
     return value.strip()
 
 
+def calculate_run_rate_cash_basis(
+    *,
+    operating_cash_flow: float,
+    capex: float,
+    working_capital_current: float,
+    working_capital_prior: float,
+    timing_adjustment: float,
+    sbc_expense: float,
+    annualization_factor: float,
+) -> RunRateCashComputation:
+    """Calculate the explicit timing-normalized run-rate cash bridge.
+
+    This function intentionally allows a negative result so historical stress tests can
+    expose cycle failure. Product loading may reject a non-positive cash base for reverse
+    DCF because the current solver requires positive starting equity cash flow.
+    """
+    ocf = _finite(operating_cash_flow, "operating_cash_flow")
+    capex_value = _finite(capex, "capex")
+    wc_current = _finite(working_capital_current, "working_capital_current")
+    wc_prior = _finite(working_capital_prior, "working_capital_prior")
+    timing = _finite(timing_adjustment, "timing_adjustment")
+    sbc = _finite(sbc_expense, "sbc_expense")
+    annualization = _finite(annualization_factor, "annualization_factor")
+    if ocf <= 0:
+        raise NormalizationError("operating_cash_flow must be positive")
+    if capex_value < 0:
+        raise NormalizationError("capex must be non-negative")
+    if sbc < 0:
+        raise NormalizationError("sbc_expense must be non-negative")
+    if annualization <= 0:
+        raise NormalizationError("annualization_factor must be positive")
+
+    reported_fcf = ocf - capex_value
+    working_capital_adjustment = wc_prior - wc_current
+    sbc_adjustment = -sbc
+    run_rate_period_cash = (
+        reported_fcf + working_capital_adjustment + timing + sbc_adjustment
+    )
+    return RunRateCashComputation(
+        reported_period_fcf=reported_fcf,
+        working_capital_adjustment=working_capital_adjustment,
+        timing_adjustment=timing,
+        sbc_adjustment=sbc_adjustment,
+        run_rate_period_cash=run_rate_period_cash,
+        run_rate_annualized_cash=run_rate_period_cash * annualization,
+    )
+
+
 def _read(path: Path) -> dict[str, Any]:
     if not path.is_file():
-        raise FileNotFoundError(f"normalization record not found: {path}")
+        raise FileNotFoundError(f"cash-basis record not found: {path}")
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
-        raise NormalizationError(f"invalid normalization record: {path}") from exc
+        raise NormalizationError(f"invalid cash-basis record: {path}") from exc
     if not isinstance(payload, dict):
-        raise NormalizationError("normalization record root must be an object")
+        raise NormalizationError("cash-basis record root must be an object")
     return payload
 
 
@@ -114,27 +187,32 @@ def _component_map(raw: Any, *, field: str, source_ids: set[str]) -> dict[str, C
     for index, item in enumerate(raw):
         parsed = _cash_input(item, field=f"{field}[{index}]", source_ids=source_ids)
         if parsed.id in result:
-            raise NormalizationError(f"duplicate normalization component id: {parsed.id}")
+            raise NormalizationError(f"duplicate cash-basis component id: {parsed.id}")
         result[parsed.id] = parsed
     return result
 
 
-def load_normalized_cash(
-    *,
-    record: ResearchRecord,
-    path: str | Path,
-) -> NormalizedCashResult:
-    """Load and calculate a deterministic comparative-delta cash normalization."""
+def load_cash_basis(*, record: ResearchRecord, path: str | Path) -> CashBasisResult:
+    """Load an evidence-linked run-rate cash-basis record.
+
+    Schema 0.2 requires the basis kind to be explicit. `through_cycle` is intentionally
+    unsupported until a separate cycle-aware methodology passes historical stress tests.
+    """
     source_path = Path(path).resolve()
     payload = _read(source_path)
-    if payload.get("schema_version") != "0.1":
-        raise NormalizationError("unsupported normalization schema_version")
+    if payload.get("schema_version") != "0.2":
+        raise NormalizationError("unsupported cash-basis schema_version")
+    try:
+        basis_kind = CashBasisKind(payload.get("basis_kind"))
+    except (TypeError, ValueError) as exc:
+        raise NormalizationError("unsupported basis_kind") from exc
+
     ticker = _text(payload.get("ticker"), "ticker").upper()
     if ticker != record.issuer.get("ticker"):
-        raise NormalizationError("normalization ticker does not match research record")
+        raise NormalizationError("cash-basis ticker does not match research record")
     as_of = _text(payload.get("as_of"), "as_of")
     if as_of != record.as_of.isoformat():
-        raise NormalizationError("normalization as_of does not match research record")
+        raise NormalizationError("cash-basis as_of does not match research record")
     period = _text(payload.get("period"), "period")
     annualization_factor = _finite(payload.get("annualization_factor"), "annualization_factor")
     if annualization_factor <= 0:
@@ -154,11 +232,6 @@ def load_normalized_cash(
         field="reported_fcf.capex",
         source_ids=source_ids,
     )
-    if ocf.value <= 0 or capex.value < 0:
-        raise NormalizationError("reported OCF must be positive and capex must be non-negative")
-    reported_period_fcf = ocf.value - capex.value
-    if reported_period_fcf <= 0:
-        raise NormalizationError("reported-period FCF proxy must be positive")
 
     working_capital = payload.get("working_capital")
     if not isinstance(working_capital, dict):
@@ -175,7 +248,6 @@ def load_normalized_cash(
         raise NormalizationError("working-capital current/prior component ids must match")
     current_wc = sum(item.value for item in wc_current.values())
     prior_wc = sum(item.value for item in wc_prior.values())
-    wc_adjustment = prior_wc - current_wc
 
     timing_adjustment = 0.0
     timing_raw = payload.get("timing_adjustments", [])
@@ -216,14 +288,20 @@ def load_normalized_cash(
     if sbc.get("policy") != "deduct_economic_cost":
         raise NormalizationError("sbc policy must be deduct_economic_cost")
     sbc_current = _cash_input(sbc.get("current"), field="sbc.current", source_ids=source_ids)
-    if sbc_current.value < 0:
-        raise NormalizationError("SBC expense must be non-negative")
-    sbc_adjustment = -sbc_current.value
 
-    normalized_period_fcf = reported_period_fcf + wc_adjustment + timing_adjustment + sbc_adjustment
-    normalized_annualized_fcf = normalized_period_fcf * annualization_factor
-    if normalized_period_fcf <= 0 or normalized_annualized_fcf <= 0:
-        raise NormalizationError("normalized cash power must remain positive")
+    computation = calculate_run_rate_cash_basis(
+        operating_cash_flow=ocf.value,
+        capex=capex.value,
+        working_capital_current=current_wc,
+        working_capital_prior=prior_wc,
+        timing_adjustment=timing_adjustment,
+        sbc_expense=sbc_current.value,
+        annualization_factor=annualization_factor,
+    )
+    if computation.reported_period_fcf <= 0:
+        raise NormalizationError("reported-period FCF proxy must be positive")
+    if computation.run_rate_period_cash <= 0 or computation.run_rate_annualized_cash <= 0:
+        raise NormalizationError("run-rate cash basis must remain positive for reverse DCF")
 
     shares_outstanding: float | None = None
     raw_shares = payload.get("shares_outstanding")
@@ -250,23 +328,23 @@ def load_normalized_cash(
         CashBridgeItem(
             id="reported-fcf",
             label="Reported FCF proxy",
-            amount=reported_period_fcf,
+            amount=computation.reported_period_fcf,
             rationale="Operating cash flow less reported capital expenditure for the period.",
         ),
         CashBridgeItem(
             id="working-capital-delta",
-            label="Working-capital normalization",
-            amount=wc_adjustment,
+            label="Working-capital timing adjustment",
+            amount=computation.working_capital_adjustment,
             rationale=(
-                "Retain the prior comparable working-capital cash pattern and normalize only "
-                "the incremental current-period deviation."
+                "Retain the prior comparable working-capital cash pattern and adjust only "
+                "the incremental current-period deviation. This is not cycle normalization."
             ),
         ),
         *timing_bridge,
         CashBridgeItem(
             id="sbc-economic-cost",
             label="SBC economic-cost policy",
-            amount=sbc_adjustment,
+            amount=computation.sbc_adjustment,
             rationale=(
                 "Deduct reported stock-based compensation as an explicit economic-cost policy; "
                 "do not apply an equivalent dilution charge again."
@@ -274,19 +352,20 @@ def load_normalized_cash(
         ),
     ]
 
-    return NormalizedCashResult(
+    return CashBasisResult(
         ticker=ticker,
         as_of=as_of,
         period=period,
-        reported_period_fcf=reported_period_fcf,
+        basis_kind=basis_kind,
+        reported_period_fcf=computation.reported_period_fcf,
         annualization_factor=annualization_factor,
         working_capital_current=current_wc,
         working_capital_prior=prior_wc,
-        working_capital_adjustment=wc_adjustment,
-        timing_adjustment=timing_adjustment,
-        sbc_adjustment=sbc_adjustment,
-        normalized_period_fcf=normalized_period_fcf,
-        normalized_annualized_fcf=normalized_annualized_fcf,
+        working_capital_adjustment=computation.working_capital_adjustment,
+        timing_adjustment=computation.timing_adjustment,
+        sbc_adjustment=computation.sbc_adjustment,
+        run_rate_period_cash=computation.run_rate_period_cash,
+        run_rate_annualized_cash=computation.run_rate_annualized_cash,
         shares_outstanding=shares_outstanding,
         bridge=tuple(bridge),
         policy_notes=tuple(note.strip() for note in notes),
