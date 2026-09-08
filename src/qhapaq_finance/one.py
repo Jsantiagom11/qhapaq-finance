@@ -17,7 +17,7 @@ from .expectations import (
     solve_implied_fcf_growth,
 )
 from .market import Freshness, FreshnessPolicy, MarketSnapshot, classify_freshness
-from .normalization import CashBridgeItem, NormalizedCashResult, load_normalized_cash
+from .normalization import CashBasisResult, CashBridgeItem, load_cash_basis
 from .research import ResearchRecord, load_research_record
 
 
@@ -29,8 +29,8 @@ class OneModel:
     freshness: Freshness
     evidence_as_of: date | None
     research_ready: bool
-    normalized_cash: NormalizedCashResult | None
-    normalized_cash_power: float | None
+    cash_basis: CashBasisResult | None
+    cash_basis_value: float | None
     effective_market_cap: float | None
     market_cap_provenance: str
     implied_fcf_growth: float | None
@@ -51,7 +51,7 @@ def _research_paths(root: Path, ticker: str) -> tuple[Path, Path]:
     return directory / "research.json", directory / "manifest.json"
 
 
-def _normalization_path(root: Path, ticker: str) -> Path:
+def _cash_basis_path(root: Path, ticker: str) -> Path:
     return root / "data" / "research" / ticker.lower() / "normalization.json"
 
 
@@ -89,27 +89,27 @@ def _fact_value(record: ResearchRecord, fact_id: str | None) -> float | None:
     return None
 
 
-def _load_normalization(
+def _load_cash_basis(
     root: Path, ticker: str, record: ResearchRecord | None
-) -> NormalizedCashResult | None:
+) -> CashBasisResult | None:
     if record is None:
         return None
-    path = _normalization_path(root, ticker)
+    path = _cash_basis_path(root, ticker)
     if not path.is_file():
         return None
-    return load_normalized_cash(record=record, path=path)
+    return load_cash_basis(record=record, path=path)
 
 
 def _effective_market_cap(
     snapshot: MarketSnapshot,
     record: ResearchRecord | None,
-    normalized_cash: NormalizedCashResult | None,
+    cash_basis: CashBasisResult | None,
 ) -> tuple[float | None, str]:
     if snapshot.market_cap is not None:
         return snapshot.market_cap, f"provider market cap · {snapshot.source}"
-    if normalized_cash and normalized_cash.shares_outstanding:
+    if cash_basis and cash_basis.shares_outstanding:
         return (
-            snapshot.price * normalized_cash.shares_outstanding,
+            snapshot.price * cash_basis.shares_outstanding,
             "derived · observed price × filing shares",
         )
     if record is None:
@@ -139,7 +139,7 @@ def build_one_model(
     terminal_growth: float = 0.03,
     years: int = 10,
 ) -> OneModel:
-    """Build a concise decision model while failing closed on missing normalization."""
+    """Build a concise decision model while failing closed on unsupported cash bases."""
     root = Path(repository_root).resolve()
     reference = now or datetime.now(timezone.utc)
     freshness = classify_freshness(
@@ -148,25 +148,23 @@ def build_one_model(
         now=reference,
     )
     record = _load_research(root, snapshot.ticker)
-    normalized_cash = _load_normalization(root, snapshot.ticker, record)
+    cash_basis = _load_cash_basis(root, snapshot.ticker, record)
     company_name = record.issuer.get("name", snapshot.ticker) if record else snapshot.ticker
-    normalized_cash_power = (
-        normalized_cash.normalized_annualized_fcf * 1_000_000.0
-        if normalized_cash is not None
-        else None
+    cash_basis_value = (
+        cash_basis.run_rate_annualized_cash * 1_000_000.0 if cash_basis is not None else None
     )
     effective_market_cap, market_cap_provenance = _effective_market_cap(
-        snapshot, record, normalized_cash
+        snapshot, record, cash_basis
     )
 
     implied_growth: float | None = None
     sensitivity: tuple[SensitivityPoint, ...] = ()
-    if normalized_cash_power is not None and effective_market_cap is not None:
+    if cash_basis_value is not None and effective_market_cap is not None:
         try:
             implied_growth = solve_implied_fcf_growth(
                 ReverseDcfInputs(
                     equity_value=effective_market_cap,
-                    starting_fcf=normalized_cash_power,
+                    starting_fcf=cash_basis_value,
                     discount_rate=discount_rate,
                     terminal_growth=terminal_growth,
                     years=years,
@@ -174,7 +172,7 @@ def build_one_model(
             ).implied_fcf_growth
             sensitivity = reverse_dcf_sensitivity(
                 equity_value=effective_market_cap,
-                starting_fcf=normalized_cash_power,
+                starting_fcf=cash_basis_value,
                 years=years,
             )
         except ExpectationsError:
@@ -184,27 +182,25 @@ def build_one_model(
     if record is None:
         status = "INSUFFICIENT DATA"
         status_detail = "Market state is available, but no validated research evidence pack exists."
-    elif normalized_cash is None:
+    elif cash_basis is None:
         status = "INSUFFICIENT DATA"
-        status_detail = (
-            "Research is validated, but no evidence-backed Normalized Cash Power record exists."
-        )
+        status_detail = "Research is validated, but no evidence-backed analytical cash basis exists."
     elif effective_market_cap is None:
         status = "INSUFFICIENT DATA"
         status_detail = "Research is validated, but no usable equity-value input is available."
     elif implied_growth is None:
         status = "INSUFFICIENT DATA"
         status_detail = (
-            "Normalized cash and equity value exist, but the reverse-DCF hurdle could not "
-            "be solved under this scenario."
+            "Cash basis and equity value exist, but the reverse-DCF hurdle could not be solved "
+            "under this scenario."
         )
     else:
-        status = "UNDERWRITING"
+        status = "RUN-RATE ONLY"
         status_detail = (
             f"At {discount_rate * 100:.1f}% cost of equity and {terminal_growth * 100:.1f}% "
             f"terminal growth, the observed equity value requires {implied_growth * 100:.1f}% "
-            f"annual growth from normalized cash power over {years} years. "
-            "No forward business-support range or valuation recommendation is asserted."
+            f"annual growth from the current run-rate cash basis over {years} years. "
+            "Cycle durability is not validated; this is not a full-cycle underwriting state."
         )
 
     thesis = _interpretation(record, "thesis") if record else None
@@ -219,8 +215,8 @@ def build_one_model(
         freshness=freshness,
         evidence_as_of=record.as_of if record else None,
         research_ready=record is not None,
-        normalized_cash=normalized_cash,
-        normalized_cash_power=normalized_cash_power,
+        cash_basis=cash_basis,
+        cash_basis_value=cash_basis_value,
         effective_market_cap=effective_market_cap,
         market_cap_provenance=market_cap_provenance,
         implied_fcf_growth=implied_growth,
@@ -269,7 +265,7 @@ def _template() -> str:
 
 def _bridge_html(items: tuple[CashBridgeItem, ...]) -> str:
     if not items:
-        return '<div class="empty">Normalization unavailable.</div>'
+        return '<div class="empty">Cash-basis bridge unavailable.</div>'
     rows = []
     for item in items:
         sign = "+" if item.amount > 0 else ""
@@ -324,23 +320,22 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
     if not invalidation:
         invalidation = "<li>Build and validate a research evidence pack before underwriting.</li>"
 
-    normalized = model.normalized_cash
-    reported_period = normalized.reported_period_fcf if normalized else None
-    normalized_period = normalized.normalized_period_fcf if normalized else None
-    normalization_period = normalized.period if normalized else "Not available"
-    annualization = normalized.annualization_factor if normalized else None
-    policy_note = normalized.policy_notes[0] if normalized else "Normalization unavailable."
+    cash_basis = model.cash_basis
+    reported_period = cash_basis.reported_period_fcf if cash_basis else None
+    run_rate_period = cash_basis.run_rate_period_cash if cash_basis else None
+    basis_period = cash_basis.period if cash_basis else "Not available"
+    annualization = cash_basis.annualization_factor if cash_basis else None
+    basis_kind = cash_basis.basis_kind.value.upper().replace("_", "-") if cash_basis else "MISSING"
+    policy_note = cash_basis.policy_notes[0] if cash_basis else "Cash basis unavailable."
     scenario = {
         "marketCap": model.effective_market_cap,
-        "startingFcf": model.normalized_cash_power,
+        "startingFcf": model.cash_basis_value,
         "discountRate": model.discount_rate,
         "terminalGrowth": model.terminal_growth,
         "years": model.years,
     }
     scenario_json = json.dumps(scenario, sort_keys=True, separators=(",", ":"))
-    scenario_enabled = (
-        model.normalized_cash_power is not None and model.effective_market_cap is not None
-    )
+    scenario_enabled = model.cash_basis_value is not None and model.effective_market_cap is not None
     scenario_disabled = "" if scenario_enabled else " disabled"
     currency = "$" if snapshot.currency.upper() == "USD" else html.escape(snapshot.currency) + " "
 
@@ -357,14 +352,14 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
         "__EVIDENCE_AS_OF__": evidence,
         "__MARKET_CAP__": _money(model.effective_market_cap, snapshot.currency),
         "__MARKET_CAP_SOURCE__": html.escape(model.market_cap_provenance),
-        "__NORMALIZED_CASH__": _money(model.normalized_cash_power, snapshot.currency),
+        "__CASH_BASIS__": _money(model.cash_basis_value, snapshot.currency),
         "__REPORTED_PERIOD_FCF__": _money_millions(reported_period),
-        "__NORMALIZED_PERIOD_FCF__": _money_millions(normalized_period),
-        "__NORMALIZATION_PERIOD__": html.escape(normalization_period),
+        "__RUN_RATE_PERIOD_CASH__": _money_millions(run_rate_period),
+        "__BASIS_PERIOD__": html.escape(basis_period),
         "__ANNUALIZATION__": "—" if annualization is None else f"{annualization:.2f}×",
-        "__NORMALIZATION_STATE__": "ANALYTICAL" if normalized else "MISSING",
-        "__NORMALIZATION_BRIDGE__": _bridge_html(normalized.bridge if normalized else ()),
-        "__NORMALIZATION_NOTE__": html.escape(policy_note),
+        "__BASIS_KIND__": html.escape(basis_kind),
+        "__CASH_BASIS_BRIDGE__": _bridge_html(cash_basis.bridge if cash_basis else ()),
+        "__CASH_BASIS_NOTE__": html.escape(policy_note),
         "__SENSITIVITY_TABLE__": _sensitivity_html(model.sensitivity),
         "__SOURCE__": source,
         "__HURDLE__": hurdle,
