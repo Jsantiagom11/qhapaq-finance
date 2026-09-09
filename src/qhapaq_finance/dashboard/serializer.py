@@ -7,15 +7,35 @@ from pathlib import Path
 from typing import Any
 
 from ..evidence import EvidenceKind, load_facts
-from ..qcom_case import QCOM_AS_OF, qcom_audit
+from ..explainability import explainability_contract
 from ..sensitivity import sensitivity_matrices
-from ..valuation import ResearchResult, analyze_case, load_fixture_case
+from ..valuation import (
+    ResearchResult,
+    analyze_case,
+    load_fixture_case,
+    price_value_classification,
+    valuation_cushion_prices,
+)
 
 COMPANY_NAMES = {
     "QCOM": "QUALCOMM Incorporated",
+    "NVDA": "NVIDIA Corporation",
     "VRTX": "Vertex Pharmaceuticals",
     "CSCO": "Cisco Systems",
 }
+
+
+def _empirical_case_support(ticker: str) -> tuple[Path, object, object] | None:
+    """Return evidence routing metadata; mappings select facts, never calculations."""
+    if ticker == "QCOM":
+        from ..qcom_case import QCOM_AS_OF, qcom_audit
+
+        return Path("data/research/qcom/financial-evidence.json"), QCOM_AS_OF, qcom_audit
+    if ticker == "NVDA":
+        from ..nvda_case import NVDA_AS_OF, nvda_audit
+
+        return Path("data/research/nvda/financial-evidence.json"), NVDA_AS_OF, nvda_audit
+    return None
 
 
 def _scenario(result: ResearchResult, name: str) -> dict[str, Any]:
@@ -36,11 +56,13 @@ def _scenario(result: ResearchResult, name: str) -> dict[str, Any]:
     }
 
 
-def _qcom_provenance(repository_root: str | Path) -> list[dict[str, Any]]:
+def _evidence_provenance(
+    repository_root: str | Path, evidence_path: Path, as_of: object
+) -> list[dict[str, Any]]:
     facts = load_facts(
-        Path(repository_root) / "data/research/qcom/financial-evidence.json",
+        Path(repository_root) / evidence_path,
         repository_root,
-        as_of=QCOM_AS_OF,
+        as_of=as_of,  # type: ignore[arg-type]
     )
     records: list[dict[str, Any]] = []
     for fact in facts.values():
@@ -65,10 +87,12 @@ def build_company_artifact(ticker: str, repository_root: str | Path = ".") -> di
     result = analyze_case(load_fixture_case(ticker, repository_root))
     case, market, cost = result.case, result.case.market_snapshot, result.case.capital_cost
     scenarios = {name.lower(): _scenario(result, name) for name in ("bear", "base", "bull")}
-    fixture = case.ticker != "QCOM"
-    audit: dict[str, Any] = qcom_audit(repository_root) if not fixture else {}
+    support = _empirical_case_support(case.ticker)
+    fixture = support is None
+    audit: dict[str, Any] = support[2](repository_root) if support is not None else {}  # type: ignore[operator]
     base = scenarios["base"]
     liquid_assets = market.liquid_assets
+    cushion_prices = valuation_cushion_prices(base["intrinsic_value"])
     artifact: dict[str, Any] = {
         "schema_version": "dashboard-research-v1",
         "identity": {
@@ -88,50 +112,35 @@ def build_company_artifact(ticker: str, repository_root: str | Path = ".") -> di
         "economics": {
             "revenue_ttm": audit.get("revenue"),
             "ebit_ttm": audit.get("ebit"),
-            "ebit_margin": None
-            if audit.get("revenue") is None
-            else audit["ebit"] / audit["revenue"],
             "nopat": result.nopat,
             "normalized_fcff": result.normalized_fcff,
-            "fcff_margin": None
-            if audit.get("revenue") is None
-            else result.normalized_fcff / audit["revenue"],
             "invested_capital": case.invested_capital,
             "roic": result.roic,
             "wacc": cost.wacc,
-            "roic_minus_wacc": result.roic - cost.wacc,
-            "fcff_yield": result.normalized_fcff / market.enterprise_value,
+            "roic_minus_wacc": result.roic_minus_wacc,
+            "fcff_yield": result.fcff_yield,
         },
         "valuation": {
             "scenarios": scenarios,
             "fcff_implied_discount_rate": result.fcff_implied_discount_rate,
             "reverse_dcf_implied_growth": result.reverse_implied_growth,
             "expectations": {
-                "growth_difference_pp": result.reverse_implied_growth - base["explicit_growth"],
+                "growth_difference_pp": result.expectation_growth_gap,
                 "discount_rate_difference_pp": result.fcff_implied_discount_rate - cost.wacc,
             },
         },
         "buy_zone": {
             "fair_value": base["intrinsic_value"],
-            "price_at_10_mos": base["intrinsic_value"] * 0.90,
-            "price_at_20_mos": base["intrinsic_value"] * 0.80,
-            "price_at_25_mos": base["intrinsic_value"] * 0.75,
-            "price_at_30_mos": base["intrinsic_value"] * 0.70,
+            "price_at_10_mos": cushion_prices["mos_10"],
+            "price_at_20_mos": cushion_prices["mos_20"],
+            "price_at_25_mos": cushion_prices["mos_25"],
+            "price_at_30_mos": cushion_prices["mos_30"],
         },
         "decision_zones": {
             "current_price": market.price,
             "fair_value": base["intrinsic_value"],
-            "mos_10": base["intrinsic_value"] * 0.90,
-            "mos_20": base["intrinsic_value"] * 0.80,
-            "mos_25": base["intrinsic_value"] * 0.75,
-            "mos_30": base["intrinsic_value"] * 0.70,
-            "classification": (
-                "ABOVE FAIR VALUE"
-                if market.price > base["intrinsic_value"]
-                else "FAIR-VALUE ZONE"
-                if market.price == base["intrinsic_value"]
-                else "WATCH ZONE"
-            ),
+            **cushion_prices,
+            "classification": price_value_classification(market.price, base["intrinsic_value"]),
         },
         "decision": {
             "status": "RESEARCH" if not fixture else "FIXTURE",
@@ -150,9 +159,10 @@ def build_company_artifact(ticker: str, repository_root: str | Path = ".") -> di
             "ttm": None
             if fixture
             else {
-                "formula": "TTM = FY - prior 9M + current 9M",
-                "revenue": [44284, 33013, 32798, 44069],
-                "ebit": [12355, 9437, 7302, 10220],
+                "formula": audit["ttm_formula"],
+                "labels": audit["ttm_labels"],
+                "revenue": audit["ttm_revenue_values"],
+                "ebit": audit["ttm_ebit_values"],
             },
             "fcff": {
                 "ebit": case.financial_inputs.ebit,
@@ -189,9 +199,14 @@ def build_company_artifact(ticker: str, repository_root: str | Path = ".") -> di
                 "shares": market.shares_outstanding,
             },
         },
-        "provenance": [] if fixture else _qcom_provenance(repository_root),
+        "provenance": (
+            [] if support is None else _evidence_provenance(repository_root, support[0], support[1])
+        ),
         "sensitivity": sensitivity_matrices(case),
     }
+    # The dashboard has one deterministic artifact.  Explainability is a
+    # semantic projection of it, not a novice-only second dataset.
+    artifact["explainability"] = explainability_contract(artifact)
     return artifact
 
 

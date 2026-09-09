@@ -27,6 +27,14 @@ def test_research_artifact_is_deterministic_and_classifies_cases() -> None:
     assert build_company_artifact("CSCO", ROOT)["identity"]["classification"] == "fixture"
 
 
+def test_nvda_empirical_artifact_uses_the_shared_serializer() -> None:
+    nvda = build_company_artifact("NVDA", ROOT)
+    assert nvda["identity"]["classification"] == "evidence-backed"
+    assert nvda["economics"]["revenue_ttm"] == 302_970
+    assert nvda["bridges"]["ttm"]["labels"] == ("FY", "Prior H1", "Current H1", "TTM")
+    assert nvda["provenance"]
+
+
 def test_artifact_output_and_offline_html(tmp_path: Path) -> None:
     written = write_artifacts(("QCOM", "VRTX", "CSCO"), tmp_path, ROOT)
     assert {"universe", "qcom", "qcom_provenance", "vrtx", "csco"} == set(written)
@@ -39,8 +47,31 @@ def test_artifact_output_and_offline_html(tmp_path: Path) -> None:
     assert "44,069m" in content and "TTM = FY - prior 9M + current 9M" in content
     assert "qhapaq-data" in content and "cdn" not in content.lower()
     assert "fetch(" not in content and "https://" not in content
-    assert "function" not in content.lower()  # no dashboard valuation calculator
-    assert "QCOM" in universe.read_text(encoding="utf-8")
+    assert "fetch(" not in content and "https://" not in content
+    assert "function setTheme" in content and "function setViewMode" in content
+    assert ":root[data-theme=night]" in content
+    assert "qhapaq-theme" in content and "prefers-color-scheme" in content
+    assert 'id="paper-theme"' in content and 'id="night-theme"' in content
+    assert "ROIC − WACC" in content and "13.4 pp" in content
+    assert "PRICE VS BASE VALUE" in content.upper() and "No valuation cushion" in content
+    assert "Base MOS" in content and "-18.7%" in content
+    assert "base margin of safety is negative" not in content
+    assert (
+        "The current price is above Qhapaq&#x27;s base value, so there is no valuation cushion"
+        in content
+    )
+    assert "decision-conditions" in content and "decision-conditions-grid" in content
+    assert "Gap identified in the current evidence set" in content
+    assert 'UNCERTAINTY">Unknown</span><p>' in content
+    assert "analytical-metrics" in content
+    assert "--touch-target-min:44px" in content
+    assert "font-variant-numeric:tabular-nums lining-nums" in content
+    assert "Interpretation" in content
+    assert "✓ Supported by verified financial data" in content
+    assert "metric-card" in content and "argument-card" in content
+    universe_content = universe.read_text(encoding="utf-8")
+    assert "QCOM" in universe_content
+    assert 'id="paper-theme"' in universe_content and "qhapaq-theme" in universe_content
 
 
 def test_dashboard_and_json_cli_regression(
