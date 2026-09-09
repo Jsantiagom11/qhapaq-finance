@@ -9,6 +9,36 @@
   "retrieved_at": "2026-09-07T23:10:00-05:00",
   "sources": [
     {
+      "id": "nvda-2025-q2-10q-capsule",
+      "publisher": "Qhapaq Finance evidence capsule derived from NVIDIA Corporation / SEC",
+      "title": "Evidence capsule — NVIDIA Form 10-Q for quarter ended July 27, 2025",
+      "canonical_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000209/nvda-20250727.htm",
+      "download_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000209/nvda-20250727.htm",
+      "discovery_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581025000209/0001045810-25-000209-index.htm",
+      "local_path": "data/evidence/nvda/nvda-q2fy26-sec-evidence.txt",
+      "publication_date": "2025-08-27",
+      "availability_evidence": "SEC accession 0001045810-25-000209 was filed 2025-08-27 for the quarter ended 2025-07-27. Retrieved 2026-09-09; local file is a checksum-gated Qhapaq factual capsule, not a byte-for-byte filing mirror.",
+      "reporting_period": "Q2 and six months ended 2025-07-27",
+      "media_type": "text/plain",
+      "byte_count": 1472,
+      "sha256": "87658915d57c1d9a836f3873dbb0f1f23bf2b4ede5096596260d4811cc152e32"
+    },
+    {
+      "id": "nvda-2026-10k-capsule",
+      "publisher": "Qhapaq Finance evidence capsule derived from NVIDIA Corporation / SEC",
+      "title": "Evidence capsule — NVIDIA Form 10-K for fiscal year ended January 25, 2026",
+      "canonical_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+      "download_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm",
+      "discovery_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/0001045810-26-000021-index.htm",
+      "local_path": "data/evidence/nvda/nvda-fy26-10k-evidence.txt",
+      "publication_date": "2026-02-25",
+      "availability_evidence": "SEC accession 0001045810-26-000021 was filed 2026-02-25 for the fiscal year ended 2026-01-25. Local file is a checksum-gated Qhapaq factual capsule, not a byte-for-byte filing mirror.",
+      "reporting_period": "Fiscal year ended 2026-01-25",
+      "media_type": "text/plain",
+      "byte_count": 1284,
+      "sha256": "d7b7bc1b378ca340da96f49f9208a85f754efab56c2007969911f05381dd142d"
+    },
+    {
       "id": "nvda-2026-q2-10q-capsule",
       "publisher": "Qhapaq Finance evidence capsule derived from NVIDIA Corporation / SEC",
       "title": "Evidence capsule — NVIDIA Form 10-Q for quarter ended July 26, 2026",
@@ -20,8 +50,8 @@
       "availability_evidence": "SEC accession 0001045810-26-000075 was filed 2026-08-26 for the period ended 2026-07-26. Local file is a checksum-gated Qhapaq factual capsule, not a byte-for-byte filing mirror.",
       "reporting_period": "Q2 and six months ended 2026-07-26",
       "media_type": "text/plain",
-      "byte_count": 3410,
-      "sha256": "41815aa9d8d3cd78c4d4afea4ed0ad6407387df567186170200415815f157e45"
+      "byte_count": 4337,
+      "sha256": "b006cb862bbded31f78e3750a0a757296c1784779758730b39215108644f92c0"
     },
     {
       "id": "nvda-2026-q2-ir-capsule",

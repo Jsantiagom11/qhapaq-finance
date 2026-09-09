@@ -84,6 +84,18 @@ def test_discount_rate_must_exceed_terminal_growth() -> None:
         )
 
 
+def test_reverse_dcf_rejects_near_singular_terminal_spread() -> None:
+    with pytest.raises(ExpectationsError, match="1 bp"):
+        solve_implied_fcf_growth(
+            ReverseDcfInputs(
+                equity_value=1_000.0,
+                starting_fcf=100.0,
+                discount_rate=0.03001,
+                terminal_growth=0.03,
+            )
+        )
+
+
 def test_reverse_dcf_rejects_nonpositive_cash_flow() -> None:
     with pytest.raises(ExpectationsError, match="starting_fcf must be positive"):
         solve_implied_fcf_growth(
@@ -94,3 +106,57 @@ def test_reverse_dcf_rejects_nonpositive_cash_flow() -> None:
                 terminal_growth=0.03,
             )
         )
+
+
+def _bounded_inputs_for_growth(growth: float) -> ReverseDcfInputs:
+    assumptions = ReverseDcfInputs(
+        equity_value=1.0,
+        starting_fcf=100.0,
+        discount_rate=0.09,
+        terminal_growth=0.03,
+        years=10,
+    )
+    return ReverseDcfInputs(
+        equity_value=present_value_equity_fcf(assumptions, growth=growth),
+        starting_fcf=assumptions.starting_fcf,
+        discount_rate=assumptions.discount_rate,
+        terminal_growth=assumptions.terminal_growth,
+        years=assumptions.years,
+    )
+
+
+@pytest.mark.parametrize("growth", (-0.60, 0.30))
+def test_reverse_dcf_rejects_targets_outside_declared_bounds(growth: float) -> None:
+    with pytest.raises(ExpectationsError, match="no economically valid solution"):
+        solve_implied_fcf_growth(_bounded_inputs_for_growth(growth), lower=-0.50, upper=0.20)
+
+
+def test_reverse_dcf_no_root_fails_closed_when_iteration_budget_is_insufficient() -> None:
+    with pytest.raises(ExpectationsError, match="did not converge"):
+        solve_implied_fcf_growth(
+            _bounded_inputs_for_growth(0.123),
+            lower=-0.50,
+            upper=0.20,
+            max_iterations=1,
+        )
+
+
+@pytest.mark.parametrize("growth", (-0.499999, 0.199999))
+def test_reverse_dcf_near_boundaries_meets_absolute_residual_contract(growth: float) -> None:
+    inputs = _bounded_inputs_for_growth(growth)
+    result = solve_implied_fcf_growth(inputs, lower=-0.50, upper=0.20, tolerance=1e-6)
+    assert (
+        abs(
+            present_value_equity_fcf(inputs, growth=result.implied_fcf_growth) - inputs.equity_value
+        )
+        <= 1e-6
+    )
+
+
+def test_reverse_dcf_rejects_invalid_bounds_and_replays_deterministically() -> None:
+    inputs = _bounded_inputs_for_growth(0.123)
+    with pytest.raises(ExpectationsError, match="growth bounds"):
+        solve_implied_fcf_growth(inputs, lower=0.20, upper=0.20)
+    first = solve_implied_fcf_growth(inputs, lower=-0.50, upper=0.20)
+    second = solve_implied_fcf_growth(inputs, lower=-0.50, upper=0.20)
+    assert first == second

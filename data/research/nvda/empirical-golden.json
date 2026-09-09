@@ -1,0 +1,26 @@
+{
+  "schema_version": "1.0",
+  "fixture_label": "deterministic empirical golden output from frozen NVDA filing evidence",
+  "as_of": "2026-09-08",
+  "accounting": {
+    "ttm_revenue": 302970.0,
+    "ttm_ebit": 197579.0,
+    "nopat": 162014.78,
+    "depreciation_amortization": 3687.0,
+    "capex": 7354.0,
+    "change_in_working_capital": 34102.0,
+    "fcff": 124245.78,
+    "invested_capital": 49153.5
+  },
+  "market": {"price": 230.36, "valuation_shares_millions": 24338.0, "valuation_share_basis": "diluted_weighted_average", "cash": 22443.0, "marketable_securities": 76926.0, "debt": 33366.0},
+  "valuation": {
+    "wacc": 0.10459711384576313,
+    "roic": 3.2960985484248324,
+    "roic_minus_wacc": 3.1915014345790693,
+    "bear_intrinsic_value_per_share": 85.91515007236141,
+    "base_intrinsic_value_per_share": 149.16604513480937,
+    "bull_intrinsic_value_per_share": 236.35873166873324,
+    "reverse_implied_growth": 0.22460357338131873,
+    "fcff_implied_discount_rate": 0.08017934286767997
+  }
+}

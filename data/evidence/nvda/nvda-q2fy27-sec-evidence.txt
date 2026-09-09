@@ -14,18 +14,26 @@ FACT INDEX
 - Q2 FY2026 revenue: USD 46,743 million. Filing page 3 / comparative statement of income.
 - Q2 FY2027 operating income: USD 63,734 million. Filing page 3.
 - Q2 FY2026 operating income: USD 28,440 million. Filing page 3.
+- H1 FY2027 revenue: USD 177,837 million; H1 FY2026 comparative revenue: USD 90,805 million. Filing page 3.
+- H1 FY2027 operating income: USD 117,270 million; H1 FY2026 comparative operating income: USD 50,078 million. Filing page 3.
 - H1 FY2027 operating cash flow: USD 74,421 million. Filing page 8 / cash flows.
 - H1 FY2026 operating cash flow: USD 42,779 million. Filing page 8 / comparative cash flows.
 - H1 FY2027 purchases related to property, equipment and intangibles: USD 4,434 million. Filing page 8.
 - H1 FY2026 purchases related to property, equipment and intangibles: USD 3,122 million. Filing page 8.
 - H1 FY2027 stock-based compensation expense: USD 3,954 million. Filing page 8.
 - H1 FY2026 stock-based compensation expense: USD 3,099 million. Filing page 8.
+- H1 FY2027 depreciation and amortization: USD 2,124 million; H1 FY2026 comparative: USD 1,280 million. Filing page 8.
 - H1 FY2027 changes in operating assets/liabilities: accounts receivable -24,590; inventories -10,204; prepaid/other assets -6,480; accounts payable +4,125; accrued/current liabilities +8,015; other long-term liabilities +1,970. USD million. Filing page 8.
 - H1 FY2026 comparative changes in operating assets/liabilities: accounts receivable -4,743; inventories -4,880; prepaid/other assets +946; accounts payable +2,255; accrued/current liabilities +3,075; other long-term liabilities +979. USD million. Filing page 8.
 - Q2 FY2027 Data Center revenue: USD 89,023 million. Filing page 27 / revenue by market platform.
 - Common shares outstanding as of 2026-08-21: approximately 24.1 billion. Filing cover page.
+- Diluted weighted-average shares used in six-month EPS computation: 24,338 million. Filing page 3.
 - Accounts receivable as of 2026-07-26: USD 63,059 million; as of 2026-01-25: USD 38,466 million. Filing page 5.
 - Inventory as of 2026-07-26: USD 31,575 million; as of 2026-01-25: USD 21,403 million. Filing page 5.
+- Accounts payable: USD 15,059 million; accrued and other current liabilities: USD 26,960 million. Filing page 5.
+- Cash and cash equivalents: USD 22,443 million; marketable debt securities: USD 34,143 million; marketable equity securities: USD 42,783 million. Filing page 5.
+- Property and equipment, net: USD 14,285 million; intangible assets, net: USD 2,998 million. Filing page 5.
+- Short-term debt: USD 1,000 million; long-term debt: USD 32,366 million. Filing page 5.
 - Five direct customers represented 22%, 14%, 13%, 11%, and 10% of accounts receivable as of 2026-07-26. Note disclosure around filing page 13.
 - Certain investment-grade customer payment terms can range from 90 days up to one year for large data-center builds. Note disclosure around filing page 13.
 - Supply and capacity commitments totaled USD 279 billion as of 2026-07-26, up from USD 119 billion in the prior quarter. Note 10 / commitments.

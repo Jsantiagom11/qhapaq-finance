@@ -1,0 +1,12 @@
+{
+  "currency": "USD",
+  "market_cap": null,
+  "market_state": "closed",
+  "observed_at": "2026-09-04T16:00:00-04:00",
+  "previous_close": 228.45,
+  "price": 230.36,
+  "retrieved_at": "2026-09-09T00:00:00+00:00",
+  "schema_version": "1.0",
+  "source": "FinanceCharts NVDA historical daily close; https://www.financecharts.com/compare/NVDA/summary/price",
+  "ticker": "NVDA"
+}

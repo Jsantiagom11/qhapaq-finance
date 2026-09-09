@@ -8,8 +8,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from enum import Enum
 from pathlib import Path
 
@@ -61,6 +62,10 @@ class FinancialFact:
             raise EvidenceError("duration facts require period_start")
         if self.period_kind is PeriodKind.INSTANT and self.period_start is not None:
             raise EvidenceError("instant facts cannot have period_start")
+        if not math.isfinite(self.value):
+            raise EvidenceError("financial fact value must be finite")
+        if not self.unit.strip():
+            raise EvidenceError("financial fact unit must be present")
 
 
 @dataclass(frozen=True)
@@ -71,6 +76,7 @@ class DerivedFact:
     unit: str
     inputs: tuple[str, ...]
     formula: str
+    period_start: date
     period_end: date
     kind: EvidenceKind = EvidenceKind.DERIVED
 
@@ -88,6 +94,8 @@ def reconstruct_ttm(
         raise EvidenceError("TTM reconstruction requires duration facts")
     if annual.fiscal_period != "FY" or prior_ytd.fiscal_period != current_ytd.fiscal_period:
         raise EvidenceError("TTM requires annual and comparable YTD periods")
+    if len({item.unit for item in items}) != 1:
+        raise EvidenceError("TTM facts must use one unit")
     if any(item.period_start is None for item in items):
         raise EvidenceError("TTM duration facts require starts")
     assert prior_ytd.period_start is not None
@@ -103,6 +111,7 @@ def reconstruct_ttm(
         annual.unit,
         tuple(item.id for item in items),
         "FY - prior comparable YTD + current YTD",
+        prior_ytd.period_end + timedelta(days=1),
         current_ytd.period_end,
     )
 

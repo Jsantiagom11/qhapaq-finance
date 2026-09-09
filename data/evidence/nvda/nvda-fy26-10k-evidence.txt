@@ -1,0 +1,20 @@
+QHAPAQ EVIDENCE CAPSULE
+source_mode=derived_evidence_capsule
+primary_source=NVIDIA Corporation Form 10-K for fiscal year ended 2026-01-25
+canonical_url=https://www.sec.gov/Archives/edgar/data/1045810/000104581026000021/nvda-20260125.htm
+filing_date=2026-02-25
+accession=0001045810-26-000021
+retrieved_for_qhapaq=2026-09-09T00:00:00Z
+
+This minimal factual extraction is from NVIDIA's audited SEC filing; it is not a
+byte-for-byte filing mirror. Amounts below are USD millions unless stated otherwise.
+
+FACT INDEX
+- FY2026 revenue: 215,938. Consolidated Statements of Income, p. 51.
+- FY2026 operating income: 130,387. Consolidated Statements of Income, p. 51.
+- FY2026 depreciation and amortization: 2,843. Consolidated Statements of Cash Flows, p. 55.
+- FY2026 purchases related to property, equipment and intangible assets: 6,042 cash outflow. Cash flows, p. 55.
+- Cash and cash equivalents: 10,605; marketable securities: 51,951. Liquidity table / balance sheet, pp. 42, 53.
+- Accounts receivable: 38,466; inventories: 21,403; accounts payable: 9,812; accrued and other current liabilities: 21,352. Balance sheet, p. 53.
+- Property and equipment, net: 10,383; intangible assets, net: 3,306. Balance sheet, p. 53.
+- Short-term debt: 999; long-term debt: 7,469. Balance sheet, p. 53.

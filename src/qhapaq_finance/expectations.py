@@ -11,6 +11,17 @@ class ExpectationsError(ValueError):
     """Raised when reverse-DCF inputs are internally inconsistent."""
 
 
+MIN_TERMINAL_SPREAD = 1e-4
+DEFAULT_RESIDUAL_TOLERANCE = 1e-6
+
+
+def _effective_residual_tolerance(target: float, requested: float) -> float:
+    """Keep an explicit absolute contract while allowing representable float precision."""
+    # The forward model performs several floating-point operations, so its
+    # attainable residual can be a few target ulps rather than one.
+    return max(requested, 8 * math.ulp(target))
+
+
 @dataclass(frozen=True)
 class ReverseDcfInputs:
     """Equity-FCF reverse DCF assumptions.
@@ -65,8 +76,8 @@ def validate_reverse_dcf(inputs: ReverseDcfInputs) -> ReverseDcfInputs:
         raise ExpectationsError("discount_rate must be greater than -100%")
     if terminal_growth <= -1:
         raise ExpectationsError("terminal_growth must be greater than -100%")
-    if discount_rate <= terminal_growth:
-        raise ExpectationsError("discount_rate must exceed terminal_growth")
+    if discount_rate - terminal_growth < MIN_TERMINAL_SPREAD:
+        raise ExpectationsError("discount_rate must exceed terminal_growth by at least 1 bp")
     if not isinstance(inputs.years, int) or isinstance(inputs.years, bool) or inputs.years < 1:
         raise ExpectationsError("years must be a positive integer")
     return inputs
@@ -100,13 +111,13 @@ def solve_implied_fcf_growth(
     *,
     lower: float = -0.95,
     upper: float = 0.50,
-    tolerance: float = 1e-10,
+    tolerance: float = DEFAULT_RESIDUAL_TOLERANCE,
     max_iterations: int = 256,
 ) -> ReverseDcfResult:
     """Solve the constant explicit-period FCF growth implied by current equity value.
 
-    Uses deterministic bisection and expands the upper bound when necessary. This avoids
-    an additional numerical dependency and gives stable results across environments.
+    Uses deterministic bisection inside the caller-declared interval. A bound is never
+    presented as a solution unless its absolute valuation residual meets `tolerance`.
     """
     validate_reverse_dcf(inputs)
     lower = _finite(lower, "lower")
@@ -120,26 +131,19 @@ def solve_implied_fcf_growth(
         raise ExpectationsError("max_iterations must be a positive integer")
 
     target = inputs.equity_value
+    residual_tolerance = _effective_residual_tolerance(target, tolerance)
     low_value = present_value_equity_fcf(inputs, growth=lower)
-    if low_value > target:
-        raise ExpectationsError("equity_value implies growth below the configured lower bound")
+    high_value = present_value_equity_fcf(inputs, growth=upper)
+    if not min(low_value, high_value) <= target <= max(low_value, high_value):
+        raise ExpectationsError("no economically valid solution within configured growth bounds")
 
-    high = upper
-    high_value = present_value_equity_fcf(inputs, growth=high)
-    while high_value < target and high < 10.0:
-        high = high * 2.0 + 0.10
-        high_value = present_value_equity_fcf(inputs, growth=high)
-    if high_value < target:
-        raise ExpectationsError("equity_value implies growth above the supported search range")
-
-    low = lower
+    low, high = lower, upper
     midpoint = (low + high) / 2.0
     midpoint_value = present_value_equity_fcf(inputs, growth=midpoint)
     for _ in range(max_iterations):
         midpoint = (low + high) / 2.0
         midpoint_value = present_value_equity_fcf(inputs, growth=midpoint)
-        relative_error = abs(midpoint_value - target) / target
-        if relative_error <= tolerance:
+        if abs(midpoint_value - target) <= residual_tolerance:
             break
         if midpoint_value < target:
             low = midpoint
@@ -147,6 +151,8 @@ def solve_implied_fcf_growth(
             high = midpoint
     else:
         raise ExpectationsError("reverse DCF solver did not converge")
+    if abs(midpoint_value - target) > residual_tolerance:
+        raise ExpectationsError("reverse DCF solver residual exceeds tolerance")
 
     return ReverseDcfResult(
         implied_fcf_growth=midpoint,

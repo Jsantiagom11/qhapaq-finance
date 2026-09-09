@@ -1,0 +1,28 @@
+QHAPAQ EVIDENCE CAPSULE
+source_mode=derived_evidence_capsule
+primary_source=NVIDIA Corporation Form 10-Q for quarter ended 2025-07-27
+canonical_url=https://www.sec.gov/Archives/edgar/data/1045810/000104581025000209/nvda-20250727.htm
+filing_date=2025-08-27
+reporting_date=2025-07-27
+accession=0001045810-25-000209
+retrieved_for_qhapaq=2026-09-09T00:00:00Z
+
+This concise Qhapaq factual extraction is from the official SEC filing; it is not
+a byte-for-byte mirror. Amounts below are USD millions except share counts.
+
+FACT INDEX
+- Fiscal 2026 is a 52-week year ending on the last Sunday in January; the second
+  quarter is a 13-week quarter. The six-month period ended 2025-07-27. Page 9.
+- Accounts receivable, net: 27,808; inventories: 14,962; accounts payable: 9,064;
+  accrued and other current liabilities: 15,193. Condensed Consolidated Balance
+  Sheets, p. 5.
+- Property and equipment, net: 9,141; intangible assets, net: 755. Balance sheet,
+  p. 5.
+- Prepaid expenses and other current assets: 2,658; operating lease assets: 2,084;
+  goodwill: 5,755; deferred income tax assets: 13,570; other assets: 7,216;
+  long-term operating lease liabilities: 1,831; other long-term liabilities:
+  6,055. Balance sheet, p. 5.
+- Cash and cash equivalents: 11,639; marketable securities: 45,152; long-term
+  debt: 8,466. Balance sheet, p. 5.
+- Diluted weighted-average shares used in six-month EPS computation: 24,571
+  million. Condensed Consolidated Statements of Income, p. 3.

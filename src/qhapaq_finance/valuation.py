@@ -20,6 +20,7 @@ class ValuationError(ValueError):
 
 
 TERMINAL_VALUE_SHARE_WARNING = 0.75
+MIN_TERMINAL_SPREAD = 1e-4
 
 
 def _number(value: Any, field: str) -> float:
@@ -211,6 +212,9 @@ class ResearchResult:
     scenarios: tuple[ScenarioValuation, ...]
     fcff_implied_discount_rate: float
     reverse_implied_growth: float
+    roic_minus_wacc: float
+    expectation_growth_gap: float
+    fcff_yield: float
     diagnostics: tuple[str, ...]
 
 
@@ -304,8 +308,8 @@ def value_scenario(case: ResearchCase, scenario: ScenarioAssumptions) -> Scenari
         _rate(scenario.terminal_growth, "terminal_growth"),
         case.capital_cost.wacc,
     )
-    if wacc <= terminal_growth:
-        raise ValuationError("terminal_growth must be less than discount_rate (WACC)")
+    if wacc - terminal_growth < MIN_TERMINAL_SPREAD:
+        raise ValuationError("terminal_growth must be at least 1 bp below discount_rate (WACC)")
     adjustments = tuple(
         _number(x.amount, "normalization adjustment") for x in case.normalization_adjustments
     )
@@ -345,9 +349,39 @@ def value_scenario(case: ResearchCase, scenario: ScenarioAssumptions) -> Scenari
         pv_explicit,
         pv_terminal,
         share,
-        1 - market.price / intrinsic,
+        margin_of_safety(market.price, intrinsic),
         warnings,
     )
+
+
+def margin_of_safety(price: float, intrinsic_value: float) -> float:
+    """Return valuation cushion; negative means price exceeds intrinsic value."""
+    price, intrinsic_value = _number(price, "price"), _number(intrinsic_value, "intrinsic_value")
+    if price <= 0 or intrinsic_value <= 0:
+        raise ValuationError("price and intrinsic_value must be positive")
+    return 1 - price / intrinsic_value
+
+
+def valuation_cushion_prices(intrinsic_value: float) -> dict[str, float]:
+    """Canonical prices for named margin-of-safety thresholds."""
+    value = _number(intrinsic_value, "intrinsic_value")
+    if value <= 0:
+        raise ValuationError("intrinsic_value must be positive")
+    return {
+        "mos_10": value * 0.90,
+        "mos_20": value * 0.80,
+        "mos_25": value * 0.75,
+        "mos_30": value * 0.70,
+    }
+
+
+def price_value_classification(price: float, intrinsic_value: float) -> str:
+    cushion = margin_of_safety(price, intrinsic_value)
+    if cushion < 0:
+        return "ABOVE FAIR VALUE"
+    if cushion == 0:
+        return "FAIR-VALUE ZONE"
+    return "WATCH ZONE"
 
 
 def _pv_fcff(
@@ -358,8 +392,8 @@ def _pv_fcff(
     terminal_growth = _rate(terminal_growth, "terminal_growth")
     discount_rate = _rate(discount_rate, "discount_rate")
     _positive_int(years, "years")
-    if discount_rate <= terminal_growth:
-        raise ValuationError("terminal_growth must be less than discount_rate")
+    if discount_rate - terminal_growth < MIN_TERMINAL_SPREAD:
+        raise ValuationError("terminal_growth must be at least 1 bp below discount_rate")
     pv, cash_flow = 0.0, starting_fcff
     for year in range(1, years + 1):
         cash_flow *= 1 + growth
@@ -420,7 +454,7 @@ def solve_fcff_implied_discount_rate(
     return _bisect(
         market_enterprise_value,
         lambda rate: _pv_fcff(starting_fcff, explicit_growth, terminal, rate, years),
-        terminal + 1e-6 if lower is None else _rate(lower, "lower"),
+        (terminal + 2 * MIN_TERMINAL_SPREAD if lower is None else _rate(lower, "lower")),
         _rate(upper, "upper"),
         "FCFF-implied discount rate",
     )
@@ -487,6 +521,9 @@ def analyze_case(case: ResearchCase) -> ResearchResult:
         scenarios,
         fcff_implied_discount_rate,
         reverse_growth,
+        roic - case.capital_cost.wacc,
+        reverse_growth - base.explicit_growth,
+        normalized / market_enterprise,
         diagnostics,
     )
 
@@ -573,11 +610,15 @@ def load_research_case(path: str | Path) -> ResearchCase:
 
 
 def load_fixture_case(ticker: str, repository_root: str | Path = ".") -> ResearchCase:
-    """Load QCOM from frozen filing evidence; the other two remain illustrations."""
+    """Load empirical cases from frozen filing evidence; other cases remain illustrations."""
     if ticker.upper() == "QCOM":
         from .qcom_case import load_qcom_case
 
         return load_qcom_case(repository_root)
+    if ticker.upper() == "NVDA":
+        from .nvda_case import load_nvda_case
+
+        return load_nvda_case(repository_root)
     return load_research_case(
         Path(repository_root) / "data/fixtures/value_research" / f"{ticker.lower()}.json"
     )

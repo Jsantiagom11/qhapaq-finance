@@ -37,7 +37,7 @@ def _investigate(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(
         description="Run the provider-backed Qhapaq agent research layer"
     )
-    parser.add_argument("ticker", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument("ticker", choices=("QCOM", "NVDA", "VRTX", "CSCO"), type=str.upper)
     parser.add_argument(
         "--json", action="store_true", help="emit the stable agent research artifact"
     )
@@ -166,9 +166,9 @@ def _research(arguments: list[str]) -> None:
 
 def _research_case(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(description="Analyze a deterministic FCFF/WACC research case")
-    parser.add_argument("ticker", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument("ticker", choices=("QCOM", "NVDA", "VRTX", "CSCO"), type=str.upper)
     parser.add_argument(
-        "--provenance", action="store_true", help="print frozen QCOM evidence bridge"
+        "--provenance", action="store_true", help="print the frozen empirical evidence bridge"
     )
     parser.add_argument("--json", action="store_true", help="emit deterministic research JSON")
     args = parser.parse_args(arguments)
@@ -182,6 +182,11 @@ def _research_case(arguments: list[str]) -> None:
 
         for key, value in qcom_audit().items():
             print(f"{key}={value}")
+    elif args.ticker == "NVDA":
+        from .nvda_case import nvda_audit
+
+        for key, value in nvda_audit().items():
+            print(f"{key}={value}")
 
 
 def _print_research_result(result: ResearchResult) -> None:
@@ -190,7 +195,9 @@ def _print_research_result(result: ResearchResult) -> None:
     print(f"as_of={case.as_of_date.isoformat()}")
     print(f"provenance={case.provenance}")
     print(
-        "case_kind=evidence-backed" if case.ticker == "QCOM" else "case_kind=illustrative fixture"
+        "case_kind=evidence-backed"
+        if case.ticker in {"QCOM", "NVDA"}
+        else "case_kind=illustrative fixture"
     )
     print(f"reconstructed_fcff={result.reconstructed_fcff:.0f}")
     print(f"normalized_fcff={result.normalized_fcff:.0f}")
@@ -232,7 +239,9 @@ def _print_research_result(result: ResearchResult) -> None:
 
 def _compare(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(description="Compare deterministic FCFF/WACC research cases")
-    parser.add_argument("tickers", nargs="+", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument(
+        "tickers", nargs="+", choices=("QCOM", "NVDA", "VRTX", "CSCO"), type=str.upper
+    )
     parser.add_argument("--json", action="store_true", help="emit deterministic universe JSON")
     args = parser.parse_args(arguments)
     if args.json:
@@ -269,8 +278,12 @@ def _compare(arguments: list[str]) -> None:
 
 def _dashboard(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(description="Generate an offline Qhapaq research dashboard")
-    parser.add_argument("ticker", nargs="?", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
-    parser.add_argument("--universe", nargs="+", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument(
+        "ticker", nargs="?", choices=("QCOM", "NVDA", "VRTX", "CSCO"), type=str.upper
+    )
+    parser.add_argument(
+        "--universe", nargs="+", choices=("QCOM", "NVDA", "VRTX", "CSCO"), type=str.upper
+    )
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts"))
     args = parser.parse_args(arguments)
     if (args.ticker is None) == (args.universe is None):

@@ -12,6 +12,8 @@ from qhapaq_finance.valuation import (
     _pv_fcff,
     analyze_case,
     load_fixture_case,
+    margin_of_safety,
+    price_value_classification,
     solve_fcff_implied_discount_rate,
     solve_fcff_implied_growth,
     value_scenario,
@@ -94,6 +96,18 @@ def test_fcff_valuation_uses_wacc_and_rejects_terminal_boundary() -> None:
     assert result.terminal_spread == pytest.approx(case.capital_cost.wacc - base.terminal_growth)
     with pytest.raises(ValuationError, match="terminal_growth"):
         value_scenario(case, replace(base, terminal_growth=case.capital_cost.wacc))
+    with pytest.raises(ValuationError, match="1 bp"):
+        value_scenario(case, replace(base, terminal_growth=case.capital_cost.wacc - 0.00001))
+
+
+@pytest.mark.parametrize("value", (float("nan"), float("inf"), float("-inf")))
+def test_valuation_rejects_nonfinite_wacc_and_terminal_growth(value: float) -> None:
+    case = load_fixture_case("QCOM", ROOT)
+    base = next(item for item in case.scenarios if item.name == "base")
+    with pytest.raises(ValuationError, match="finite"):
+        value_scenario(case, replace(base, terminal_growth=value))
+    with pytest.raises(ValuationError, match="finite"):
+        value_scenario(replace(case, capital_cost=replace(case.capital_cost, wacc=value)), base)
 
 
 def test_invalid_case_numeric_and_sign_assumptions_are_rejected() -> None:
@@ -159,6 +173,41 @@ def test_enterprise_to_equity_bridge_and_margin_of_safety() -> None:
         )
 
 
+@pytest.mark.parametrize(
+    ("field", "multiplier", "direction"),
+    (
+        ("cash_and_equivalents", 1.25, "higher"),
+        ("marketable_securities", 1.25, "higher"),
+        ("debt", 1.25, "lower"),
+        ("shares_outstanding", 2.0, "lower"),
+    ),
+)
+def test_enterprise_to_equity_bridge_monotonicity(
+    field: str, multiplier: float, direction: str
+) -> None:
+    case = load_fixture_case("QCOM", ROOT)
+    base = next(item for item in case.scenarios if item.name == "base")
+    baseline = value_scenario(case, base).intrinsic_value_per_share
+    market_update = {field: getattr(case.market_snapshot, field) * multiplier}
+    changed_market = replace(case.market_snapshot, **market_update)
+    changed_case = replace(case, market_snapshot=changed_market)
+    if field in {"debt", "shares_outstanding"}:
+        changed_case = replace(
+            changed_case,
+            capital_cost=CapitalCost.from_assumptions(
+                risk_free_rate=case.capital_cost.risk_free_rate,
+                equity_risk_premium=case.capital_cost.equity_risk_premium,
+                beta=case.capital_cost.beta,
+                pre_tax_cost_of_debt=case.capital_cost.pre_tax_cost_of_debt,
+                tax_rate=case.capital_cost.tax_rate,
+                market_equity=changed_market.equity_value,
+                debt=changed_market.debt,
+            ),
+        )
+    changed = value_scenario(changed_case, base).intrinsic_value_per_share
+    assert changed > baseline if direction == "higher" else changed < baseline
+
+
 def test_bear_base_bull_are_independent() -> None:
     result = analyze_case(load_fixture_case("QCOM", ROOT))
     scenarios = {item.name: item for item in result.scenarios}
@@ -167,6 +216,31 @@ def test_bear_base_bull_are_independent() -> None:
         < scenarios["base"].intrinsic_value_per_share
         < scenarios["bull"].intrinsic_value_per_share
     )
+
+
+@pytest.mark.parametrize("ticker", ["VRTX", "CSCO"])
+def test_second_company_synthetic_gate_is_deterministic_and_financially_coherent(
+    ticker: str,
+) -> None:
+    """These are intentionally labelled fixtures, not empirical company evidence."""
+    first = analyze_case(load_fixture_case(ticker, ROOT))
+    second = analyze_case(load_fixture_case(ticker, ROOT))
+    valuations = {item.name: item for item in first.scenarios}
+    assert first == second
+    assert (
+        valuations["bear"].intrinsic_value_per_share < valuations["base"].intrinsic_value_per_share
+    )
+    assert (
+        valuations["base"].intrinsic_value_per_share < valuations["bull"].intrinsic_value_per_share
+    )
+
+
+def test_cushion_and_price_value_classification_share_one_financial_contract() -> None:
+    assert margin_of_safety(80, 100) == pytest.approx(0.20)
+    assert margin_of_safety(120, 100) == pytest.approx(-0.20)
+    assert price_value_classification(120, 100) == "ABOVE FAIR VALUE"
+    assert price_value_classification(100, 100) == "FAIR-VALUE ZONE"
+    assert price_value_classification(80, 100) == "WATCH ZONE"
 
 
 def test_reverse_dcf_convergence_boundary_and_no_solution() -> None:
