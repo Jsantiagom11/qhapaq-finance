@@ -54,15 +54,74 @@ class OllamaProvider:
         if timeout <= 0:
             raise ValueError("Ollama timeout must be positive")
         self._model = model
-        self._url = f"{base_url.rstrip('/')}/api/chat"
+        self._base_url = base_url.rstrip("/")
+        self._url = f"{self._base_url}/api/chat"
         self._timeout = timeout
         self._opener = opener
         self._diagnostics: dict[str, dict[str, bool]] = {}
+        self._unload_attempted = False
+        self._unload_succeeded = False
 
     @property
     def diagnostics(self) -> dict[str, dict[str, bool]]:
         """Return per-stage contract-repair outcomes without changing the artifact schema."""
         return {stage: values.copy() for stage, values in self._diagnostics.items()}
+
+    @property
+    def lifecycle_diagnostics(self) -> dict[str, object]:
+        """Minimal local runtime diagnostics kept outside the stable artifact contract."""
+        return {
+            "local_profile": True,
+            "provider": "ollama",
+            "model": self._model,
+            "repair_attempted": any(
+                values["repair_attempted"] for values in self._diagnostics.values()
+            ),
+            "repair_succeeded": any(
+                values["repair_succeeded"] for values in self._diagnostics.values()
+            ),
+            "model_unload_attempted": self._unload_attempted,
+            "model_unload_succeeded": self._unload_succeeded,
+        }
+
+    def preflight(self) -> None:
+        """Check only daemon reachability and local model availability; never pull a model."""
+        request = Request(f"{self._base_url}/api/tags", method="GET")
+        try:
+            with self._opener(request, timeout=self._timeout) as response:
+                raw = response.read()
+        except HTTPError as exc:
+            raise OllamaProviderError(f"OLLAMA_HTTP_ERROR: HTTP {exc.code}") from exc
+        except (URLError, TimeoutError, OSError) as exc:
+            raise OllamaProviderError("OLLAMA_UNAVAILABLE: local daemon connection failed") from exc
+        try:
+            models = json.loads(raw.decode("utf-8"))["models"]
+            names = {item["name"] for item in models if isinstance(item, dict)}
+        except (KeyError, TypeError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise OllamaProviderError("OLLAMA_INVALID_RESPONSE: malformed model list") from exc
+        if self._model not in names:
+            raise OllamaProviderError(
+                f"OLLAMA_MODEL_MISSING: model '{self._model}' is not installed; "
+                f"run: ollama pull {self._model}"
+            )
+
+    def unload(self) -> bool:
+        """Release the model after a pipeline without masking its primary outcome."""
+        self._unload_attempted = True
+        request = Request(
+            f"{self._base_url}/api/generate",
+            data=json.dumps({"model": self._model, "keep_alive": 0, "stream": False}).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with self._opener(request, timeout=self._timeout) as response:
+                response.read()
+        except (HTTPError, URLError, TimeoutError, OSError):
+            self._unload_succeeded = False
+            return False
+        self._unload_succeeded = True
+        return True
 
     def synthesize(
         self, artifact: dict[str, object], interpretation: DeterministicInterpretation

@@ -32,6 +32,7 @@ from qhapaq_finance.agents.ollama_adapter import (
 from qhapaq_finance.agents.openai_adapter import OpenAIAgentsProvider
 from qhapaq_finance.agents.orchestrator import AgentPipelineError, ResearchOrchestrator
 from qhapaq_finance.agents.validation import NumericalClaimValidator, evidence_catalog
+from qhapaq_finance.config import LOCAL_RESEARCH_PROFILE
 from qhapaq_finance.dashboard import build_company_artifact, canonical_json
 
 ROOT = Path(__file__).parents[1]
@@ -522,7 +523,7 @@ def test_ollama_synthesis_repairs_numeric_qualitative_field_once() -> None:
     invalid["assessment"] = "Watch at 10 percent"
     valid = _ollama_synthesis(float(artifact["market"]["price"]))
     transport = OllamaTransport([invalid, valid])
-    provider = OllamaProvider("qwen3.5:4b", opener=transport)
+    provider = OllamaProvider("chosen-model", opener=transport)
     synthesis = provider.synthesize(artifact, interpret_artifact(artifact))
     assert synthesis.assessment == "Watch valuation discipline"
     assert synthesis.numeric_claims[0].value == artifact["market"]["price"]
@@ -533,7 +534,7 @@ def test_ollama_synthesis_repairs_numeric_qualitative_field_once() -> None:
         "repair_succeeded": True,
     }
     repair = transport.requests[1]
-    assert repair["model"] == "qwen3.5:4b"
+    assert repair["model"] == "chosen-model"
     assert repair["stream"] is False
     assert repair["think"] is False
     assert repair["options"] == {"temperature": 0}
@@ -586,7 +587,7 @@ def test_ollama_provider_fails_closed_for_invalid_structured_output(content: obj
     artifact = build_company_artifact("QCOM", ROOT)
     transport = OllamaTransport([content])
     with pytest.raises(OllamaProviderError, match="OLLAMA_INVALID_RESPONSE"):
-        OllamaProvider("qwen3.5:4b", opener=transport).synthesize(
+        OllamaProvider("chosen-model", opener=transport).synthesize(
             artifact, interpret_artifact(artifact)
         )
     assert len(transport.requests) == 1
@@ -601,7 +602,7 @@ def test_ollama_provider_reports_connection_failure_explicitly() -> None:
 
     artifact = build_company_artifact("QCOM", ROOT)
     with pytest.raises(OllamaProviderError, match="OLLAMA_UNAVAILABLE"):
-        OllamaProvider("qwen3.5:4b", opener=unavailable).synthesize(
+        OllamaProvider("chosen-model", opener=unavailable).synthesize(
             artifact, interpret_artifact(artifact)
         )
     assert len(requests) == 1
@@ -613,7 +614,7 @@ def test_ollama_provider_rejects_wrong_ollama_response_shape() -> None:
 
     artifact = build_company_artifact("QCOM", ROOT)
     with pytest.raises(OllamaProviderError, match="OLLAMA_INVALID_RESPONSE"):
-        OllamaProvider("qwen3.5:4b", opener=wrong_shape).synthesize(
+        OllamaProvider("chosen-model", opener=wrong_shape).synthesize(
             artifact, interpret_artifact(artifact)
         )
 
@@ -665,6 +666,136 @@ def test_ollama_cli_does_not_require_openai_key(
     artifact = build_company_artifact("QCOM", ROOT)
     responses = [_ollama_synthesis(float(artifact["market"]["price"])), _ollama_challenge()]
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setattr(OllamaProvider, "preflight", lambda self: None)
+    monkeypatch.setattr(OllamaProvider, "unload", lambda self: True)
     monkeypatch.setattr(OllamaProvider, "_run", lambda *args, **kwargs: responses.pop(0))
-    cli.main(["investigate", "QCOM", "--provider", "ollama", "--model", "qwen3.5:4b", "--json"])
+    cli.main(["investigate", "QCOM", "--provider", "ollama", "--model", "qwen3.5:9b", "--json"])
     assert '"provider": "OllamaProvider"' in capsys.readouterr().out
+
+
+def test_local_profile_is_the_validated_immutable_default() -> None:
+    assert LOCAL_RESEARCH_PROFILE.provider == "ollama"
+    assert LOCAL_RESEARCH_PROFILE.model == "qwen3.5:9b"
+    assert LOCAL_RESEARCH_PROFILE.endpoint == "http://127.0.0.1:11434"
+    assert LOCAL_RESEARCH_PROFILE.temperature == 0
+    assert not LOCAL_RESEARCH_PROFILE.think
+    assert not LOCAL_RESEARCH_PROFILE.stream
+    assert LOCAL_RESEARCH_PROFILE.max_contract_repairs == 1
+    assert LOCAL_RESEARCH_PROFILE.unload_after_run
+
+
+def test_ollama_preflight_checks_tags_without_pulling() -> None:
+    requests: list[object] = []
+
+    def available(request: object, *, timeout: float) -> _Response:
+        requests.append(request)
+        return _Response({"models": [{"name": "qwen3.5:9b"}]})
+
+    OllamaProvider("qwen3.5:9b", opener=available).preflight()
+    assert requests[0].get_method() == "GET"  # type: ignore[attr-defined]
+    assert requests[0].full_url.endswith("/api/tags")  # type: ignore[attr-defined]
+
+
+def test_ollama_preflight_reports_unavailable_and_missing_model() -> None:
+    def unavailable(request: object, *, timeout: float) -> _Response:
+        raise URLError("refused")
+
+    with pytest.raises(OllamaProviderError, match="OLLAMA_UNAVAILABLE"):
+        OllamaProvider("qwen3.5:9b", opener=unavailable).preflight()
+
+    with pytest.raises(OllamaProviderError, match=r"ollama pull qwen3.5:9b"):
+        OllamaProvider(
+            "qwen3.5:9b", opener=lambda request, timeout: _Response({"models": []})
+        ).preflight()
+
+
+def test_ollama_unload_uses_local_keep_alive_zero_request() -> None:
+    requests: list[object] = []
+
+    def released(request: object, *, timeout: float) -> _Response:
+        requests.append(request)
+        return _Response({"done": True})
+
+    provider = OllamaProvider("qwen3.5:9b", opener=released)
+    assert provider.unload()
+    request = requests[0]
+    assert request.full_url.endswith("/api/generate")  # type: ignore[attr-defined]
+    assert json.loads(request.data.decode()) == {  # type: ignore[attr-defined]
+        "model": "qwen3.5:9b",
+        "keep_alive": 0,
+        "stream": False,
+    }
+    assert provider.lifecycle_diagnostics["model_unload_attempted"]
+    assert provider.lifecycle_diagnostics["model_unload_succeeded"]
+
+
+def test_local_cli_selects_default_or_overridden_model_and_never_needs_openai(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setattr(OllamaProvider, "preflight", lambda self: None)
+    monkeypatch.setattr(OllamaProvider, "unload", lambda self: True)
+    seen: list[str] = []
+    responses = [_ollama_synthesis(float(artifact["market"]["price"])), _ollama_challenge()]
+
+    def respond(self: OllamaProvider, **kwargs: object) -> dict[str, object]:
+        seen.append(self._model)
+        return responses.pop(0)
+
+    monkeypatch.setattr(OllamaProvider, "_run", respond)
+    cli.main(["investigate", "QCOM", "--local", "--json"])
+    assert seen == ["qwen3.5:9b", "qwen3.5:9b"]
+    capsys.readouterr()
+    responses[:] = [_ollama_synthesis(float(artifact["market"]["price"])), _ollama_challenge()]
+    cli.main(["investigate", "QCOM", "--local", "--model", "custom-local", "--json"])
+    assert seen[-2:] == ["custom-local", "custom-local"]
+
+
+def test_local_cli_rejects_explicit_provider_combination() -> None:
+    with pytest.raises(SystemExit) as exc:
+        cli.main(["investigate", "QCOM", "--local", "--provider", "ollama"])
+    assert exc.value.code == 2
+
+
+def test_local_cli_unloads_once_after_pipeline_success_or_failure(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    events: list[str] = []
+    monkeypatch.setattr(OllamaProvider, "preflight", lambda self: events.append("preflight"))
+    monkeypatch.setattr(OllamaProvider, "unload", lambda self: events.append("unload") or True)
+    responses = [_ollama_synthesis(float(artifact["market"]["price"])), _ollama_challenge()]
+
+    def success(self: OllamaProvider, **kwargs: object) -> dict[str, object]:
+        events.append("challenge" if responses and len(responses) == 1 else "synthesis")
+        return responses.pop(0)
+
+    monkeypatch.setattr(OllamaProvider, "_run", success)
+    cli.main(["investigate", "QCOM", "--local"])
+    assert events == ["preflight", "synthesis", "challenge", "unload"]
+
+    events.clear()
+    monkeypatch.setattr(OllamaProvider, "_run", lambda self, **kwargs: {"ticker": "QCOM"})
+    monkeypatch.setattr(
+        OllamaProvider,
+        "unload",
+        lambda self: events.append("unload") or (_ for _ in ()).throw(RuntimeError("cleanup")),
+    )
+    with pytest.raises(AgentPipelineError):
+        cli.main(["investigate", "QCOM", "--local"])
+    assert events == ["preflight", "unload"]
+
+
+def test_unload_failure_is_diagnostic_only_after_valid_local_artifact(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    monkeypatch.setattr(OllamaProvider, "preflight", lambda self: None)
+    monkeypatch.setattr(OllamaProvider, "unload", lambda self: False)
+    responses = [_ollama_synthesis(float(artifact["market"]["price"])), _ollama_challenge()]
+    monkeypatch.setattr(OllamaProvider, "_run", lambda *args, **kwargs: responses.pop(0))
+    cli.main(["investigate", "QCOM", "--local", "--json"])
+    captured = capsys.readouterr()
+    assert '"schema_version": "agent-research-v1"' in captured.out
+    assert "Ollama model unload failed" in captured.err

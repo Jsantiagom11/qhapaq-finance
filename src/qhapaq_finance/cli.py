@@ -2,6 +2,7 @@ import argparse
 import os
 import sys
 import webbrowser
+from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -40,14 +41,21 @@ def _investigate(arguments: list[str]) -> None:
     parser.add_argument(
         "--json", action="store_true", help="emit the stable agent research artifact"
     )
-    parser.add_argument("--provider", choices=("openai", "ollama"), default="openai")
+    parser.add_argument(
+        "--local", action="store_true", help="use the validated local Ollama profile"
+    )
+    parser.add_argument("--provider", choices=("openai", "ollama"))
     parser.add_argument("--model")
     args = parser.parse_args(arguments)
+    if args.local and args.provider is not None:
+        parser.error("--local cannot be combined with --provider; use one provider selection")
+    provider_name = "ollama" if args.local else args.provider or "openai"
     from .agents.orchestrator import ResearchOrchestrator
     from .agents.provider import AgentProvider
 
     provider: AgentProvider
-    if args.provider == "openai":
+    local_cleanup: Callable[[], bool] | None = None
+    if provider_name == "openai":
         if not os.environ.get("OPENAI_API_KEY"):
             parser.error(
                 "OpenAI investigate requires OPENAI_API_KEY; deterministic commands remain offline"
@@ -57,9 +65,26 @@ def _investigate(arguments: list[str]) -> None:
         provider = OpenAIAgentsProvider(model=args.model or "gpt-4.1-mini")
     else:
         from .agents.ollama_adapter import OllamaProvider
+        from .config import LOCAL_RESEARCH_PROFILE
 
-        provider = OllamaProvider(model=args.model or "qwen3.5:4b")
-    result = ResearchOrchestrator(provider).investigate(build_company_artifact(args.ticker))
+        provider = OllamaProvider(
+            model=args.model or LOCAL_RESEARCH_PROFILE.model,
+            base_url=LOCAL_RESEARCH_PROFILE.endpoint,
+        )
+        local_cleanup = provider.unload
+        try:
+            provider.preflight()
+        except Exception as exc:
+            parser.error(str(exc))
+    try:
+        result = ResearchOrchestrator(provider).investigate(build_company_artifact(args.ticker))
+    finally:
+        try:
+            unloaded = local_cleanup() if local_cleanup is not None else True
+        except Exception:
+            unloaded = False
+        if not unloaded:
+            print("warning: Ollama model unload failed", file=sys.stderr)
     if args.json:
         print(canonical_json(result.to_dict()), end="")
     else:

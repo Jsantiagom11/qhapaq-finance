@@ -2,6 +2,23 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
+class LocalResearchProfile:
+    """The deliberately small, zero-cost local inference configuration."""
+
+    provider: str = "ollama"
+    model: str = "qwen3.5:9b"
+    endpoint: str = "http://127.0.0.1:11434"
+    temperature: int = 0
+    think: bool = False
+    stream: bool = False
+    max_contract_repairs: int = 1
+    unload_after_run: bool = True
+
+
+LOCAL_RESEARCH_PROFILE = LocalResearchProfile()
+
+
+@dataclass(frozen=True)
 class ResearchConfig:
     """Explicit assumptions used by the baseline experiment."""
 
