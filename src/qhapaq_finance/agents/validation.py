@@ -8,6 +8,7 @@ from typing import Any
 
 from .contracts import (
     EvidenceKind,
+    EvidenceRef,
     NumericUnit,
     ResearchSynthesis,
     ThesisChallenge,
@@ -35,6 +36,100 @@ class ValidationResult:
                 for item in self.failures
             ],
         }
+
+
+@dataclass(frozen=True)
+class EvidenceCatalogEntry:
+    """One provider-selectable evidence item from the numerical firewall allowlist."""
+
+    evidence_id: str
+    evidence_ref: EvidenceRef
+    metric_label: str
+    value: float
+    unit: NumericUnit
+
+    def to_dict(self) -> dict[str, object]:
+        return {
+            "evidence_id": self.evidence_id,
+            "evidence_path": self.evidence_ref.path,
+            "evidence_kind": self.evidence_ref.kind.value,
+            "metric_label": self.metric_label,
+            "value": self.value,
+            "unit": self.unit.value,
+        }
+
+
+def evidence_catalog(
+    artifact: dict[str, Any], interpretation: DeterministicInterpretation
+) -> tuple[EvidenceCatalogEntry, ...]:
+    """Return the stable, complete numerical-firewall allowlist for a provider."""
+    deterministic = EvidenceKind.DETERMINISTIC_ARTIFACT
+    signal = EvidenceKind.INTERPRETATION_SIGNAL
+    return (
+        EvidenceCatalogEntry(
+            "market_price",
+            EvidenceRef("market.price", deterministic),
+            "Market price",
+            float(artifact["market"]["price"]),
+            NumericUnit.USD_PER_SHARE,
+        ),
+        EvidenceCatalogEntry(
+            "base_intrinsic_value",
+            EvidenceRef("valuation.scenarios.base.intrinsic_value", deterministic),
+            "Base intrinsic value",
+            float(artifact["valuation"]["scenarios"]["base"]["intrinsic_value"]),
+            NumericUnit.USD_PER_SHARE,
+        ),
+        EvidenceCatalogEntry(
+            "base_margin_of_safety",
+            EvidenceRef("valuation.scenarios.base.margin_of_safety", deterministic),
+            "Base margin of safety",
+            float(artifact["valuation"]["scenarios"]["base"]["margin_of_safety"]),
+            NumericUnit.RATIO,
+        ),
+        EvidenceCatalogEntry(
+            "base_terminal_value_share",
+            EvidenceRef("valuation.scenarios.base.terminal_value_share", deterministic),
+            "Base terminal value share",
+            float(artifact["valuation"]["scenarios"]["base"]["terminal_value_share"]),
+            NumericUnit.RATIO,
+        ),
+        EvidenceCatalogEntry(
+            "roic_minus_wacc",
+            EvidenceRef("economics.roic_minus_wacc", deterministic),
+            "ROIC minus WACC",
+            float(artifact["economics"]["roic_minus_wacc"]),
+            NumericUnit.RATIO,
+        ),
+        EvidenceCatalogEntry(
+            "growth_difference",
+            EvidenceRef("valuation.expectations.growth_difference_pp", deterministic),
+            "Growth difference",
+            float(artifact["valuation"]["expectations"]["growth_difference_pp"]) * 100,
+            NumericUnit.PERCENTAGE_POINT,
+        ),
+        EvidenceCatalogEntry(
+            "price_fair_value_distance",
+            EvidenceRef("price_fair_value_distance", signal),
+            "Price-to-fair-value distance",
+            interpretation.price_fair_value_distance,
+            NumericUnit.RATIO,
+        ),
+        EvidenceCatalogEntry(
+            "market_implied_growth_gap",
+            EvidenceRef("market_implied_growth_gap_pp", signal),
+            "Market-implied growth gap",
+            interpretation.market_implied_growth_gap_pp * 100,
+            NumericUnit.PERCENTAGE_POINT,
+        ),
+        EvidenceCatalogEntry(
+            "roic_wacc_spread",
+            EvidenceRef("roic_wacc_spread", signal),
+            "ROIC-WACC spread",
+            interpretation.roic_wacc_spread,
+            NumericUnit.RATIO,
+        ),
+    )
 
 
 class NumericalClaimValidator:
@@ -109,52 +204,11 @@ class NumericalClaimValidator:
     def _allowed(
         self, artifact: dict[str, Any], interpretation: DeterministicInterpretation
     ) -> dict[tuple[EvidenceKind, str], tuple[float, NumericUnit, str]]:
-        deterministic = EvidenceKind.DETERMINISTIC_ARTIFACT
-        signal = EvidenceKind.INTERPRETATION_SIGNAL
         return {
-            (deterministic, "market.price"): (
-                float(artifact["market"]["price"]),
-                NumericUnit.USD_PER_SHARE,
-                "Market price",
-            ),
-            (deterministic, "valuation.scenarios.base.intrinsic_value"): (
-                float(artifact["valuation"]["scenarios"]["base"]["intrinsic_value"]),
-                NumericUnit.USD_PER_SHARE,
-                "Base intrinsic value",
-            ),
-            (deterministic, "valuation.scenarios.base.margin_of_safety"): (
-                float(artifact["valuation"]["scenarios"]["base"]["margin_of_safety"]),
-                NumericUnit.RATIO,
-                "Base margin of safety",
-            ),
-            (deterministic, "valuation.scenarios.base.terminal_value_share"): (
-                float(artifact["valuation"]["scenarios"]["base"]["terminal_value_share"]),
-                NumericUnit.RATIO,
-                "Base terminal value share",
-            ),
-            (deterministic, "economics.roic_minus_wacc"): (
-                float(artifact["economics"]["roic_minus_wacc"]),
-                NumericUnit.RATIO,
-                "ROIC minus WACC",
-            ),
-            (deterministic, "valuation.expectations.growth_difference_pp"): (
-                float(artifact["valuation"]["expectations"]["growth_difference_pp"]) * 100,
-                NumericUnit.PERCENTAGE_POINT,
-                "Growth difference",
-            ),
-            (signal, "price_fair_value_distance"): (
-                interpretation.price_fair_value_distance,
-                NumericUnit.RATIO,
-                "Price-to-fair-value distance",
-            ),
-            (signal, "market_implied_growth_gap_pp"): (
-                interpretation.market_implied_growth_gap_pp * 100,
-                NumericUnit.PERCENTAGE_POINT,
-                "Market-implied growth gap",
-            ),
-            (signal, "roic_wacc_spread"): (
-                interpretation.roic_wacc_spread,
-                NumericUnit.RATIO,
-                "ROIC-WACC spread",
-            ),
+            (entry.evidence_ref.kind, entry.evidence_ref.path): (
+                entry.value,
+                entry.unit,
+                entry.metric_label,
+            )
+            for entry in evidence_catalog(artifact, interpretation)
         }

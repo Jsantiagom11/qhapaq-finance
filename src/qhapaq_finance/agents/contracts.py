@@ -26,6 +26,24 @@ class NumericUnit(StrEnum):
     PERCENTAGE_POINT = "PERCENTAGE_POINT"
 
 
+# These names define the qualitative portions of the provider-independent contracts.
+# Providers may derive output constraints from them, but contract validation remains final.
+RESEARCH_SYNTHESIS_QUALITATIVE_TEXT_FIELDS = ("assessment", "thesis")
+RESEARCH_SYNTHESIS_QUALITATIVE_ITEMS_FIELDS = (
+    "positive_evidence",
+    "negative_evidence",
+    "critical_assumptions",
+    "invalidation_conditions",
+    "open_questions",
+)
+THESIS_CHALLENGE_QUALITATIVE_ITEMS_FIELDS = (
+    "challenges",
+    "fragile_assumptions",
+    "missing_evidence",
+    "potential_confirmation_bias",
+)
+
+
 @dataclass(frozen=True)
 class EvidenceRef:
     """A stable path into a deterministic input or interpretation signal."""
@@ -100,15 +118,9 @@ class ResearchSynthesis:
         _text(self.ticker, "ticker")
         if not isinstance(self.confidence, Confidence):
             raise ValueError("confidence must be a Confidence")
-        _qualitative(self.assessment, "assessment")
-        _qualitative(self.thesis, "thesis")
-        for field in (
-            "positive_evidence",
-            "negative_evidence",
-            "critical_assumptions",
-            "invalidation_conditions",
-            "open_questions",
-        ):
+        for field in RESEARCH_SYNTHESIS_QUALITATIVE_TEXT_FIELDS:
+            _qualitative(getattr(self, field), field)
+        for field in RESEARCH_SYNTHESIS_QUALITATIVE_ITEMS_FIELDS:
             _items(getattr(self, field), field)
         _evidence_refs(self.evidence_refs)
         _numeric_claims(self.numeric_claims)
@@ -124,12 +136,7 @@ class ThesisChallenge:
     numeric_claims: tuple[NumericClaim, ...] = ()
 
     def __post_init__(self) -> None:
-        for field in (
-            "challenges",
-            "fragile_assumptions",
-            "missing_evidence",
-            "potential_confirmation_bias",
-        ):
+        for field in THESIS_CHALLENGE_QUALITATIVE_ITEMS_FIELDS:
             _items(getattr(self, field), field)
         _evidence_refs(self.evidence_refs)
         _numeric_claims(self.numeric_claims)

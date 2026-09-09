@@ -8,6 +8,7 @@ from typing import Any, cast
 
 from .contracts import ResearchSynthesis, ThesisChallenge
 from .interpretation import DeterministicInterpretation
+from .validation import evidence_catalog
 
 
 class OpenAIAgentsProvider:
@@ -19,6 +20,7 @@ class OpenAIAgentsProvider:
     def synthesize(
         self, artifact: dict[str, object], interpretation: DeterministicInterpretation
     ) -> ResearchSynthesis:
+        catalog = evidence_catalog(artifact, interpretation)
         return cast(
             ResearchSynthesis,
             self._run(
@@ -26,11 +28,15 @@ class OpenAIAgentsProvider:
                 instructions=(
                     "Interpret only supplied deterministic evidence. Do not calculate, invent, or "
                     "change financial facts. All prose must be qualitative: place every number in "
-                    "numeric_claims with an explicit evidence_ref. Use the exact canonical metric "
-                    "label for its evidence_ref."
+                    "numeric_claims with an explicit evidence_ref. Use ONLY ALLOWED_EVIDENCE; "
+                    "never invent or infer paths. Copy its exact path, metric label, value, and unit."
                 ),
                 output_type=ResearchSynthesis,
-                payload={"artifact": artifact, "interpretation": interpretation.to_dict()},
+                payload={
+                    "artifact": artifact,
+                    "interpretation": interpretation.to_dict(),
+                    "ALLOWED_EVIDENCE": [entry.to_dict() for entry in catalog],
+                },
             ),
         )
 
@@ -40,6 +46,7 @@ class OpenAIAgentsProvider:
         interpretation: DeterministicInterpretation,
         synthesis: ResearchSynthesis,
     ) -> ThesisChallenge:
+        catalog = evidence_catalog(artifact, interpretation)
         return cast(
             ThesisChallenge,
             self._run(
@@ -47,14 +54,15 @@ class OpenAIAgentsProvider:
                 instructions=(
                     "Adversarially challenge the supplied thesis using only supplied deterministic "
                     "evidence. Do not calculate or invent financial facts. Put every number in "
-                    "numeric_claims with an explicit evidence_ref. Use the exact canonical metric "
-                    "label for its evidence_ref."
+                    "numeric_claims with an explicit evidence_ref. Use ONLY ALLOWED_EVIDENCE; "
+                    "never invent or infer paths. Copy its exact path, metric label, value, and unit."
                 ),
                 output_type=ThesisChallenge,
                 payload={
                     "artifact": artifact,
                     "interpretation": interpretation.to_dict(),
                     "synthesis": synthesis,
+                    "ALLOWED_EVIDENCE": [entry.to_dict() for entry in catalog],
                 },
             ),
         )

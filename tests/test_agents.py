@@ -4,6 +4,7 @@
 import json
 from dataclasses import replace
 from pathlib import Path
+from urllib.error import HTTPError, URLError
 
 import pytest
 
@@ -22,8 +23,15 @@ from qhapaq_finance.agents.interpretation import (
     SignalCode,
     interpret_artifact,
 )
+from qhapaq_finance.agents.ollama_adapter import (
+    OllamaProvider,
+    OllamaProviderError,
+    _challenge_schema,
+    _synthesis_schema,
+)
+from qhapaq_finance.agents.openai_adapter import OpenAIAgentsProvider
 from qhapaq_finance.agents.orchestrator import AgentPipelineError, ResearchOrchestrator
-from qhapaq_finance.agents.validation import NumericalClaimValidator
+from qhapaq_finance.agents.validation import NumericalClaimValidator, evidence_catalog
 from qhapaq_finance.dashboard import build_company_artifact, canonical_json
 
 ROOT = Path(__file__).parents[1]
@@ -148,6 +156,110 @@ def test_firewall_rejects_spoofed_evidence_reference() -> None:
     assert result.failures[0].reason == "unknown evidence reference"
 
 
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/valuation/scenarios/base/intrinsic_value",
+        "/interpretation/valuation_status",
+        "/interpretation/margin_of_safety",
+    ],
+)
+def test_firewall_rejects_invented_json_pointer_evidence_paths(path: str) -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    interpretation = interpret_artifact(artifact)
+    synthesis = FakeProvider().synthesize(artifact, interpretation)
+    invalid = replace(
+        synthesis,
+        evidence_refs=(EvidenceRef(path, EvidenceKind.DETERMINISTIC_ARTIFACT),),
+    )
+    result = NumericalClaimValidator().validate(invalid, artifact, interpretation)
+    assert not result.valid
+    assert result.failures[0].reason == "unknown evidence reference"
+
+
+def test_evidence_catalog_is_stable_and_is_the_validator_allowlist() -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    interpretation = interpret_artifact(artifact)
+    catalog = evidence_catalog(artifact, interpretation)
+    assert catalog == evidence_catalog(artifact, interpretation)
+    assert [entry.evidence_id for entry in catalog] == [
+        "market_price",
+        "base_intrinsic_value",
+        "base_margin_of_safety",
+        "base_terminal_value_share",
+        "roic_minus_wacc",
+        "growth_difference",
+        "price_fair_value_distance",
+        "market_implied_growth_gap",
+        "roic_wacc_spread",
+    ]
+    assert next(
+        entry for entry in catalog if entry.evidence_id == "base_intrinsic_value"
+    ).to_dict() == {
+        "evidence_id": "base_intrinsic_value",
+        "evidence_path": "valuation.scenarios.base.intrinsic_value",
+        "evidence_kind": "DETERMINISTIC_ARTIFACT",
+        "metric_label": "Base intrinsic value",
+        "value": artifact["valuation"]["scenarios"]["base"]["intrinsic_value"],
+        "unit": "USD_PER_SHARE",
+    }
+    content = ResearchSynthesis(
+        ticker="QCOM",
+        assessment="Watch valuation discipline",
+        confidence=Confidence.MEDIUM,
+        thesis="Cash generation supports a conditional case",
+        positive_evidence=("Value creation is positive",),
+        negative_evidence=("Terminal dependence is material",),
+        critical_assumptions=("Cash conversion persists",),
+        invalidation_conditions=("Capital efficiency deteriorates",),
+        open_questions=("What sustains durable demand",),
+        evidence_refs=tuple(entry.evidence_ref for entry in catalog),
+        numeric_claims=tuple(
+            NumericClaim(entry.metric_label, entry.value, entry.unit, entry.evidence_ref)
+            for entry in catalog
+        ),
+    )
+    assert NumericalClaimValidator().validate(content, artifact, interpretation).valid
+
+
+@pytest.mark.parametrize(
+    ("label", "value", "unit", "reason"),
+    [
+        (
+            "Invented label",
+            0.0,
+            NumericUnit.USD_PER_SHARE,
+            "label does not match referenced metric",
+        ),
+        (
+            "Market price",
+            0.0,
+            NumericUnit.USD_PER_SHARE,
+            "value does not match deterministic evidence",
+        ),
+        ("Market price", 0.0, NumericUnit.RATIO, "unit does not match referenced value"),
+    ],
+)
+def test_validator_rejects_changed_canonical_tuple_after_evidence_selection(
+    label: str, value: float, unit: NumericUnit, reason: str
+) -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    interpretation = interpret_artifact(artifact)
+    synthesis = FakeProvider().synthesize(artifact, interpretation)
+    selected = next(
+        entry
+        for entry in evidence_catalog(artifact, interpretation)
+        if entry.evidence_id == "market_price"
+    )
+    invalid = replace(
+        synthesis,
+        numeric_claims=(NumericClaim(label, value, unit, selected.evidence_ref),),
+    )
+    result = NumericalClaimValidator().validate(invalid, artifact, interpretation)
+    assert not result.valid
+    assert result.failures[0].reason == reason
+
+
 def test_orchestration_order_serialization_and_failure_propagation() -> None:
     artifact = build_company_artifact("QCOM", ROOT)
     provider = FakeProvider()
@@ -228,3 +340,331 @@ def test_investigate_requires_configuration_without_affecting_offline_commands(
     assert "OPENAI_API_KEY" in capsys.readouterr().err
     cli.main(["research", "QCOM", "--json"])
     assert '"schema_version": "dashboard-research-v1"' in capsys.readouterr().out
+
+
+class _Response:
+    def __init__(self, data: object) -> None:
+        self._data = json.dumps(data).encode()
+
+    def __enter__(self) -> "_Response":
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        return None
+
+    def read(self) -> bytes:
+        return self._data
+
+
+class OllamaTransport:
+    def __init__(self, contents: list[object]) -> None:
+        self.contents = contents
+        self.requests: list[dict[str, object]] = []
+
+    def __call__(self, request: object, *, timeout: float) -> _Response:
+        data = json.loads(request.data.decode())  # type: ignore[attr-defined]
+        self.requests.append(data)
+        return _Response({"message": {"content": json.dumps(self.contents.pop(0))}})
+
+
+def _ollama_synthesis(price: float) -> dict[str, object]:
+    return {
+        "ticker": "QCOM",
+        "assessment": "Watch valuation discipline",
+        "confidence": "MEDIUM",
+        "thesis": "Cash generation supports a conditional case",
+        "positive_evidence": ["Value creation is positive"],
+        "negative_evidence": ["Terminal dependence is material"],
+        "critical_assumptions": ["Cash conversion persists"],
+        "invalidation_conditions": ["Capital efficiency deteriorates"],
+        "open_questions": ["What sustains durable demand"],
+        "evidence_refs": [{"evidence_id": "market_price"}],
+        "numeric_claims": [{"evidence_id": "market_price"}],
+    }
+
+
+def _ollama_challenge() -> dict[str, object]:
+    return {
+        "challenges": ["The valuation depends on durable cash generation"],
+        "fragile_assumptions": ["Capital returns remain strong"],
+        "missing_evidence": ["Segment demand persistence needs evidence"],
+        "potential_confirmation_bias": ["Recent execution may receive too much weight"],
+        "evidence_refs": [{"evidence_id": "market_price"}],
+        "numeric_claims": [],
+    }
+
+
+def test_ollama_provider_uses_schema_constrained_local_requests() -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    transport = OllamaTransport(
+        [_ollama_synthesis(float(artifact["market"]["price"])), _ollama_challenge()]
+    )
+    provider = OllamaProvider("chosen-model", opener=transport)
+    result = ResearchOrchestrator(provider).investigate(artifact)
+    assert result.validation["synthesis"].valid
+    assert result.validation["challenge"].valid
+    assert len(transport.requests) == 2
+    assert provider.diagnostics == {
+        "synthesis": {
+            "initial_contract_valid": True,
+            "repair_attempted": False,
+            "repair_succeeded": False,
+        },
+        "challenge": {
+            "initial_contract_valid": True,
+            "repair_attempted": False,
+            "repair_succeeded": False,
+        },
+    }
+    for request in transport.requests:
+        assert request["model"] == "chosen-model"
+        assert request["stream"] is False
+        assert request["think"] is False
+        assert request["options"] == {"temperature": 0}
+        assert request["format"]["type"] == "object"  # type: ignore[index]
+        assert request["format"]["additionalProperties"] is False  # type: ignore[index]
+        instructions = request["messages"][0]["content"]  # type: ignore[index]
+        assert "must contain no digits" in instructions
+        assert "prices, percentages, ratios, dates, counts" in instructions
+        assert "only in numeric_claims" in instructions
+        assert "Do not restate numeric facts in prose" in instructions
+        assert "ALLOWED_EVIDENCE" in instructions
+        assert "never invent, shorten, normalize, infer, or construct a path" in instructions
+        payload = json.loads(request["messages"][1]["content"])  # type: ignore[index]
+        assert "artifact" not in payload
+        assert payload["ALLOWED_EVIDENCE"] == [
+            entry.to_dict() for entry in evidence_catalog(artifact, interpret_artifact(artifact))
+        ]
+        assert any(
+            entry["evidence_id"] == "base_intrinsic_value" for entry in payload["ALLOWED_EVIDENCE"]
+        )
+
+
+def test_ollama_schema_contains_all_contract_qualitative_fields() -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    catalog = evidence_catalog(artifact, interpret_artifact(artifact))
+    synthesis_properties = _synthesis_schema(catalog)["properties"]  # type: ignore[index]
+    assert synthesis_properties["evidence_refs"]["items"]["properties"]["evidence_id"][  # type: ignore[index]
+        "enum"
+    ] == [entry.evidence_id for entry in catalog]
+    assert synthesis_properties["numeric_claims"]["items"]["properties"]["evidence_id"][  # type: ignore[index]
+        "enum"
+    ] == [entry.evidence_id for entry in catalog]
+    for field in ("assessment", "thesis"):
+        assert synthesis_properties[field] == {"type": "string", "minLength": 1}  # type: ignore[index]
+    for field in (
+        "positive_evidence",
+        "negative_evidence",
+        "critical_assumptions",
+        "invalidation_conditions",
+        "open_questions",
+    ):
+        assert synthesis_properties[field]["items"] == {"type": "string", "minLength": 1}  # type: ignore[index]
+
+    challenge_properties = _challenge_schema(catalog)["properties"]  # type: ignore[index]
+    for field in (
+        "challenges",
+        "fragile_assumptions",
+        "missing_evidence",
+        "potential_confirmation_bias",
+    ):
+        assert challenge_properties[field]["items"] == {"type": "string", "minLength": 1}  # type: ignore[index]
+
+
+def test_ollama_resolves_a_valid_canonical_evidence_selection() -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    response = _ollama_synthesis(float(artifact["market"]["price"]))
+    response["evidence_refs"] = [{"evidence_id": "base_intrinsic_value"}]
+    response["numeric_claims"] = [{"evidence_id": "base_intrinsic_value"}]
+    provider = OllamaProvider("chosen-model", opener=OllamaTransport([response]))
+    synthesis = provider.synthesize(artifact, interpret_artifact(artifact))
+    assert synthesis.numeric_claims == (
+        NumericClaim(
+            "Base intrinsic value",
+            float(artifact["valuation"]["scenarios"]["base"]["intrinsic_value"]),
+            NumericUnit.USD_PER_SHARE,
+            EvidenceRef(
+                "valuation.scenarios.base.intrinsic_value", EvidenceKind.DETERMINISTIC_ARTIFACT
+            ),
+        ),
+    )
+
+
+def test_openai_provider_receives_the_same_allowed_evidence_catalog(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    interpretation = interpret_artifact(artifact)
+    expected = [entry.to_dict() for entry in evidence_catalog(artifact, interpretation)]
+    provider = OpenAIAgentsProvider()
+    calls: list[dict[str, object]] = []
+
+    def capture(**kwargs: object) -> object:
+        calls.append(kwargs)
+        return (
+            FakeProvider().synthesize(artifact, interpretation)
+            if kwargs["name"] == "Qhapaq Research Synthesis"
+            else FakeProvider().challenge(
+                artifact, interpretation, FakeProvider().synthesize(artifact, interpretation)
+            )
+        )
+
+    monkeypatch.setattr(provider, "_run", capture)
+    synthesis = provider.synthesize(artifact, interpretation)
+    provider.challenge(artifact, interpretation, synthesis)
+    assert [call["payload"]["ALLOWED_EVIDENCE"] for call in calls] == [expected, expected]  # type: ignore[index]
+
+
+def test_ollama_synthesis_repairs_numeric_qualitative_field_once() -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    catalog = evidence_catalog(artifact, interpret_artifact(artifact))
+    invalid = _ollama_synthesis(float(artifact["market"]["price"]))
+    invalid["assessment"] = "Watch at 10 percent"
+    valid = _ollama_synthesis(float(artifact["market"]["price"]))
+    transport = OllamaTransport([invalid, valid])
+    provider = OllamaProvider("qwen3.5:4b", opener=transport)
+    synthesis = provider.synthesize(artifact, interpret_artifact(artifact))
+    assert synthesis.assessment == "Watch valuation discipline"
+    assert synthesis.numeric_claims[0].value == artifact["market"]["price"]
+    assert len(transport.requests) == 2
+    assert provider.diagnostics["synthesis"] == {
+        "initial_contract_valid": False,
+        "repair_attempted": True,
+        "repair_succeeded": True,
+    }
+    repair = transport.requests[1]
+    assert repair["model"] == "qwen3.5:4b"
+    assert repair["stream"] is False
+    assert repair["think"] is False
+    assert repair["options"] == {"temperature": 0}
+    assert repair["format"] == _synthesis_schema(catalog)
+    repair_payload = json.loads(repair["messages"][1]["content"])  # type: ignore[index]
+    assert repair_payload["original_structured_output"] == invalid
+    assert repair_payload["output_json_schema"] == _synthesis_schema(catalog)
+    assert "FIELD: assessment" in repair_payload["contract_feedback"]
+    assert "qualitative fields must contain no digits" in repair_payload["contract_feedback"]
+
+
+def test_ollama_challenge_repairs_numeric_qualitative_field_once() -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    invalid = _ollama_challenge()
+    invalid["challenges"] = ["The downside is 10 percent"]
+    transport = OllamaTransport([invalid, _ollama_challenge()])
+    provider = OllamaProvider("chosen-model", opener=transport)
+    interpretation = interpret_artifact(artifact)
+    challenge = provider.challenge(
+        artifact,
+        interpretation,
+        FakeProvider().synthesize(artifact, interpretation),
+    )
+    assert challenge.challenges == ("The valuation depends on durable cash generation",)
+    assert len(transport.requests) == 2
+    assert provider.diagnostics["challenge"]["repair_succeeded"]
+    repair_payload = json.loads(transport.requests[1]["messages"][1]["content"])  # type: ignore[index]
+    assert "FIELD: challenges" in repair_payload["contract_feedback"]
+
+
+def test_ollama_contract_repair_failure_is_explicit_and_bounded() -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    invalid = _ollama_synthesis(float(artifact["market"]["price"]))
+    invalid["thesis"] = "The result is 10 percent favorable"
+    transport = OllamaTransport([invalid, invalid])
+    provider = OllamaProvider("chosen-model", opener=transport)
+    with pytest.raises(OllamaProviderError, match="OLLAMA_CONTRACT_REPAIR_FAILED") as exc:
+        provider.synthesize(artifact, interpret_artifact(artifact))
+    assert len(transport.requests) == 2
+    assert exc.value.initial_failure is not None
+    assert exc.value.repair_failure is not None
+    assert provider.diagnostics["synthesis"]["repair_succeeded"] is False
+
+
+@pytest.mark.parametrize(
+    "content",
+    ["not json", ["not", "an", "object"], {"ticker": "QCOM"}],
+)
+def test_ollama_provider_fails_closed_for_invalid_structured_output(content: object) -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    transport = OllamaTransport([content])
+    with pytest.raises(OllamaProviderError, match="OLLAMA_INVALID_RESPONSE"):
+        OllamaProvider("qwen3.5:4b", opener=transport).synthesize(
+            artifact, interpret_artifact(artifact)
+        )
+    assert len(transport.requests) == 1
+
+
+def test_ollama_provider_reports_connection_failure_explicitly() -> None:
+    requests: list[object] = []
+
+    def unavailable(request: object, *, timeout: float) -> _Response:
+        requests.append(request)
+        raise URLError("refused")
+
+    artifact = build_company_artifact("QCOM", ROOT)
+    with pytest.raises(OllamaProviderError, match="OLLAMA_UNAVAILABLE"):
+        OllamaProvider("qwen3.5:4b", opener=unavailable).synthesize(
+            artifact, interpret_artifact(artifact)
+        )
+    assert len(requests) == 1
+
+
+def test_ollama_provider_rejects_wrong_ollama_response_shape() -> None:
+    def wrong_shape(request: object, *, timeout: float) -> _Response:
+        return _Response({"response": "not a chat response"})
+
+    artifact = build_company_artifact("QCOM", ROOT)
+    with pytest.raises(OllamaProviderError, match="OLLAMA_INVALID_RESPONSE"):
+        OllamaProvider("qwen3.5:4b", opener=wrong_shape).synthesize(
+            artifact, interpret_artifact(artifact)
+        )
+
+
+def test_ollama_provider_reports_missing_model_explicitly() -> None:
+    requests: list[object] = []
+
+    def missing_model(request: object, *, timeout: float) -> _Response:
+        requests.append(request)
+        raise HTTPError("http://127.0.0.1:11434/api/chat", 404, "not found", {}, None)
+
+    artifact = build_company_artifact("QCOM", ROOT)
+    with pytest.raises(OllamaProviderError, match="OLLAMA_MODEL_MISSING"):
+        OllamaProvider("absent-model", opener=missing_model).synthesize(
+            artifact, interpret_artifact(artifact)
+        )
+    assert len(requests) == 1
+
+
+def test_ollama_http_error_does_not_trigger_repair() -> None:
+    requests: list[object] = []
+
+    def server_error(request: object, *, timeout: float) -> _Response:
+        requests.append(request)
+        raise HTTPError("http://127.0.0.1:11434/api/chat", 500, "server error", {}, None)
+
+    artifact = build_company_artifact("QCOM", ROOT)
+    with pytest.raises(OllamaProviderError, match="OLLAMA_HTTP_ERROR"):
+        OllamaProvider("chosen-model", opener=server_error).synthesize(
+            artifact, interpret_artifact(artifact)
+        )
+    assert len(requests) == 1
+
+
+def test_unknown_evidence_id_fails_closed_without_repair() -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    response = _ollama_synthesis(float(artifact["market"]["price"]))
+    response["evidence_refs"] = [{"evidence_id": "invented_path"}]
+    transport = OllamaTransport([response])
+    provider = OllamaProvider("chosen-model", opener=transport)
+    with pytest.raises(OllamaProviderError, match="OLLAMA_INVALID_RESPONSE: unknown evidence_id"):
+        provider.synthesize(artifact, interpret_artifact(artifact))
+    assert len(transport.requests) == 1
+
+
+def test_ollama_cli_does_not_require_openai_key(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    artifact = build_company_artifact("QCOM", ROOT)
+    responses = [_ollama_synthesis(float(artifact["market"]["price"])), _ollama_challenge()]
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setattr(OllamaProvider, "_run", lambda *args, **kwargs: responses.pop(0))
+    cli.main(["investigate", "QCOM", "--provider", "ollama", "--model", "qwen3.5:4b", "--json"])
+    assert '"provider": "OllamaProvider"' in capsys.readouterr().out

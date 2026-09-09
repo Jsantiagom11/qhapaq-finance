@@ -40,16 +40,26 @@ def _investigate(arguments: list[str]) -> None:
     parser.add_argument(
         "--json", action="store_true", help="emit the stable agent research artifact"
     )
-    parser.add_argument("--model", default="gpt-4.1-mini")
+    parser.add_argument("--provider", choices=("openai", "ollama"), default="openai")
+    parser.add_argument("--model")
     args = parser.parse_args(arguments)
-    if not os.environ.get("OPENAI_API_KEY"):
-        parser.error("investigate requires OPENAI_API_KEY; deterministic commands remain offline")
-    from .agents.openai_adapter import OpenAIAgentsProvider
     from .agents.orchestrator import ResearchOrchestrator
+    from .agents.provider import AgentProvider
 
-    result = ResearchOrchestrator(OpenAIAgentsProvider(model=args.model)).investigate(
-        build_company_artifact(args.ticker)
-    )
+    provider: AgentProvider
+    if args.provider == "openai":
+        if not os.environ.get("OPENAI_API_KEY"):
+            parser.error(
+                "OpenAI investigate requires OPENAI_API_KEY; deterministic commands remain offline"
+            )
+        from .agents.openai_adapter import OpenAIAgentsProvider
+
+        provider = OpenAIAgentsProvider(model=args.model or "gpt-4.1-mini")
+    else:
+        from .agents.ollama_adapter import OllamaProvider
+
+        provider = OllamaProvider(model=args.model or "qwen3.5:4b")
+    result = ResearchOrchestrator(provider).investigate(build_company_artifact(args.ticker))
     if args.json:
         print(canonical_json(result.to_dict()), end="")
     else:
