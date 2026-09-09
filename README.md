@@ -95,3 +95,32 @@ data/frozen/ecb/             verified ECB snapshot and provenance manifest
 src/qhapaq_finance/          momentum baseline, data validation, and ECB renderer
 tests/                       deterministic method and evidence-boundary tests
 ```
+
+## Visual QA (WebKit / iPad Pro)
+
+Visual QA is development tooling only. It renders the same offline standalone dashboard,
+serves it briefly on localhost (to avoid `file://` WebKit storage differences), and captures
+full-page WebKit screenshots. Playwright is an optional dependency and is not needed for
+`qhapaq research`, `qhapaq compare`, `qhapaq dashboard`, or `qhapaq investigate`.
+
+WSL2 one-time setup:
+
+```bash
+uv sync --extra visual
+uv run playwright install webkit
+# If Playwright reports missing Linux libraries, review and run explicitly:
+uv run playwright install-deps webkit
+```
+
+Run the audit (no browser download or system-package installation occurs here):
+
+```bash
+uv run python -m qhapaq_finance.visual_audit QCOM --device ipad-pro-13
+```
+
+Artifacts are written to `output/visual-audit/qcom/<UTC-run-id>/`: the rendered dashboard,
+eight portrait/landscape primary screenshots, two narrow responsive stress screenshots,
+`manifest.json`, and self-contained `report.html` (screenshots are embedded as data URLs);
+it does not require internet access. Touch-target and clipping observations are warnings, while
+browser/render failures, missing required page state, screenshot failures, and horizontal page
+overflow fail the command.
