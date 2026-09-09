@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 import webbrowser
 from datetime import datetime, timedelta, timezone
@@ -6,6 +7,14 @@ from pathlib import Path
 
 from .backtest import run_backtest
 from .config import ResearchConfig
+from .dashboard import (
+    build_company_artifact,
+    build_universe_artifact,
+    canonical_json,
+    render_company_dashboard,
+    render_universe_dashboard,
+    write_artifacts,
+)
 from .data import download_adjusted_close, file_sha256
 from .expectations import ReverseDcfInputs, solve_implied_fcf_growth
 from .market import (
@@ -20,6 +29,33 @@ from .one import build_one_model, render_one_html
 from .research import load_research_record
 from .research_report import render_research_report
 from .tearsheet import build_tearsheet_model, png_dimensions, render_tearsheet
+from .valuation import ResearchResult, analyze_case, load_fixture_case
+
+
+def _investigate(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(
+        description="Run the provider-backed Qhapaq agent research layer"
+    )
+    parser.add_argument("ticker", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument(
+        "--json", action="store_true", help="emit the stable agent research artifact"
+    )
+    parser.add_argument("--model", default="gpt-4.1-mini")
+    args = parser.parse_args(arguments)
+    if not os.environ.get("OPENAI_API_KEY"):
+        parser.error("investigate requires OPENAI_API_KEY; deterministic commands remain offline")
+    from .agents.openai_adapter import OpenAIAgentsProvider
+    from .agents.orchestrator import ResearchOrchestrator
+
+    result = ResearchOrchestrator(OpenAIAgentsProvider(model=args.model)).investigate(
+        build_company_artifact(args.ticker)
+    )
+    if args.json:
+        print(canonical_json(result.to_dict()), end="")
+    else:
+        print(f"ticker={result.ticker}")
+        print(f"assessment={result.synthesis.assessment}")
+        print(f"confidence={result.synthesis.confidence}")
 
 
 def _baseline(arguments: list[str]) -> None:
@@ -91,6 +127,133 @@ def _research(arguments: list[str]) -> None:
     print(f"issuer={issuer['name']} ({issuer['ticker']})")
     print(f"evidence_coverage={coverage}")
     print(f"html_sha256={file_sha256(output)}")
+
+
+def _research_case(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(description="Analyze a deterministic FCFF/WACC research case")
+    parser.add_argument("ticker", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument(
+        "--provenance", action="store_true", help="print frozen QCOM evidence bridge"
+    )
+    parser.add_argument("--json", action="store_true", help="emit deterministic research JSON")
+    args = parser.parse_args(arguments)
+    if args.json:
+        print(canonical_json(build_company_artifact(args.ticker)), end="")
+        return
+    result = analyze_case(load_fixture_case(args.ticker))
+    _print_research_result(result)
+    if args.ticker == "QCOM":
+        from .qcom_case import qcom_audit
+
+        for key, value in qcom_audit().items():
+            print(f"{key}={value}")
+
+
+def _print_research_result(result: ResearchResult) -> None:
+    case = result.case
+    print(f"ticker={case.ticker}")
+    print(f"as_of={case.as_of_date.isoformat()}")
+    print(f"provenance={case.provenance}")
+    print(
+        "case_kind=evidence-backed" if case.ticker == "QCOM" else "case_kind=illustrative fixture"
+    )
+    print(f"reconstructed_fcff={result.reconstructed_fcff:.0f}")
+    print(f"normalized_fcff={result.normalized_fcff:.0f}")
+    print(f"nopat={result.nopat:.0f}")
+    print(f"roic={result.roic:.2%}")
+    print(f"reinvestment_rate={case.reinvestment_rate:.2%}")
+    print(f"growth_consistency={result.growth_consistency}")
+    cost = case.capital_cost
+    for name in (
+        "risk_free_rate",
+        "equity_risk_premium",
+        "beta",
+        "cost_of_equity",
+        "pre_tax_cost_of_debt",
+        "tax_rate",
+        "market_equity",
+        "debt",
+        "equity_weight",
+        "debt_weight",
+        "wacc",
+    ):
+        value = getattr(cost, name)
+        if name in {"beta", "market_equity", "debt"}:
+            print(f"{name}={value:.2f}" if name == "beta" else f"{name}={value:.0f}")
+        else:
+            print(f"{name}={value:.2%}")
+    for scenario in result.scenarios:
+        prefix = f"{scenario.name}_"
+        print(f"{prefix}intrinsic_value={scenario.intrinsic_value_per_share:.2f}")
+        print(f"{prefix}margin_of_safety={scenario.margin_of_safety:.2%}")
+        print(f"{prefix}terminal_spread={scenario.terminal_spread:.2%}")
+        print(f"{prefix}terminal_value_share={scenario.terminal_value_share:.2%}")
+    print(f"reverse_implied_growth={result.reverse_implied_growth:.2%}")
+    print(f"fcff_implied_discount_rate={result.fcff_implied_discount_rate:.2%}")
+    print(f"thesis={' | '.join(case.thesis)}")
+    print(f"invalidation={' | '.join(case.invalidation_conditions)}")
+    print(f"diagnostics={' | '.join(result.diagnostics) if result.diagnostics else 'none'}")
+
+
+def _compare(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(description="Compare deterministic FCFF/WACC research cases")
+    parser.add_argument("tickers", nargs="+", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument("--json", action="store_true", help="emit deterministic universe JSON")
+    args = parser.parse_args(arguments)
+    if args.json:
+        print(canonical_json(build_universe_artifact(tuple(args.tickers))), end="")
+        return
+    print(
+        " ".join(
+            (
+                "ticker",
+                "normalized_fcff_yield",
+                "roic",
+                "wacc",
+                "roic_minus_wacc",
+                "base_mos",
+                "bear_mos",
+                "fcff_implied_discount_rate",
+                "terminal_value_share",
+            )
+        )
+    )
+    for ticker in args.tickers:
+        result = analyze_case(load_fixture_case(ticker))
+        case = result.case
+        scenarios = {item.name: item for item in result.scenarios}
+        yield_value = result.normalized_fcff / case.market_snapshot.enterprise_value
+        print(
+            f"{ticker} {yield_value:.2%} {result.roic:.2%} {case.capital_cost.wacc:.2%} "
+            f"{result.roic - case.capital_cost.wacc:.2%} {scenarios['base'].margin_of_safety:.2%} "
+            f"{scenarios['bear'].margin_of_safety:.2%} "
+            f"{result.fcff_implied_discount_rate:.2%} "
+            f"{scenarios['base'].terminal_value_share:.2%}"
+        )
+
+
+def _dashboard(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(description="Generate an offline Qhapaq research dashboard")
+    parser.add_argument("ticker", nargs="?", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument("--universe", nargs="+", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument("--output-dir", type=Path, default=Path("artifacts"))
+    args = parser.parse_args(arguments)
+    if (args.ticker is None) == (args.universe is None):
+        parser.error("provide one ticker or --universe TICKER [...]")
+    tickers = (args.ticker,) if args.ticker else tuple(args.universe)
+    written = write_artifacts(tickers, args.output_dir)
+    if args.ticker:
+        output = render_company_dashboard(
+            build_company_artifact(args.ticker),
+            args.output_dir / f"{args.ticker.lower()}-dashboard.html",
+        )
+    else:
+        output = render_universe_dashboard(
+            build_universe_artifact(tickers), args.output_dir / "qhapaq-universe.html"
+        )
+    print(f"dashboard={output}")
+    for name, path in sorted(written.items()):
+        print(f"artifact_{name}={path}")
 
 
 def _market(arguments: list[str]) -> None:
@@ -242,9 +405,18 @@ def main(argv: list[str] | None = None) -> None:
     if arguments and arguments[0] == "tearsheet":
         _tearsheet(arguments[1:])
     elif arguments and arguments[0] == "research":
-        _research(arguments[1:])
+        if len(arguments) >= 2 and arguments[1].upper() in {"QCOM", "VRTX", "CSCO"}:
+            _research_case(arguments[1:])
+        else:
+            _research(arguments[1:])
+    elif arguments and arguments[0] == "compare":
+        _compare(arguments[1:])
+    elif arguments and arguments[0] == "dashboard":
+        _dashboard(arguments[1:])
     elif arguments and arguments[0] == "market":
         _market(arguments[1:])
+    elif arguments and arguments[0] == "investigate":
+        _investigate(arguments[1:])
     elif arguments and arguments[0] == "reverse-dcf":
         _reverse_dcf(arguments[1:])
     elif arguments and not arguments[0].startswith("-"):

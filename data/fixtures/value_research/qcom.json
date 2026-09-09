@@ -1,0 +1,16 @@
+{
+  "schema_version": "0.1",
+  "fixture_label": "deterministic example input; not live financial data",
+  "ticker": "QCOM",
+  "as_of_date": "2026-09-08",
+  "provenance": "Illustrative semiconductor/licensing case for deterministic architecture tests.",
+  "financial_inputs": {"ebit": 12000, "tax_rate": 0.18, "depreciation_amortization": 1800, "capex": 1400, "change_in_nwc": 300},
+  "normalization_adjustments": [{"label": "Working-capital timing normalization", "amount": 250}],
+  "capital_cost_assumptions": {"risk_free_rate": 0.04, "equity_risk_premium": 0.05, "beta": 1.1, "pre_tax_cost_of_debt": 0.045, "tax_rate": 0.18},
+  "invested_capital": 30000, "reinvestment_rate": 0.32,
+  "scenarios": [{"name": "bear", "explicit_growth": 0.01, "terminal_growth": 0.02, "years": 8}, {"name": "base", "explicit_growth": 0.06, "terminal_growth": 0.025, "years": 8}, {"name": "bull", "explicit_growth": 0.1, "terminal_growth": 0.03, "years": 8}],
+  "market_snapshot": {"price": 150, "shares_outstanding": 1100, "cash_and_equivalents": 11000, "debt": 15000, "other_senior_claims": 0},
+  "thesis": ["Licensing and semiconductor economics can generate strong cash conversion."],
+  "invalidation_conditions": ["Sustained licensing pressure or a severe handset-cycle impairment."],
+  "risk_notes": ["Cyclicality, customer concentration, and licensing exposure."]
+}

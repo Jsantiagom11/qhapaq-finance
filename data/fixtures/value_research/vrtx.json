@@ -1,0 +1,16 @@
+{
+  "schema_version": "0.1",
+  "fixture_label": "deterministic example input; not live financial data",
+  "ticker": "VRTX",
+  "as_of_date": "2026-09-08",
+  "provenance": "Illustrative high-return biotech case for deterministic architecture tests.",
+  "financial_inputs": {"ebit": 5000, "tax_rate": 0.18, "depreciation_amortization": 500, "capex": 400, "change_in_nwc": 150},
+  "normalization_adjustments": [{"label": "R&D timing normalization", "amount": 100}],
+  "capital_cost_assumptions": {"risk_free_rate": 0.04, "equity_risk_premium": 0.05, "beta": 0.7, "pre_tax_cost_of_debt": 0.04, "tax_rate": 0.18},
+  "invested_capital": 9000, "reinvestment_rate": 0.2,
+  "scenarios": [{"name": "bear", "explicit_growth": 0.02, "terminal_growth": 0.02, "years": 8}, {"name": "base", "explicit_growth": 0.09, "terminal_growth": 0.025, "years": 8}, {"name": "bull", "explicit_growth": 0.14, "terminal_growth": 0.03, "years": 8}],
+  "market_snapshot": {"price": 420, "shares_outstanding": 250, "cash_and_equivalents": 10000, "debt": 1500, "other_senior_claims": 0},
+  "thesis": ["High return on capital can support reinvestment-led compounding."],
+  "invalidation_conditions": ["Product concentration or pipeline disappointment reduces durable cash generation."],
+  "risk_notes": ["Product concentration and R&D/pipeline execution."]
+}

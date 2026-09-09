@@ -13,3 +13,11 @@ logs/
 .env
 /artifacts/research-tearsheet-demo.png
 /artifacts/research/
+
+# Local credentials
+.netrc
+.npmrc
+.pypirc
+
+# Generated artifacts
+output/
