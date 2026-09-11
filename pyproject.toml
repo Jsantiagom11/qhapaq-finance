@@ -41,3 +41,7 @@ select = ["E", "F", "I", "UP", "B"]
 [[tool.mypy.overrides]]
 module = ["yfinance", "yfinance.*"]
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["playwright", "playwright.*"]
+ignore_missing_imports = true

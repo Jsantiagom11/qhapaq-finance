@@ -4,16 +4,15 @@
 
 - Objective: align repository documentation with the evidence-first company research and portfolio
   decision direction without changing implementation.
-- Repository root: `/home/propane/workspace/qhapaq-finance`.
+- Repository root: `<repo-root>`.
 - Branch: `feat/frozen-ecb-fx-snapshot` (unchanged).
 - Starting HEAD: `92381c9c18edb2d0f965a9b162a94929e19dfbfa`.
-- Required predecessor check: the user-reported commit equals starting HEAD.
+- Required predecessor check: the expected predecessor commit equals starting HEAD.
 - Initial worktree: clean; `git status --short` returned no paths.
-- Applicable `AGENTS.md`: none found in the repository or its parent workspace.
 
 ## Inspected evidence and boundary
 
-The local README, package metadata, governance documents, source, tests, frozen ECB manifest and
+The repository README, package metadata, governance documents, source, tests, frozen ECB manifest and
 dataset documentation, prior daily reports, Git history, and rendered PNG were inspected. Source and
 tests implement a momentum methodological baseline plus checksum-validated ECB loading and a
 deterministic FX PNG renderer. The recorded renderer report documents passing tests and visual
@@ -22,8 +21,8 @@ documentation-only increment. The PNG was opened and inspected during this sessi
 
 No inspected source implements company research records, portfolio ingestion, economic dependency
 modeling, before/after decision comparison, or portfolio optimization. Planned product statements
-are labeled accordingly. No supplied research-universe spreadsheet was found in the repository, and
-no claim is made about files elsewhere in WSL.
+are labeled accordingly. No research-universe spreadsheet was present in the repository, and no
+claim is made about files outside the repository boundary.
 
 ## Documentation changes
 
@@ -55,8 +54,8 @@ execution.
 
 ## Unresolved inputs
 
-- Location and contents of the supplied research universe, and selection of one real company from
-  that verified universe.
+- Location and contents of the research universe, and selection of one real company from that
+  verified universe.
 - For future portfolio decisions: horizon, reference currency, liquidity needs, risk tolerance,
   constraints, and comparison benchmark.
 

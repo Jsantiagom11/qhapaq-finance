@@ -16,6 +16,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           enable-cache: true
+      - run: python scripts/check_publication.py
       - run: uv sync --frozen --extra dev
       - run: uv lock --check
       - run: uv run ruff format --check .

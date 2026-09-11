@@ -50,8 +50,8 @@ rejection, and absence of a network or synthetic fallback.
 
 ## Final quality gates
 
-Commands used `UV_CACHE_DIR=/tmp/qhapaq-uv-cache`; rendering commands and tests additionally used
-`MPLCONFIGDIR=/tmp/qhapaq-mplconfig` where applicable.
+Commands used `UV_CACHE_DIR=<cache-dir>`; rendering commands and tests additionally used
+`MPLCONFIGDIR=<matplotlib-cache-dir>` where applicable.
 
 | Command | Result |
 | --- | --- |
@@ -73,18 +73,16 @@ format, lint, and targeted-test checks passed before the complete final sequence
 
 ## Reproducibility and artifact
 
-Two separate CLI processes rendered to
-`/tmp/qhapaq-tearsheet-renders.4SsrSf/render-1.png` and
-`/tmp/qhapaq-tearsheet-renders.4SsrSf/render-2.png`, each with `--as-of 2026-08-31`. `cmp` confirmed
-identical bytes. Both temporary renders and the final repository demo have:
+Two separate CLI processes rendered to temporary files under `<tmp>/qhapaq-tearsheet-renders/`, each
+with `--as-of 2026-08-31`. `cmp` confirmed identical bytes. Both temporary renders and the final
+repository demo have:
 
 - Dimensions: `2400 x 1350`, 8-bit RGBA PNG.
 - SHA-256: `f64fbef0b0cb3045f32b46b65bed1c438b21f640426f4c5805903eb21e2518db`.
 - Final path: `artifacts/research-tearsheet-demo.png`.
 
-The previously existing PNG was preserved without overwrite at
-`/tmp/qhapaq-tearsheet-backup.Z9U6Pv/research-tearsheet-demo.png`; its historical SHA-256 was also
-`f64fbef0b0cb3045f32b46b65bed1c438b21f640426f4c5805903eb21e2518db`.
+The previously existing PNG was preserved outside the repository before overwrite; its historical
+SHA-256 was also `f64fbef0b0cb3045f32b46b65bed1c438b21f640426f4c5805903eb21e2518db`.
 The PNG and backup remain outside the commit.
 
 ## Visual inspection
