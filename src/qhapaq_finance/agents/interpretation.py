@@ -4,11 +4,11 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from enum import StrEnum
+from enum import Enum
 from typing import Any
 
 
-class SignalCode(StrEnum):
+class SignalCode(str, Enum):
     ABOVE_FAIR_VALUE = "ABOVE_FAIR_VALUE"
     BELOW_FAIR_VALUE = "BELOW_FAIR_VALUE"
     AT_FAIR_VALUE = "AT_FAIR_VALUE"
