@@ -11,8 +11,10 @@ from .accounting import (
     TtmFactSpec,
     normalize_accounting_snapshot,
 )
+from .capital_cost import load_legacy_assumptions
 from .evidence import FinancialFact, load_facts
 from .market import load_market_snapshot
+from .market_inputs import canonical_market_input
 from .valuation import (
     CapitalCost,
     FcffInputs,
@@ -48,8 +50,12 @@ NVDA_ACCOUNTING_SPEC = AccountingEvidenceSpec(
 
 
 def _accounting_snapshot(facts: dict[str, FinancialFact]) -> AccountingSnapshot:
-    # Filing tax expense / pretax income is not asserted to be a durable operating-tax rate.
-    return normalize_accounting_snapshot(facts, spec=NVDA_ACCOUNTING_SPEC, tax_rate=0.18)
+    assumptions = load_legacy_assumptions(
+        Path(__file__).resolve().parents[2] / "data/research/nvda/capital-cost-legacy.json"
+    )
+    return normalize_accounting_snapshot(
+        facts, spec=NVDA_ACCOUNTING_SPEC, tax_rate=assumptions["tax_rate"]
+    )
 
 
 def _require_reconciled(facts: dict[str, FinancialFact]) -> None:
@@ -74,22 +80,24 @@ def load_nvda_case(repository_root: str | Path = ".") -> ResearchCase:
     assert snapshot.invested_capital is not None and snapshot.valuation_shares is not None
     assert snapshot.cash is not None and snapshot.marketable_securities is not None
     assert snapshot.debt is not None
-    frozen_market = load_market_snapshot(root / "data/research/nvda/market-2026-09-04.json")
-    if frozen_market.ticker != "NVDA":
-        raise ValueError("NVDA market snapshot ticker mismatch")
+    market_input = canonical_market_input(
+        root=root,
+        ticker="NVDA",
+        evaluation_as_of=NVDA_AS_OF,
+        valuation_shares=snapshot.valuation_shares,
+    )
+    if market_input is None:
+        raise ValueError("NVDA canonical market profile is unavailable")
     market = MarketSnapshot(
-        price=frozen_market.price,
+        price=market_input.price,
         shares_outstanding=snapshot.valuation_shares,
         cash_and_equivalents=snapshot.cash,
         marketable_securities=snapshot.marketable_securities,
         debt=snapshot.debt,
     )
+    assumptions = load_legacy_assumptions(root / "data/research/nvda/capital-cost-legacy.json")
     cost = CapitalCost.from_assumptions(
-        risk_free_rate=0.04,
-        equity_risk_premium=0.05,
-        beta=1.30,
-        pre_tax_cost_of_debt=0.045,
-        tax_rate=snapshot.tax_rate,
+        **assumptions,
         market_equity=market.equity_value,
         debt=market.debt,
     )
@@ -129,6 +137,7 @@ def load_nvda_case(repository_root: str | Path = ".") -> ResearchCase:
             "it excludes goodwill, leases and financial investments as an explicit classification "
             "policy.",
         ),
+        market_input.provenance(NVDA_AS_OF),
     )
 
 

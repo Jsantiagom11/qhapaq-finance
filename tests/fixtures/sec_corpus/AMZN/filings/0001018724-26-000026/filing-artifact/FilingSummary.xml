@@ -1,0 +1,698 @@
+<?xml version='1.0' encoding='utf-8'?>
+<FilingSummary>
+  <Version>3.26.1</Version>
+  <ProcessingTime/>
+  <ReportFormat>html</ReportFormat>
+  <ContextCount>360</ContextCount>
+  <ElementCount>388</ElementCount>
+  <EntityCount>1</EntityCount>
+  <FootnotesReported>false</FootnotesReported>
+  <SegmentCount>100</SegmentCount>
+  <ScenarioCount>0</ScenarioCount>
+  <TuplesReported>false</TuplesReported>
+  <UnitCount>10</UnitCount>
+  <MyReports>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R1.htm</HtmlFileName>
+      <LongName>0000001 - Document - Cover</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/Cover</Role>
+      <ShortName>Cover</ShortName>
+      <MenuCategory>Cover</MenuCategory>
+      <Position>1</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R2.htm</HtmlFileName>
+      <LongName>9952151 - Statement - Consolidated Statements of Cash Flows</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/ConsolidatedStatementsofCashFlows</Role>
+      <ShortName>Consolidated Statements of Cash Flows</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>2</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R3.htm</HtmlFileName>
+      <LongName>9952152 - Statement - Consolidated Statements of Operations</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/ConsolidatedStatementsofOperations</Role>
+      <ShortName>Consolidated Statements of Operations</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>3</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R4.htm</HtmlFileName>
+      <LongName>9952153 - Statement - Consolidated Statements of Comprehensive Income</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/ConsolidatedStatementsofComprehensiveIncome</Role>
+      <ShortName>Consolidated Statements of Comprehensive Income</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>4</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R5.htm</HtmlFileName>
+      <LongName>9952154 - Statement - Consolidated Statements of Comprehensive Income (Parenthetical)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/ConsolidatedStatementsofComprehensiveIncomeParenthetical</Role>
+      <ShortName>Consolidated Statements of Comprehensive Income (Parenthetical)</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>5</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R6.htm</HtmlFileName>
+      <LongName>9952155 - Statement - Consolidated Balance Sheets</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/ConsolidatedBalanceSheets</Role>
+      <ShortName>Consolidated Balance Sheets</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>6</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R7.htm</HtmlFileName>
+      <LongName>9952156 - Statement - Consolidated Balance Sheets (Parenthetical)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/ConsolidatedBalanceSheetsParenthetical</Role>
+      <ShortName>Consolidated Balance Sheets (Parenthetical)</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>7</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R8.htm</HtmlFileName>
+      <LongName>9952157 - Disclosure - Accounting Policies and Supplemental Disclosures</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosures</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>8</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R9.htm</HtmlFileName>
+      <LongName>9952158 - Disclosure - Financial Instruments</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/FinancialInstruments</Role>
+      <ShortName>Financial Instruments</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>9</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R10.htm</HtmlFileName>
+      <LongName>9952159 - Disclosure - Leases</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/Leases</Role>
+      <ShortName>Leases</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>10</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R11.htm</HtmlFileName>
+      <LongName>9952160 - Disclosure - Commitments and Contingencies</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/CommitmentsandContingencies</Role>
+      <ShortName>Commitments and Contingencies</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>11</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R12.htm</HtmlFileName>
+      <LongName>9952161 - Disclosure - Debt</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/Debt</Role>
+      <ShortName>Debt</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>12</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R13.htm</HtmlFileName>
+      <LongName>9952162 - Disclosure - Stockholders' Equity</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/StockholdersEquity</Role>
+      <ShortName>Stockholders' Equity</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>13</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R14.htm</HtmlFileName>
+      <LongName>9952163 - Disclosure - Income Taxes</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/IncomeTaxes</Role>
+      <ShortName>Income Taxes</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>14</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R15.htm</HtmlFileName>
+      <LongName>9952164 - Disclosure - Segment Information</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/SegmentInformation</Role>
+      <ShortName>Segment Information</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>15</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R16.htm</HtmlFileName>
+      <LongName>995445 - Disclosure - Insider Trading Arrangements</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://xbrl.sec.gov/ecd/role/InsiderTradingArrangements</Role>
+      <ShortName>Insider Trading Arrangements</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>16</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R17.htm</HtmlFileName>
+      <LongName>9955511 - Disclosure - Accounting Policies and Supplemental Disclosures (Policies)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresPolicies</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures (Policies)</ShortName>
+      <MenuCategory>Policies</MenuCategory>
+      <ParentRole>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosures</ParentRole>
+      <Position>17</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R18.htm</HtmlFileName>
+      <LongName>9955512 - Disclosure - Accounting Policies and Supplemental Disclosures (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresTables</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosures</ParentRole>
+      <Position>18</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R19.htm</HtmlFileName>
+      <LongName>9955513 - Disclosure - Financial Instruments (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/FinancialInstrumentsTables</Role>
+      <ShortName>Financial Instruments (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.amazon.com/role/FinancialInstruments</ParentRole>
+      <Position>19</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R20.htm</HtmlFileName>
+      <LongName>9955514 - Disclosure - Leases (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/LeasesTables</Role>
+      <ShortName>Leases (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.amazon.com/role/Leases</ParentRole>
+      <Position>20</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R21.htm</HtmlFileName>
+      <LongName>9955515 - Disclosure - Commitments and Contingencies (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/CommitmentsandContingenciesTables</Role>
+      <ShortName>Commitments and Contingencies (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.amazon.com/role/CommitmentsandContingencies</ParentRole>
+      <Position>21</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R22.htm</HtmlFileName>
+      <LongName>9955516 - Disclosure - Debt (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/DebtTables</Role>
+      <ShortName>Debt (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.amazon.com/role/Debt</ParentRole>
+      <Position>22</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R23.htm</HtmlFileName>
+      <LongName>9955517 - Disclosure - Stockholders' Equity (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/StockholdersEquityTables</Role>
+      <ShortName>Stockholders' Equity (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.amazon.com/role/StockholdersEquity</ParentRole>
+      <Position>23</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R24.htm</HtmlFileName>
+      <LongName>9955518 - Disclosure - Segment Information (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/SegmentInformationTables</Role>
+      <ShortName>Segment Information (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.amazon.com/role/SegmentInformation</ParentRole>
+      <Position>24</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R25.htm</HtmlFileName>
+      <LongName>9955519 - Disclosure - Accounting Policies and Supplemental Disclosures - Use of Estimates (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresUseofEstimatesDetails</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures - Use of Estimates (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>25</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R26.htm</HtmlFileName>
+      <LongName>9955520 - Disclosure - Accounting Policies and Supplemental Disclosures - Supplemental Cash Flow Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresSupplementalCashFlowInformationDetails</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures - Supplemental Cash Flow Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>26</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R27.htm</HtmlFileName>
+      <LongName>9955521 - Disclosure - Accounting Policies and Supplemental Disclosures - Calculation of Diluted Shares (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresCalculationofDilutedSharesDetails</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures - Calculation of Diluted Shares (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>27</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R28.htm</HtmlFileName>
+      <LongName>9955522 - Disclosure - Accounting Policies and Supplemental Disclosures - Other Income (Expense), Net (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresOtherIncomeExpenseNetDetails</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures - Other Income (Expense), Net (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>28</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R29.htm</HtmlFileName>
+      <LongName>9955523 - Disclosure - Accounting Policies and Supplemental Disclosures - Derivative Instruments (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresDerivativeInstrumentsDetails</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures - Derivative Instruments (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>29</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R30.htm</HtmlFileName>
+      <LongName>9955524 - Disclosure - Accounting Policies and Supplemental Disclosures - Inventories (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresInventoriesDetails</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures - Inventories (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>30</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R31.htm</HtmlFileName>
+      <LongName>9955525 - Disclosure - Accounting Policies and Supplemental Disclosures - Accounts Receivable, Net and Other (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresAccountsReceivableNetandOtherDetails</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures - Accounts Receivable, Net and Other (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>31</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R32.htm</HtmlFileName>
+      <LongName>9955526 - Disclosure - Accounting Policies and Supplemental Disclosures - Digital Video and Music Content (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresDigitalVideoandMusicContentDetails</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures - Digital Video and Music Content (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>32</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R33.htm</HtmlFileName>
+      <LongName>9955527 - Disclosure - Accounting Policies and Supplemental Disclosures - Unearned Revenue (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/AccountingPoliciesandSupplementalDisclosuresUnearnedRevenueDetails</Role>
+      <ShortName>Accounting Policies and Supplemental Disclosures - Unearned Revenue (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>33</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R34.htm</HtmlFileName>
+      <LongName>9955528 - Disclosure - Financial Instruments - Fair Values on Recurring Basis (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/FinancialInstrumentsFairValuesonRecurringBasisDetails</Role>
+      <ShortName>Financial Instruments - Fair Values on Recurring Basis (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>34</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R35.htm</HtmlFileName>
+      <LongName>9955529 - Disclosure - Financial Instruments - Contractual Maturities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/FinancialInstrumentsContractualMaturitiesDetails</Role>
+      <ShortName>Financial Instruments - Contractual Maturities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>35</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R36.htm</HtmlFileName>
+      <LongName>9955530 - Disclosure - Financial Instruments - Non-Marketable Equity Investments (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/FinancialInstrumentsNonMarketableEquityInvestmentsDetails</Role>
+      <ShortName>Financial Instruments - Non-Marketable Equity Investments (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>36</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R37.htm</HtmlFileName>
+      <LongName>9955531 - Disclosure - Financial Instruments - Consolidated Statements of Cash Flows Reconciliation (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/FinancialInstrumentsConsolidatedStatementsofCashFlowsReconciliationDetails</Role>
+      <ShortName>Financial Instruments - Consolidated Statements of Cash Flows Reconciliation (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>37</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R38.htm</HtmlFileName>
+      <LongName>9955532 - Disclosure - Leases - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/LeasesAdditionalInformationDetails</Role>
+      <ShortName>Leases - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>38</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R39.htm</HtmlFileName>
+      <LongName>9955533 - Disclosure - Leases - Lease Cost (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/LeasesLeaseCostDetails</Role>
+      <ShortName>Leases - Lease Cost (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>39</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R40.htm</HtmlFileName>
+      <LongName>9955534 - Disclosure - Leases - Other Operating and Finance Lease Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/LeasesOtherOperatingandFinanceLeaseInformationDetails</Role>
+      <ShortName>Leases - Other Operating and Finance Lease Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>40</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R41.htm</HtmlFileName>
+      <LongName>9955535 - Disclosure - Leases - Operating and Finance Lease Liability Reconciliation (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/LeasesOperatingandFinanceLeaseLiabilityReconciliationDetails</Role>
+      <ShortName>Leases - Operating and Finance Lease Liability Reconciliation (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>41</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R42.htm</HtmlFileName>
+      <LongName>9955536 - Disclosure - Commitments and Contingencies - Commitments (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/CommitmentsandContingenciesCommitmentsDetails</Role>
+      <ShortName>Commitments and Contingencies - Commitments (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>42</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R43.htm</HtmlFileName>
+      <LongName>9955537 - Disclosure - Commitments and Contingencies - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/CommitmentsandContingenciesAdditionalInformationDetails</Role>
+      <ShortName>Commitments and Contingencies - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>43</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R44.htm</HtmlFileName>
+      <LongName>9955538 - Disclosure - Debt - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/DebtAdditionalInformationDetails</Role>
+      <ShortName>Debt - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>44</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R45.htm</HtmlFileName>
+      <LongName>9955539 - Disclosure - Debt - Long-Term Debt Obligations (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/DebtLongTermDebtObligationsDetails</Role>
+      <ShortName>Debt - Long-Term Debt Obligations (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>45</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R46.htm</HtmlFileName>
+      <LongName>9955540 - Disclosure - Stockholders' Equity - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/StockholdersEquityAdditionalInformationDetails</Role>
+      <ShortName>Stockholders' Equity - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>46</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R47.htm</HtmlFileName>
+      <LongName>9955541 - Disclosure - Stockholders' Equity - Stock-based Compensation Expense (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/StockholdersEquityStockbasedCompensationExpenseDetails</Role>
+      <ShortName>Stockholders' Equity - Stock-based Compensation Expense (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>47</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R48.htm</HtmlFileName>
+      <LongName>9955542 - Disclosure - Stockholders' Equity - Restricted Stock Unit Activity (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/StockholdersEquityRestrictedStockUnitActivityDetails</Role>
+      <ShortName>Stockholders' Equity - Restricted Stock Unit Activity (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>48</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R49.htm</HtmlFileName>
+      <LongName>9955543 - Disclosure - Stockholders' Equity - Scheduled Vesting for Outstanding Restricted Stock Units (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/StockholdersEquityScheduledVestingforOutstandingRestrictedStockUnitsDetails</Role>
+      <ShortName>Stockholders' Equity - Scheduled Vesting for Outstanding Restricted Stock Units (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>49</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R50.htm</HtmlFileName>
+      <LongName>9955544 - Disclosure - Stockholders' Equity - Changes in Stockholders Equity (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/StockholdersEquityChangesinStockholdersEquityDetails</Role>
+      <ShortName>Stockholders' Equity - Changes in Stockholders Equity (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>50</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R51.htm</HtmlFileName>
+      <LongName>9955545 - Disclosure - Stockholders' Equity - Schedule of Accumulated Other Comprehensive Income (Loss) (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/StockholdersEquityScheduleofAccumulatedOtherComprehensiveIncomeLossDetails</Role>
+      <ShortName>Stockholders' Equity - Schedule of Accumulated Other Comprehensive Income (Loss) (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>51</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R52.htm</HtmlFileName>
+      <LongName>9955546 - Disclosure - Stockholders' Equity - Schedule of Accumulated Other Comprehensive Income (Loss) (Parenthetical) (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/StockholdersEquityScheduleofAccumulatedOtherComprehensiveIncomeLossParentheticalDetails</Role>
+      <ShortName>Stockholders' Equity - Schedule of Accumulated Other Comprehensive Income (Loss) (Parenthetical) (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>52</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R53.htm</HtmlFileName>
+      <LongName>9955547 - Disclosure - Income Taxes (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/IncomeTaxesDetails</Role>
+      <ShortName>Income Taxes (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.amazon.com/role/IncomeTaxes</ParentRole>
+      <Position>53</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R54.htm</HtmlFileName>
+      <LongName>9955548 - Disclosure - Segment Information - Reportable Segments and Reconciliation to Consolidated Net Income (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/SegmentInformationReportableSegmentsandReconciliationtoConsolidatedNetIncomeDetails</Role>
+      <ShortName>Segment Information - Reportable Segments and Reconciliation to Consolidated Net Income (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>54</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R55.htm</HtmlFileName>
+      <LongName>9955549 - Disclosure - Segment Information - Disaggregation of Revenue (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/SegmentInformationDisaggregationofRevenueDetails</Role>
+      <ShortName>Segment Information - Disaggregation of Revenue (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>55</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R56.htm</HtmlFileName>
+      <LongName>9955550 - Disclosure - Segment Information - Reconciliation of Assets from Segment to Consolidated (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/SegmentInformationReconciliationofAssetsfromSegmenttoConsolidatedDetails</Role>
+      <ShortName>Segment Information - Reconciliation of Assets from Segment to Consolidated (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>56</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R57.htm</HtmlFileName>
+      <LongName>9955551 - Disclosure - Segment Information - Reconciliation of Property and Equipment from Segments to Consolidated (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/SegmentInformationReconciliationofPropertyandEquipmentfromSegmentstoConsolidatedDetails</Role>
+      <ShortName>Segment Information - Reconciliation of Property and Equipment from Segments to Consolidated (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>57</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R58.htm</HtmlFileName>
+      <LongName>9955552 - Disclosure - Segment Information - Reconciliation of Property and Equipment Additions from Segments to Consolidated (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/SegmentInformationReconciliationofPropertyandEquipmentAdditionsfromSegmentstoConsolidatedDetails</Role>
+      <ShortName>Segment Information - Reconciliation of Property and Equipment Additions from Segments to Consolidated (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>58</Position>
+    </Report>
+    <Report instance="amzn-20260630.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R59.htm</HtmlFileName>
+      <LongName>9955553 - Disclosure - Segment Information - Depreciation and Amortization Expense, by Segment (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.amazon.com/role/SegmentInformationDepreciationandAmortizationExpensebySegmentDetails</Role>
+      <ShortName>Segment Information - Depreciation and Amortization Expense, by Segment (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>59</Position>
+    </Report>
+    <Report>
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <LongName>All Reports</LongName>
+      <ReportType>Book</ReportType>
+      <ShortName>All Reports</ShortName>
+    </Report>
+  </MyReports>
+  <InputFiles>
+    <File doctype="10-Q" isDefinitelyFs="true" isUsgaap="true" original="amzn-20260630.htm">amzn-20260630.htm</File>
+    <File>amzn-20260630.xsd</File>
+    <File>amzn-20260630_cal.xml</File>
+    <File>amzn-20260630_def.xml</File>
+    <File>amzn-20260630_lab.xml</File>
+    <File>amzn-20260630_pre.xml</File>
+  </InputFiles>
+  <SupplementalFiles/>
+  <BaseTaxonomies>
+    <BaseTaxonomy items="2">http://fasb.org/srt/2026</BaseTaxonomy>
+    <BaseTaxonomy items="1182">http://fasb.org/us-gaap/2026</BaseTaxonomy>
+    <BaseTaxonomy items="53">http://xbrl.sec.gov/dei/2026</BaseTaxonomy>
+    <BaseTaxonomy items="35">http://xbrl.sec.gov/ecd/2026</BaseTaxonomy>
+  </BaseTaxonomies>
+  <HasPresentationLinkbase>true</HasPresentationLinkbase>
+  <HasCalculationLinkbase>true</HasCalculationLinkbase>
+</FilingSummary>

@@ -1,0 +1,14 @@
+{
+  "schema_version": "capital-cost-legacy-v1",
+  "source_mode": "legacy",
+  "methodology": "legacy_capm_wacc_assumption",
+  "as_of": "2026-09-08",
+  "values": {
+    "risk_free_rate": 0.04,
+    "equity_risk_premium": 0.05,
+    "beta": 1.1,
+    "pre_tax_cost_of_debt": 0.045,
+    "tax_rate": 0.18
+  },
+  "note": "Frozen analyst assumptions retained solely for numerical compatibility; not canonical evidence."
+}

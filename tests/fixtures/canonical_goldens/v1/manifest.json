@@ -1,0 +1,36 @@
+{
+  "issuer_goldens": [
+    {
+      "path": "AAPL.json",
+      "sha256": "2f0296709539a9c0b656d91178c7d67a859eebd340453b5f61814473f1b7f13c",
+      "ticker": "AAPL"
+    },
+    {
+      "path": "AMZN.json",
+      "sha256": "6b18133d9c1057c6b47df900b63e128db9afbe97436937bc05e0dc4076d7c86f",
+      "ticker": "AMZN"
+    },
+    {
+      "path": "COST.json",
+      "sha256": "37d33f7e19448c1655c52973ab9615da3d6672eca7d2793e89dc2b5b05872779",
+      "ticker": "COST"
+    },
+    {
+      "path": "NVDA.json",
+      "sha256": "18510d652c702cd5269d997e41b24fdc839225496d9aca6d229a2d7d4715939d",
+      "ticker": "NVDA"
+    },
+    {
+      "path": "QCOM.json",
+      "sha256": "a305dd0507e2f4af86391cfa7e3d77f3e65825e179c44efdfb9c52536deb23f1",
+      "ticker": "QCOM"
+    },
+    {
+      "path": "VRTX.json",
+      "sha256": "8b285801f448cfed1ddf078242f81e357a09dd1469a0e2c9b30cd63027f38e11",
+      "ticker": "VRTX"
+    }
+  ],
+  "schema_version": "canonical-golden-manifest-v1",
+  "sec_corpus_root_manifest_sha256": "edeb82d8d6dc8c0920cb6d63b3beb70a8d5d9f5744dd35869116726d01a0a332"
+}

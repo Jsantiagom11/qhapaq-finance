@@ -1,0 +1,66 @@
+{
+  "created_at": "2026-09-13T03:59:01.443522Z",
+  "issuers": [
+    {
+      "artifact_count": 20,
+      "cik": "0000320193",
+      "issuer_manifest_path": "AAPL/manifest.json",
+      "issuer_manifest_sha256": "88f37ef0092d8594d4b900bb4a4565423b22bd269ee5d2c734fe1d05c0ecdfdc",
+      "issuer_schema_version": "sec-corpus-issuer-v1",
+      "selected_10_k_accession": "0000320193-25-000079",
+      "selected_10_q_accession": "0000320193-26-000020",
+      "ticker": "AAPL"
+    },
+    {
+      "artifact_count": 20,
+      "cik": "0000804328",
+      "issuer_manifest_path": "QCOM/manifest.json",
+      "issuer_manifest_sha256": "67dfa72ffe44e6e0d4d4a9dc17ef232d1e16261a3a7cc418fb3123a24520b3e9",
+      "issuer_schema_version": "sec-corpus-issuer-v1",
+      "selected_10_k_accession": "0000804328-25-000085",
+      "selected_10_q_accession": "0000804328-26-000086",
+      "ticker": "QCOM"
+    },
+    {
+      "artifact_count": 20,
+      "cik": "0001045810",
+      "issuer_manifest_path": "NVDA/manifest.json",
+      "issuer_manifest_sha256": "aa0b13043cbfbbb62cebe24efa39cd1a5748b4d56746126e2f439147b7411dd0",
+      "issuer_schema_version": "sec-corpus-issuer-v1",
+      "selected_10_k_accession": "0001045810-26-000021",
+      "selected_10_q_accession": "0001045810-26-000075",
+      "ticker": "NVDA"
+    },
+    {
+      "artifact_count": 20,
+      "cik": "0000909832",
+      "issuer_manifest_path": "COST/manifest.json",
+      "issuer_manifest_sha256": "834d2a3f2ffb38bc3839cfb8bbed1ddfd180b6c9d9301056d50aea05c5770eaf",
+      "issuer_schema_version": "sec-corpus-issuer-v1",
+      "selected_10_k_accession": "0000909832-25-000101",
+      "selected_10_q_accession": "0000909832-26-000051",
+      "ticker": "COST"
+    },
+    {
+      "artifact_count": 20,
+      "cik": "0001018724",
+      "issuer_manifest_path": "AMZN/manifest.json",
+      "issuer_manifest_sha256": "bcd3b601308fff6291550d31bc04eee54c58da9adcd89b9b423210fc8f4bc718",
+      "issuer_schema_version": "sec-corpus-issuer-v1",
+      "selected_10_k_accession": "0001018724-26-000004",
+      "selected_10_q_accession": "0001018724-26-000026",
+      "ticker": "AMZN"
+    },
+    {
+      "artifact_count": 20,
+      "cik": "0000875320",
+      "issuer_manifest_path": "VRTX/manifest.json",
+      "issuer_manifest_sha256": "33687d6c4d03cb73605d5298c56dd289d8c39393bc2ce2d557e0547bb6f2949c",
+      "issuer_schema_version": "sec-corpus-issuer-v1",
+      "selected_10_k_accession": "0000875320-26-000056",
+      "selected_10_q_accession": "0000875320-26-000259",
+      "ticker": "VRTX"
+    }
+  ],
+  "schema_version": "sec-corpus-v2"
+}

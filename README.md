@@ -96,6 +96,43 @@ src/qhapaq_finance/          momentum baseline, data validation, and ECB rendere
 tests/                       deterministic method and evidence-boundary tests
 ```
 
+## Research universe foundation
+
+`data/domain/issuers.json` is the canonical registry for issuers, securities,
+evidence identities, and locally validated research artifacts. An issuer owns
+fundamentals and evidence identity; a security owns its ticker and share-class
+metadata. `data/universes/` contains versioned universe snapshots. The initial
+`sp500-top10` snapshot is explicitly operator-supplied as of 2026-08-31; it does
+not assert weights, prices, market capitalizations, or source URLs.
+
+This separation matters for Alphabet: `GOOGL` and `GOOG` are distinct securities
+that resolve to one Alphabet issuer and one future issuer-level evidence identity.
+Universe membership is not research coverage. Qhapaq derives evidence,
+deterministic-research, and agent-research readiness from the registry and local
+validated artifacts; a known security without evidence fails explicitly rather
+than receiving a placeholder result. Existing VRTX and CSCO inputs are still
+labelled illustrative fixtures, not evidence-backed research.
+
+Inspect the supplied universe and the serial, issuer-deduplicated agent plan:
+
+```bash
+qhapaq universe sp500-top10
+qhapaq universe sp500-top10 --agent-plan
+```
+
+The agent layer remains deterministic-finance first, generative interpretation
+second. Evidence Scout and Evidence Auditor are acquisition/gating boundaries;
+Research Analyst and Thesis Challenger can only use validated evidence references;
+the Cross-sectional Reviewer is reserved for comparison of completed canonical
+artifacts. No agent output is authoritative for numerical finance.
+
+For a one-off local run, `bin/qhapaq-local-agent investigate SECURITY` starts the
+disabled-by-default Ollama daemon, verifies it, delegates provider preflight and
+model lifecycle to Qhapaq, and stops the daemon through an exit trap. The wrapper
+does not enable the service, pull models, change WSL/GPU settings, or contain
+security-domain knowledge. OllamaProvider remains responsible for `keep_alive=0`
+model unload; deterministic commands never initialize a provider.
+
 ## Visual QA (WebKit / iPad Pro)
 
 Visual QA is development tooling only. It renders the same offline standalone dashboard,

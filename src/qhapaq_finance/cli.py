@@ -5,8 +5,11 @@ import webbrowser
 from collections.abc import Callable
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import cast
 
+from .analysis import AnalysisOrchestrator
 from .backtest import run_backtest
+from .company_resolver import CompanyResolver
 from .config import ResearchConfig
 from .dashboard import (
     build_company_artifact,
@@ -29,15 +32,32 @@ from .market import (
 from .one import build_one_model, render_one_html
 from .research import load_research_record
 from .research_report import render_research_report
+from .research_result import (
+    agent_projection,
+    build_canonical_research_result,
+    canonical_research_json,
+)
+from .sec_acquisition import fetch_to_staging
+from .sec_client import SecClient
+from .sec_config import SecConfig
 from .tearsheet import build_tearsheet_model, png_dimensions, render_tearsheet
+from .universe import DomainRegistry, UniverseError, issuer_batch_plan, load_universe
 from .valuation import ResearchResult, analyze_case, load_fixture_case
+
+
+def _security(value: str) -> str:
+    """Argparse conversion without duplicating a ticker allowlist."""
+    try:
+        return DomainRegistry().security(value).ticker
+    except UniverseError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
 
 
 def _investigate(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(
         description="Run the provider-backed Qhapaq agent research layer"
     )
-    parser.add_argument("ticker", choices=("QCOM", "NVDA", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument("ticker", type=_security)
     parser.add_argument(
         "--json", action="store_true", help="emit the stable agent research artifact"
     )
@@ -47,6 +67,11 @@ def _investigate(arguments: list[str]) -> None:
     parser.add_argument("--provider", choices=("openai", "ollama"))
     parser.add_argument("--model")
     args = parser.parse_args(arguments)
+    capability = DomainRegistry().capability(args.ticker)
+    if not capability.agent_research_ready:
+        parser.error(
+            f"agent research unavailable for {args.ticker}: deterministic research is unavailable"
+        )
     if args.local and args.provider is not None:
         parser.error("--local cannot be combined with --provider; use one provider selection")
     provider_name = "ollama" if args.local else args.provider or "openai"
@@ -77,7 +102,8 @@ def _investigate(arguments: list[str]) -> None:
         except Exception as exc:
             parser.error(str(exc))
     try:
-        result = ResearchOrchestrator(provider).investigate(build_company_artifact(args.ticker))
+        canonical_result = build_canonical_research_result(args.ticker)
+        result = ResearchOrchestrator(provider).investigate(agent_projection(canonical_result))
     finally:
         try:
             unloaded = local_cleanup() if local_cleanup is not None else True
@@ -166,27 +192,69 @@ def _research(arguments: list[str]) -> None:
 
 def _research_case(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(description="Analyze a deterministic FCFF/WACC research case")
-    parser.add_argument("ticker", choices=("QCOM", "NVDA", "VRTX", "CSCO"), type=str.upper)
+    parser.add_argument("ticker", type=_security)
     parser.add_argument(
         "--provenance", action="store_true", help="print the frozen empirical evidence bridge"
     )
     parser.add_argument("--json", action="store_true", help="emit deterministic research JSON")
     args = parser.parse_args(arguments)
+    try:
+        case = load_fixture_case(args.ticker)
+    except UniverseError as exc:
+        parser.error(str(exc))
     if args.json:
-        print(canonical_json(build_company_artifact(args.ticker)), end="")
+        print(canonical_research_json(build_canonical_research_result(case.ticker)), end="")
         return
-    result = analyze_case(load_fixture_case(args.ticker))
+    result = analyze_case(case)
     _print_research_result(result)
-    if args.ticker == "QCOM":
-        from .qcom_case import qcom_audit
-
-        for key, value in qcom_audit().items():
+    support = DomainRegistry().audit(args.ticker)
+    if support is not None:
+        for key, value in support[2]().items():
             print(f"{key}={value}")
-    elif args.ticker == "NVDA":
-        from .nvda_case import nvda_audit
 
-        for key, value in nvda_audit().items():
-            print(f"{key}={value}")
+
+def _sec(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(description="Explicitly stage an SEC resource for review")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    fetch = subparsers.add_parser("fetch", help="fetch an SEC resource into untrusted staging")
+    fetch.add_argument("url")
+    fetch.add_argument("--staging-root", type=Path, default=Path("data/raw"))
+    fetch.add_argument("--source-id")
+    refresh_symbols = subparsers.add_parser(
+        "refresh-symbols", help="refresh the SEC company/ticker reference cache"
+    )
+    refresh_symbols.add_argument("--repository-root", type=Path, default=Path("."))
+    refresh_symbols.add_argument("--cache-path", type=Path)
+    args = parser.parse_args(arguments)
+    client = SecClient(SecConfig.from_env())
+    if args.command == "fetch":
+        metadata = {"source_id": args.source_id} if args.source_id else None
+        staged = fetch_to_staging(
+            client,
+            args.url,
+            args.staging_root,
+            source_metadata=metadata,
+        )
+        print("state=STAGED")
+        print(f"raw_path={staged.raw_path}")
+        print(f"metadata_path={staged.metadata_path}")
+        print(f"sha256={staged.sha256}")
+        return
+    if args.command == "refresh-symbols":
+        count = CompanyResolver(args.repository_root, cache_path=args.cache_path).refresh(client)
+        print("state=REFRESHED")
+        print(f"symbol_count={count}")
+        return
+    raise AssertionError("unreachable")
+
+
+def _analyze(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(description="Run one generic offline Qhapaq analysis")
+    parser.add_argument("ticker")
+    parser.add_argument("--repository-root", type=Path, default=Path("."))
+    args = parser.parse_args(arguments)
+    result = AnalysisOrchestrator(args.repository_root).analyze(args.ticker)
+    print(canonical_json(result.to_dict()), end="")
 
 
 def _print_research_result(result: ResearchResult) -> None:
@@ -196,7 +264,7 @@ def _print_research_result(result: ResearchResult) -> None:
     print(f"provenance={case.provenance}")
     print(
         "case_kind=evidence-backed"
-        if case.ticker in {"QCOM", "NVDA"}
+        if DomainRegistry().capability(case.ticker).evidence_available
         else "case_kind=illustrative fixture"
     )
     print(f"reconstructed_fcff={result.reconstructed_fcff:.0f}")
@@ -239,11 +307,20 @@ def _print_research_result(result: ResearchResult) -> None:
 
 def _compare(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(description="Compare deterministic FCFF/WACC research cases")
-    parser.add_argument(
-        "tickers", nargs="+", choices=("QCOM", "NVDA", "VRTX", "CSCO"), type=str.upper
-    )
+    parser.add_argument("tickers", nargs="+", type=_security)
     parser.add_argument("--json", action="store_true", help="emit deterministic universe JSON")
     args = parser.parse_args(arguments)
+    registry = DomainRegistry()
+    for ticker in args.tickers:
+        issuer = registry.issuer_for(ticker)
+        if (
+            registry.research(issuer.id).get("kind") == "evidence-backed"
+            and not registry.capability(ticker).deterministic_research_ready
+        ):
+            parser.error(
+                f"deterministic research unavailable for {ticker}: "
+                "validated evidence is unavailable"
+            )
     if args.json:
         print(canonical_json(build_universe_artifact(tuple(args.tickers))), end="")
         return
@@ -278,17 +355,24 @@ def _compare(arguments: list[str]) -> None:
 
 def _dashboard(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(description="Generate an offline Qhapaq research dashboard")
-    parser.add_argument(
-        "ticker", nargs="?", choices=("QCOM", "NVDA", "VRTX", "CSCO"), type=str.upper
-    )
-    parser.add_argument(
-        "--universe", nargs="+", choices=("QCOM", "NVDA", "VRTX", "CSCO"), type=str.upper
-    )
+    parser.add_argument("ticker", nargs="?", type=_security)
+    parser.add_argument("--universe", nargs="+", type=_security)
     parser.add_argument("--output-dir", type=Path, default=Path("artifacts"))
     args = parser.parse_args(arguments)
     if (args.ticker is None) == (args.universe is None):
         parser.error("provide one ticker or --universe TICKER [...]")
     tickers = (args.ticker,) if args.ticker else tuple(args.universe)
+    registry = DomainRegistry()
+    for ticker in tickers:
+        issuer = registry.issuer_for(ticker)
+        if (
+            registry.research(issuer.id).get("kind") == "evidence-backed"
+            and not registry.capability(ticker).deterministic_research_ready
+        ):
+            parser.error(
+                f"deterministic research unavailable for {ticker}: "
+                "validated evidence is unavailable"
+            )
     written = write_artifacts(tickers, args.output_dir)
     if args.ticker:
         output = render_company_dashboard(
@@ -302,6 +386,79 @@ def _dashboard(arguments: list[str]) -> None:
     print(f"dashboard={output}")
     for name, path in sorted(written.items()):
         print(f"artifact_{name}={path}")
+
+
+def _universe(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(
+        description="Inspect a versioned research universe and derived readiness"
+    )
+    parser.add_argument("universe_id")
+    parser.add_argument(
+        "--agent-plan", action="store_true", help="list issuer-deduplicated serial agent candidates"
+    )
+    args = parser.parse_args(arguments)
+    try:
+        snapshot = load_universe(args.universe_id)
+        registry = DomainRegistry()
+    except UniverseError as exc:
+        parser.error(str(exc))
+    print(f"universe_id={snapshot.universe_id}")
+    print(f"as_of={snapshot.as_of.isoformat()}")
+    print(f"provenance={snapshot.provenance}")
+    if args.agent_plan:
+        for issuer in issuer_batch_plan(snapshot, registry, agent_only=True):
+            print(f"agent_issuer={issuer.id}")
+        return
+    for security in snapshot.securities:
+        capability = registry.capability(security.ticker, snapshot)
+        print(
+            f"security={security.ticker} issuer={security.issuer_id} "
+            f"evidence_available={capability.evidence_available} "
+            f"deterministic_research_ready={capability.deterministic_research_ready} "
+            f"agent_research_ready={capability.agent_research_ready}"
+        )
+
+
+def _readiness(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(description="Inspect offline evidence and model readiness")
+    parser.add_argument("ticker", type=_security)
+    parser.add_argument("--json", action="store_true")
+    args = parser.parse_args(arguments)
+    registry = DomainRegistry()
+    capability = registry.capability(args.ticker)
+    payload: dict[str, object] = {
+        "security": args.ticker,
+        "issuer_id": registry.issuer_for(args.ticker).id,
+        "evidence_quality": capability.quality_report.to_dict()
+        if capability.quality_report
+        else None,
+        "model_readiness": capability.model_readiness.to_dict()
+        if capability.model_readiness
+        else None,
+        "deterministic_research_ready": capability.deterministic_research_ready,
+        "agent_research_ready": capability.agent_research_ready,
+    }
+    if args.json:
+        print(canonical_json(payload), end="")
+        return
+    print(f"security={args.ticker} issuer={payload['issuer_id']}")
+    quality_status = (
+        "PASS" if capability.quality_report and capability.quality_report.research_ready else "FAIL"
+    )
+    print(f"evidence_quality={quality_status}")
+    if capability.model_readiness:
+        report = capability.model_readiness.to_dict()
+        print(f"selected_model={report['profile_id']}@{report['profile_version']}")
+        for key in (
+            "satisfied_requirements",
+            "missing_requirements",
+            "invalid_requirements",
+            "quality_blocked_requirements",
+        ):
+            values = cast(list[str], report[key])
+            print(f"{key}={','.join(values) or 'none'}")
+    print(f"deterministic_research_ready={capability.deterministic_research_ready}")
+    print(f"agent_research_ready={capability.agent_research_ready}")
 
 
 def _market(arguments: list[str]) -> None:
@@ -452,15 +609,28 @@ def main(argv: list[str] | None = None) -> None:
     arguments = sys.argv[1:] if argv is None else argv
     if arguments and arguments[0] == "tearsheet":
         _tearsheet(arguments[1:])
+    elif arguments and arguments[0] == "sec":
+        _sec(arguments[1:])
+    elif arguments and arguments[0] == "analyze":
+        _analyze(arguments[1:])
     elif arguments and arguments[0] == "research":
-        if len(arguments) >= 2 and arguments[1].upper() in {"QCOM", "VRTX", "CSCO"}:
-            _research_case(arguments[1:])
+        if len(arguments) >= 2 and not arguments[1].startswith("-"):
+            try:
+                DomainRegistry().security(arguments[1])
+            except UniverseError:
+                _research(arguments[1:])
+            else:
+                _research_case(arguments[1:])
         else:
             _research(arguments[1:])
     elif arguments and arguments[0] == "compare":
         _compare(arguments[1:])
     elif arguments and arguments[0] == "dashboard":
         _dashboard(arguments[1:])
+    elif arguments and arguments[0] == "universe":
+        _universe(arguments[1:])
+    elif arguments and arguments[0] == "readiness":
+        _readiness(arguments[1:])
     elif arguments and arguments[0] == "market":
         _market(arguments[1:])
     elif arguments and arguments[0] == "investigate":

@@ -9,10 +9,12 @@ from __future__ import annotations
 
 import json
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date
 from pathlib import Path
 from typing import Any
+
+from .market_inputs import MarketProvenance, compatibility_market_provenance
 
 
 class ValuationError(ValueError):
@@ -65,6 +67,8 @@ class CapitalCost:
     equity_weight: float
     debt_weight: float
     wacc: float
+    source_mode: str = "legacy"
+    provenance: object | None = None
 
     @classmethod
     def from_assumptions(
@@ -111,7 +115,48 @@ class CapitalCost:
             ew,
             dw,
             ew * ke + dw * kd * (1 - tax),
+            "legacy",
+            None,
         )
+
+    @classmethod
+    def from_determination(cls, determination: object) -> CapitalCost:
+        """Adapt a validated capital-cost domain result into the valuation engine."""
+        provenance = getattr(determination, "provenance", None)
+        if getattr(provenance, "source_mode", None) != "canonical":
+            raise ValuationError("CANONICAL_CAPITAL_COST_REQUIRED")
+        fields = (
+            "risk_free_rate",
+            "equity_risk_premium",
+            "beta",
+            "cost_of_equity",
+            "pre_tax_cost_of_debt",
+            "tax_rate",
+            "market_equity",
+            "debt",
+            "equity_weight",
+            "debt_weight",
+            "wacc",
+        )
+        try:
+            values = {field: float(getattr(determination, field)) for field in fields}
+            return cls(
+                risk_free_rate=values["risk_free_rate"],
+                equity_risk_premium=values["equity_risk_premium"],
+                beta=values["beta"],
+                cost_of_equity=values["cost_of_equity"],
+                pre_tax_cost_of_debt=values["pre_tax_cost_of_debt"],
+                tax_rate=values["tax_rate"],
+                market_equity=values["market_equity"],
+                debt=values["debt"],
+                equity_weight=values["equity_weight"],
+                debt_weight=values["debt_weight"],
+                wacc=values["wacc"],
+                source_mode="canonical",
+                provenance=provenance,
+            )
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise ValuationError("CANONICAL_CAPITAL_COST_INVALID") from exc
 
 
 @dataclass(frozen=True)
@@ -183,6 +228,7 @@ class ResearchCase:
     thesis: tuple[str, ...]
     invalidation_conditions: tuple[str, ...]
     risk_notes: tuple[str, ...]
+    market_provenance: MarketProvenance | None = None
 
 
 @dataclass(frozen=True)
@@ -610,15 +656,19 @@ def load_research_case(path: str | Path) -> ResearchCase:
 
 
 def load_fixture_case(ticker: str, repository_root: str | Path = ".") -> ResearchCase:
-    """Load empirical cases from frozen filing evidence; other cases remain illustrations."""
-    if ticker.upper() == "QCOM":
-        from .qcom_case import load_qcom_case
+    """Compatibility entrypoint backed by the declarative domain registry."""
+    from .universe import DomainRegistry
 
-        return load_qcom_case(repository_root)
-    if ticker.upper() == "NVDA":
-        from .nvda_case import load_nvda_case
-
-        return load_nvda_case(repository_root)
-    return load_research_case(
-        Path(repository_root) / "data/fixtures/value_research" / f"{ticker.lower()}.json"
-    )
+    registry = DomainRegistry(repository_root)
+    case = registry.load_case(ticker)
+    if registry.research(registry.issuer_for(ticker).id).get("kind") == "fixture":
+        return replace(
+            case,
+            market_provenance=compatibility_market_provenance(
+                root=repository_root,
+                ticker=ticker,
+                research_as_of=case.as_of_date,
+                source_mode="fixture",
+            ),
+        )
+    return case

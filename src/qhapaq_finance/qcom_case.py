@@ -11,7 +11,9 @@ from .accounting import (
     TtmFactSpec,
     normalize_accounting_snapshot,
 )
+from .capital_cost import load_legacy_assumptions
 from .evidence import FinancialFact, load_facts
+from .market_inputs import compatibility_market_provenance
 from .valuation import (
     CapitalCost,
     FcffInputs,
@@ -46,8 +48,12 @@ QCOM_ACCOUNTING_SPEC = AccountingEvidenceSpec(
 
 
 def _accounting_snapshot(facts: dict[str, FinancialFact]) -> AccountingSnapshot:
-    # Tax is an explicit assumption, because it is not a normalized operating tax fact.
-    return normalize_accounting_snapshot(facts, spec=QCOM_ACCOUNTING_SPEC, tax_rate=0.18)
+    assumptions = load_legacy_assumptions(
+        Path(__file__).resolve().parents[2] / "data/research/qcom/capital-cost-legacy.json"
+    )
+    return normalize_accounting_snapshot(
+        facts, spec=QCOM_ACCOUNTING_SPEC, tax_rate=assumptions["tax_rate"]
+    )
 
 
 def _require_reconciled(facts: dict[str, FinancialFact]) -> None:
@@ -70,7 +76,7 @@ def load_qcom_case(repository_root: str | Path = ".") -> ResearchCase:
     facts = load_facts(root / "data/research/qcom/financial-evidence.json", root, as_of=QCOM_AS_OF)
     _require_reconciled(facts)
     snapshot = _accounting_snapshot(facts)
-    # Tax, scenarios and market-risk inputs are explicit analyst assumptions, not SEC facts.
+    # Tax and capital-cost values are explicit legacy assumptions, not SEC facts.
     tax_rate = snapshot.tax_rate
     assert tax_rate is not None
     assert snapshot.valuation_shares is not None
@@ -84,12 +90,9 @@ def load_qcom_case(repository_root: str | Path = ".") -> ResearchCase:
         marketable_securities=snapshot.marketable_securities,
         debt=snapshot.debt,
     )
+    assumptions = load_legacy_assumptions(root / "data/research/qcom/capital-cost-legacy.json")
     cost = CapitalCost.from_assumptions(
-        risk_free_rate=0.04,
-        equity_risk_premium=0.05,
-        beta=1.10,
-        pre_tax_cost_of_debt=0.045,
-        tax_rate=tax_rate,
+        **assumptions,
         market_equity=market.equity_value,
         debt=market.debt,
     )
@@ -132,6 +135,9 @@ def load_qcom_case(repository_root: str | Path = ".") -> ResearchCase:
         (
             "SBC is in EBIT and CFO reconciliation; it is not separately subtracted from FCFF."
             " Cover-page shares as of 2026-07-27 are used for market equity, not EPS averages.",
+        ),
+        compatibility_market_provenance(
+            root=root, ticker="QCOM", research_as_of=QCOM_AS_OF, source_mode="legacy"
         ),
     )
 

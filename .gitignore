@@ -21,3 +21,5 @@ logs/
 
 # Generated artifacts
 output/
+
+.env

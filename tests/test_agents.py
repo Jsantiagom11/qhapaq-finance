@@ -340,7 +340,7 @@ def test_investigate_requires_configuration_without_affecting_offline_commands(
     assert exc.value.code == 2
     assert "OPENAI_API_KEY" in capsys.readouterr().err
     cli.main(["research", "QCOM", "--json"])
-    assert '"schema_version": "dashboard-research-v1"' in capsys.readouterr().out
+    assert '"schema_version":"research-result-v1"' in capsys.readouterr().out
 
 
 class _Response:

@@ -1,0 +1,307 @@
+{
+  "CIK": "0001018724",
+  "evidence_notes": [
+    "Frozen companyfacts and selected filing inline XBRL were reviewed; no dimensional observation is selected."
+  ],
+  "metrics": [
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001018724-26-000004",
+          "end": "2025-12-31",
+          "filed": "2026-02-06",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2025-01-01",
+          "val": 716924000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 716924000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-06",
+      "filing_form": "10-K",
+      "metric": "revenue",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-12-31",
+        "start_date": "2025-01-01"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001018724-26-000004",
+      "source_artifact_path": "filings/0001018724-26-000004/filing-artifact/amzn-20251231.htm",
+      "source_artifact_sha256": "beb1bfc28558135e76882db0cf36ba72a1ab44e2144fe37534f4da1e120ddb57",
+      "source_concept_qname": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "taxonomy": "us-gaap",
+      "ticker": "AMZN"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001018724-26-000004",
+          "end": "2025-12-31",
+          "filed": "2026-02-06",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2025-01-01",
+          "val": 79975000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 79975000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-06",
+      "filing_form": "10-K",
+      "metric": "operating_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-12-31",
+        "start_date": "2025-01-01"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001018724-26-000004",
+      "source_artifact_path": "filings/0001018724-26-000004/filing-artifact/amzn-20251231.htm",
+      "source_artifact_sha256": "beb1bfc28558135e76882db0cf36ba72a1ab44e2144fe37534f4da1e120ddb57",
+      "source_concept_qname": "us-gaap:OperatingIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "AMZN"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001018724-26-000004",
+          "end": "2025-12-31",
+          "filed": "2026-02-06",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": "2025-01-01",
+          "val": 77670000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 77670000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-06",
+      "filing_form": "10-K",
+      "metric": "net_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-12-31",
+        "start_date": "2025-01-01"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001018724-26-000004",
+      "source_artifact_path": "filings/0001018724-26-000004/filing-artifact/amzn-20251231.htm",
+      "source_artifact_sha256": "beb1bfc28558135e76882db0cf36ba72a1ab44e2144fe37534f4da1e120ddb57",
+      "source_concept_qname": "us-gaap:NetIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "AMZN"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001018724-26-000004",
+          "end": "2025-12-31",
+          "filed": "2026-02-06",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 86810000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 86810000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-06",
+      "filing_form": "10-K",
+      "metric": "cash_and_equivalents",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-12-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001018724-26-000004",
+      "source_artifact_path": "filings/0001018724-26-000004/filing-artifact/amzn-20251231.htm",
+      "source_artifact_sha256": "beb1bfc28558135e76882db0cf36ba72a1ab44e2144fe37534f4da1e120ddb57",
+      "source_concept_qname": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+      "taxonomy": "us-gaap",
+      "ticker": "AMZN"
+    },
+    {
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_status": "AMBIGUOUS",
+      "filed_date": "2026-02-06",
+      "filing_form": "10-K",
+      "metric": "total_debt",
+      "period_kind": "INSTANT",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "AMBIGUOUS: LongTermDebt=68836000000 (face value) conflicts with LongTermDebtCurrent + LongTermDebtNoncurrent=68396000000 (carrying components); ShortTermBorrowings=455000000 is separately reported.",
+      "source_accession": "0001018724-26-000004",
+      "source_artifact_path": "filings/0001018724-26-000004/filing-artifact/amzn-20251231.htm",
+      "source_artifact_sha256": "beb1bfc28558135e76882db0cf36ba72a1ab44e2144fe37534f4da1e120ddb57",
+      "source_concept_qname": "us-gaap:LongTermDebt",
+      "ticker": "AMZN"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001018724-26-000004",
+          "end": "2025-12-31",
+          "filed": "2026-02-06",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 818042000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 818042000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-06",
+      "filing_form": "10-K",
+      "metric": "total_assets",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-12-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001018724-26-000004",
+      "source_artifact_path": "filings/0001018724-26-000004/filing-artifact/amzn-20251231.htm",
+      "source_artifact_sha256": "beb1bfc28558135e76882db0cf36ba72a1ab44e2144fe37534f4da1e120ddb57",
+      "source_concept_qname": "us-gaap:Assets",
+      "taxonomy": "us-gaap",
+      "ticker": "AMZN"
+    },
+    {
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_status": "MISSING",
+      "filed_date": "2026-02-06",
+      "filing_form": "10-K",
+      "metric": "total_liabilities",
+      "period_kind": "INSTANT",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "MISSING: the selected filing has LiabilitiesAndStockholdersEquity and component liabilities, but no consolidated Liabilities fact; no aggregation rule is introduced.",
+      "source_accession": "0001018724-26-000004",
+      "source_artifact_path": "filings/0001018724-26-000004/filing-artifact/amzn-20251231.htm",
+      "source_artifact_sha256": "beb1bfc28558135e76882db0cf36ba72a1ab44e2144fe37534f4da1e120ddb57",
+      "source_concept_qname": null,
+      "ticker": "AMZN"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001018724-26-000004",
+          "end": "2025-12-31",
+          "filed": "2026-02-06",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 411065000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 411065000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-06",
+      "filing_form": "10-K",
+      "metric": "shareholders_equity",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-12-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001018724-26-000004",
+      "source_artifact_path": "filings/0001018724-26-000004/filing-artifact/amzn-20251231.htm",
+      "source_artifact_sha256": "beb1bfc28558135e76882db0cf36ba72a1ab44e2144fe37534f4da1e120ddb57",
+      "source_concept_qname": "us-gaap:StockholdersEquity",
+      "taxonomy": "us-gaap",
+      "ticker": "AMZN"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001018724-26-000004",
+          "end": "2025-12-31",
+          "filed": "2026-02-06",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2025-01-01",
+          "val": 10827000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "7549fb68446eee40e1f50a166fa06b2d2ee6349e07c8553a4828757e032d3cd4"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 10827000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-06",
+      "filing_form": "10-K",
+      "metric": "diluted_shares",
+      "normalized_unit": "shares",
+      "period": {
+        "end_date": "2025-12-31",
+        "start_date": "2025-01-01"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001018724-26-000004",
+      "source_artifact_path": "filings/0001018724-26-000004/filing-artifact/amzn-20251231.htm",
+      "source_artifact_sha256": "beb1bfc28558135e76882db0cf36ba72a1ab44e2144fe37534f4da1e120ddb57",
+      "source_concept_qname": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding",
+      "taxonomy": "us-gaap",
+      "ticker": "AMZN"
+    }
+  ],
+  "schema_version": "canonical-golden-v1",
+  "source_corpus_version": "sec-corpus-v2",
+  "source_issuer_manifest_sha256": "bcd3b601308fff6291550d31bc04eee54c58da9adcd89b9b423210fc8f4bc718",
+  "target_fiscal_year": 2025,
+  "target_report_date": "2025-12-31",
+  "ticker": "AMZN"
+}

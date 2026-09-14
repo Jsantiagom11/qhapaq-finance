@@ -75,7 +75,7 @@ class ResearchOrchestrator:
         return AgentResearchArtifact(
             schema_version="agent-research-v1",
             ticker=ticker,
-            deterministic_artifact_ref="dashboard-research-v1",
+            deterministic_artifact_ref="research-result-v1",
             deterministic_interpretation=interpretation,
             synthesis=synthesis,
             challenge=challenge,

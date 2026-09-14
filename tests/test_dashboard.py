@@ -78,7 +78,7 @@ def test_dashboard_and_json_cli_regression(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     cli.main(["research", "QCOM", "--json"])
-    assert '"schema_version": "dashboard-research-v1"' in capsys.readouterr().out
+    assert '"schema_version":"research-result-v1"' in capsys.readouterr().out
     cli.main(["compare", "QCOM", "VRTX", "CSCO", "--json"])
     assert '"schema_version": "dashboard-universe-v1"' in capsys.readouterr().out
     cli.main(["dashboard", "QCOM", "--output-dir", str(tmp_path)])
