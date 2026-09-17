@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .company_resolver import CompanyResolver, SymbolResolver
 from .sec_acquisition import (
     ImmutableArtifactConflictError,
     _write_new_atomically,
@@ -99,6 +100,7 @@ def build_sec_corpus(
     corpus_root: str | Path = "tests/fixtures/sec_corpus",
     staging_root: str | Path = "data/raw/sec_corpus_staging",
     tickers: tuple[str, ...] = tuple(_ISSUER_CIKS),
+    resolver: SymbolResolver | None = None,
 ) -> dict[str, Any]:
     """Acquire the fixed issuer corpus using only ``client`` for HTTP traffic.
 
@@ -107,9 +109,19 @@ def build_sec_corpus(
     manifest, so it cannot look like a complete frozen fixture.
     """
     root, staging = Path(corpus_root), Path(staging_root)
+    active_resolver = resolver or CompanyResolver()
     issuers: list[dict[str, Any]] = []
-    for ticker in tickers:
-        cik = _ISSUER_CIKS[ticker]
+
+    for requested_ticker in tickers:
+        resolved = active_resolver.resolve(requested_ticker)
+        if resolved is None:
+            raise ValueError(
+                "ticker cannot be resolved from cached SEC company reference: "
+                f"{requested_ticker}"
+            )
+
+        ticker = resolved.ticker
+        cik = resolved.cik
         issuer_root = root / ticker
         submissions, submission_record = _fetch_json(
             client,
@@ -172,7 +184,15 @@ def build_sec_corpus(
             for issuer in issuers
         ],
     }
-    _write_json_immutable(root / "manifest.json", manifest)
+    is_full_fixed_corpus = (
+        len(tickers) == len(_ISSUER_CIKS)
+        and set(tickers) == set(_ISSUER_CIKS)
+    )
+    root_manifest_path = root / "manifest.json"
+
+    if is_full_fixed_corpus or not root_manifest_path.exists():
+        _write_json_immutable(root_manifest_path, manifest)
+
     return manifest
 
 

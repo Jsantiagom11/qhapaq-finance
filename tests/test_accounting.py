@@ -3,8 +3,11 @@ from pathlib import Path
 
 import pytest
 
+import qhapaq_finance.accounting as accounting
 from qhapaq_finance.accounting import AccountingError, AccountingSnapshot
+from qhapaq_finance.analysis import CompanyIdentity
 from qhapaq_finance.evidence import EvidenceError, load_facts, reconstruct_ttm
+from qhapaq_finance.local_sec_corpus import LocalSecCorpus
 from qhapaq_finance.qcom_case import QCOM_AS_OF, _accounting_snapshot
 
 ROOT = Path(__file__).parents[1]
@@ -25,8 +28,111 @@ def test_evidence_normalizes_to_complete_ttm_accounting_snapshot() -> None:
     assert snapshot.cash == 4_533
     assert snapshot.debt == 15_270
     assert snapshot.valuation_shares == 1_050
-    assert snapshot.invested_capital == pytest.approx(37_416.5)
+    assert snapshot.invested_capital is not None
+    assert snapshot.invested_capital.opening.top_down.value == pytest.approx(37_429)
+    assert snapshot.invested_capital.closing.top_down.value == pytest.approx(37_404)
+    assert snapshot.invested_capital.average == pytest.approx(37_416.5)
     assert "ebit_fy25" in snapshot.source_lineage
+
+
+def test_promoted_evidence_translates_to_accounting_evidence_spec() -> None:
+    source = load_facts(EVIDENCE, ROOT, as_of=QCOM_AS_OF)
+
+    facts = {
+        "revenue": source["revenue_fy25"],
+        "ebit": source["ebit_fy25"],
+        "depreciation_amortization": source["da_fy25"],
+        "capex": source["capex_fy25"],
+        "income_tax_expense": replace(
+            source["revenue_fy25"],
+            id="income_tax_expense",
+        ),
+        "pretax_income": replace(
+            source["ebit_fy25"],
+            id="pretax_income",
+        ),
+        "operating_current_assets_opening": replace(
+            source["ar_q3fy26"],
+            id="operating_current_assets_opening",
+        ),
+        "operating_current_liabilities_opening": replace(
+            source["ap_q3fy26"],
+            id="operating_current_liabilities_opening",
+        ),
+        "operating_current_assets_closing": replace(
+            source["ar_q3fy26"],
+            id="operating_current_assets_closing",
+        ),
+        "operating_current_liabilities_closing": replace(
+            source["ap_q3fy26"],
+            id="operating_current_liabilities_closing",
+        ),
+        "net_operating_assets_opening": replace(
+            source["net_operating_assets_q3fy26"],
+            id="net_operating_assets_opening",
+        ),
+        "net_operating_assets_closing": replace(
+            source["net_operating_assets_q3fy26"],
+            id="net_operating_assets_closing",
+        ),
+        "cash": source["cash_q3fy26"],
+        "marketable_securities": source["marketable_securities_q3fy26"],
+        "total_debt": source["long_term_debt_q3fy26"],
+        "valuation_shares": source["shares_cover_q3fy26"],
+    }
+
+    spec = accounting.accounting_evidence_spec_from_promoted_facts(facts)
+
+    assert spec.operating_nwc_opening_assets == ("operating_current_assets_opening",)
+    assert spec.operating_nwc_opening_liabilities == ("operating_current_liabilities_opening",)
+    assert spec.operating_nwc_closing_assets == ("operating_current_assets_closing",)
+    assert spec.operating_nwc_closing_liabilities == ("operating_current_liabilities_closing",)
+    assert spec.net_operating_assets_opening == ("net_operating_assets_opening",)
+    assert spec.net_operating_assets_closing == ("net_operating_assets_closing",)
+    assert spec.require_ttm_endpoint_alignment is True
+
+
+def test_promoted_evidence_adapter_fails_closed_when_a_canonical_metric_is_missing() -> None:
+    with pytest.raises(AccountingError, match="missing promoted accounting metric"):
+        accounting.accounting_evidence_spec_from_promoted_facts({})
+
+
+def test_local_sec_corpus_promotes_aapl_to_accounting_evidence_spec() -> None:
+    facts, spec = accounting.promote_local_sec_accounting_evidence(
+        LocalSecCorpus(ROOT),
+        CompanyIdentity("AAPL", None, None, None, None, None, "0000320193", None),
+    )
+
+    assert facts["cash"].source_accessions
+    assert spec.cash == ("cash",)
+    assert spec.debt == ("total_debt",)
+
+
+def test_local_sec_corpus_promotes_aapl_to_accounting_snapshot() -> None:
+    facts, spec = accounting.promote_local_sec_accounting_evidence(
+        LocalSecCorpus(ROOT),
+        CompanyIdentity("AAPL", None, None, None, None, None, "0000320193", None),
+    )
+
+    snapshot = accounting.normalize_accounting_snapshot(facts, spec=spec, tax_rate=None)
+
+    assert snapshot.cash is not None
+
+
+def test_local_sec_corpus_promotes_aapl_effective_tax_rate_from_compatible_ttm_facts() -> None:
+    facts, spec = accounting.promote_local_sec_accounting_evidence(
+        LocalSecCorpus(ROOT),
+        CompanyIdentity("AAPL", None, None, None, None, None, "0000320193", None),
+    )
+
+    snapshot = accounting.normalize_accounting_snapshot(facts, spec=spec, tax_rate=None)
+
+    assert facts["income_tax_expense"].period_end == facts["pretax_income"].period_end
+    assert snapshot.income_tax_expense == pytest.approx(26_976_000_000)
+    assert snapshot.pretax_income == pytest.approx(155_906_000_000)
+    assert snapshot.tax_rate == pytest.approx(26_976_000_000 / 155_906_000_000)
+    assert "income_tax_expense" in snapshot.source_lineage
+    assert "pretax_income" in snapshot.source_lineage
 
 
 def test_accounting_fails_closed_when_required_evidence_is_missing() -> None:
@@ -123,3 +229,73 @@ def test_ttm_rejects_unit_mismatch_and_nonfinite_evidence() -> None:
         )
     with pytest.raises(EvidenceError, match="finite"):
         replace(facts["revenue_fy25"], value=float("nan"))
+
+
+def test_local_sec_accounting_derives_balance_sheet_endpoints_from_ttm_period() -> None:
+    from datetime import timedelta
+
+    facts, spec = accounting.promote_local_sec_accounting_evidence(
+        LocalSecCorpus(ROOT),
+        CompanyIdentity("AAPL", None, None, None, None, None, "0000320193", None),
+    )
+
+    revenue = facts["revenue"]
+    assert revenue.period_start is not None
+
+    opening_end = revenue.period_start - timedelta(days=1)
+    closing_end = revenue.period_end
+
+    assert facts["operating_current_assets_opening"].period_end == opening_end
+    assert facts["operating_current_liabilities_opening"].period_end == opening_end
+
+    assert facts["operating_current_assets_closing"].period_end == closing_end
+    assert facts["operating_current_liabilities_closing"].period_end == closing_end
+
+    assert facts["cash"].period_end == closing_end
+    assert facts["marketable_securities"].period_end == closing_end
+    assert facts["total_debt"].period_end == closing_end
+
+    # AAPL lacks a homogeneous opening/closing NOA representation for this TTM.
+    assert "net_operating_assets_opening" not in facts
+    assert "net_operating_assets_closing" not in facts
+    assert spec.net_operating_assets_opening == ()
+    assert spec.net_operating_assets_closing == ()
+
+
+def test_accounting_snapshot_can_omit_invested_capital_when_noa_pair_is_unavailable() -> None:
+    from dataclasses import replace
+
+    from qhapaq_finance.qcom_case import QCOM_ACCOUNTING_SPEC
+
+    facts = load_facts(EVIDENCE, ROOT, as_of=QCOM_AS_OF)
+    spec = replace(
+        QCOM_ACCOUNTING_SPEC,
+        net_operating_assets_opening=(),
+        net_operating_assets_closing=(),
+    )
+
+    snapshot = accounting.normalize_accounting_snapshot(
+        facts,
+        spec=spec,
+        tax_rate=0.18,
+    )
+
+    assert snapshot.invested_capital is None
+    assert snapshot.change_in_working_capital == 475
+    assert snapshot.fcff == pytest.approx(7_981.4)
+
+
+def test_aapl_financing_identity_remains_complete_when_opening_intangibles_are_missing() -> None:
+    facts, spec = accounting.promote_local_sec_accounting_evidence(
+        LocalSecCorpus(ROOT),
+        CompanyIdentity("AAPL", None, None, None, None, None, "0000320193", None),
+    )
+
+    snapshot = accounting.normalize_accounting_snapshot(facts, spec=spec, tax_rate=None)
+
+    assert snapshot.invested_capital is not None
+    assert snapshot.invested_capital.opening.top_down.value == pytest.approx(34_542_000_000)
+    assert snapshot.invested_capital.closing.top_down.value == pytest.approx(45_347_000_000)
+    assert snapshot.invested_capital.average == pytest.approx(39_944_500_000)
+    assert snapshot.invested_capital.opening.bottom_up is not None
+    assert snapshot.invested_capital.opening.bottom_up.components["net_intangibles"].value is None

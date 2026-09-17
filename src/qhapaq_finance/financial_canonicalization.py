@@ -50,6 +50,23 @@ class PeriodKind(str, Enum):
     DURATION = "DURATION"
 
 
+class DebtMeasurementBasis(str, Enum):
+    """Accounting measurement used by a reported debt amount."""
+
+    CARRYING_AMOUNT = "CARRYING_AMOUNT"
+    FACE_VALUE = "FACE_VALUE"
+
+
+class DebtComponentKind(str, Enum):
+    """A mutually identifiable portion of interest-bearing debt."""
+
+    COMBINED_TOTAL = "COMBINED_TOTAL"
+    LONG_TERM_CURRENT = "LONG_TERM_CURRENT"
+    LONG_TERM_NONCURRENT = "LONG_TERM_NONCURRENT"
+    COMMERCIAL_PAPER = "COMMERCIAL_PAPER"
+    SHORT_TERM_BORROWINGS = "SHORT_TERM_BORROWINGS"
+
+
 @dataclass(frozen=True)
 class IssuerProfile:
     kind: ProfileKind
@@ -114,6 +131,30 @@ class RawFact:
             raise ValueError("duration raw facts require a start date")
         if self.period_kind is PeriodKind.INSTANT and self.start is not None:
             raise ValueError("instant raw facts cannot have a start date")
+
+
+@dataclass(frozen=True)
+class DebtComponent:
+    """An approved debt fact with its coverage and measurement semantics.
+
+    ``coverage`` is intentionally explicit: a policy may sum components only
+    when each coverage is unique and the complete set is known to be additive.
+    """
+
+    fact: RawFact
+    kind: DebtComponentKind
+    measurement_basis: DebtMeasurementBasis
+    coverage: str
+
+
+@dataclass(frozen=True)
+class DebtDerivation:
+    """Complete, auditable lineage for a direct or component debt decision."""
+
+    measurement_basis: DebtMeasurementBasis
+    components: tuple[DebtComponent, ...]
+    operator: str
+    direct_fact_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -253,6 +294,7 @@ class ResolutionDecision:
     selected_fact_id: str | None
     candidates: tuple[FactCandidate, ...]
     validation_results: tuple[str, ...]
+    debt_derivation: DebtDerivation | None = None
 
 
 @dataclass(frozen=True)
@@ -262,6 +304,281 @@ class CanonicalMetric:
     raw_fact: RawFact | None
     normalized_value: float | None
     normalized_unit: str | None
+
+
+class DebtResolutionPolicy:
+    """Fail-closed resolver for total interest-bearing debt.
+
+    This is a concept policy, not an issuer mapping.  It deliberately excludes
+    lease obligations and refuses to compare or combine face and carrying
+    amounts.  A derivation must be complete for the known long-term debt
+    coverage and contain no component whose overlap cannot be ruled out.
+    """
+
+    _DIRECT_CONCEPTS: Mapping[str, DebtMeasurementBasis] = {
+        "DebtLongtermAndShorttermCombinedAmount": DebtMeasurementBasis.CARRYING_AMOUNT,
+        "DebtInstrumentCarryingAmount": DebtMeasurementBasis.CARRYING_AMOUNT,
+        "LongTermDebt": DebtMeasurementBasis.FACE_VALUE,
+    }
+    _COMPONENT_CONCEPTS: Mapping[str, tuple[DebtComponentKind, str]] = {
+        "LongTermDebtCurrent": (DebtComponentKind.LONG_TERM_CURRENT, "long-term-current"),
+        "LongTermDebtNoncurrent": (
+            DebtComponentKind.LONG_TERM_NONCURRENT,
+            "long-term-noncurrent",
+        ),
+        "CommercialPaper": (DebtComponentKind.COMMERCIAL_PAPER, "commercial-paper"),
+        # This concept cannot be proven disjoint from LongTermDebtCurrent from
+        # company facts alone, so its presence blocks a component derivation.
+        "ShortTermBorrowings": (
+            DebtComponentKind.SHORT_TERM_BORROWINGS,
+            "short-term-borrowings",
+        ),
+    }
+
+    def resolve(
+        self,
+        profile: IssuerProfile,
+        context: FactContext,
+        spec: MetricSpec,
+        facts: tuple[RawFact, ...],
+    ) -> CanonicalMetric:
+        if profile.kind not in spec.applicable_profiles:
+            return FinancialCanonicalizer._unresolved(
+                spec, ResolutionStatus.NOT_APPLICABLE, (), profile.reason
+            )
+        candidates = tuple(self._candidate(fact, context) for fact in facts)
+        valid = tuple(item.fact for item in candidates if item.accepted)
+        direct = tuple(fact for fact in valid if fact.concept in self._DIRECT_CONCEPTS)
+        components = tuple(fact for fact in valid if fact.concept in self._COMPONENT_CONCEPTS)
+        derived_result = self._derived(spec, components, candidates)
+        component_concepts = {fact.concept for fact in components}
+        has_carrying_pair = {"LongTermDebtCurrent", "LongTermDebtNoncurrent"}.issubset(
+            component_concepts
+        )
+        has_carrier = any(fact.concept == "DebtInstrumentCarryingAmount" for fact in direct)
+        has_combined = any(
+            fact.concept == "DebtLongtermAndShorttermCombinedAmount" for fact in direct
+        )
+        if has_carrying_pair and "ShortTermBorrowings" in component_concepts:
+            return self._unresolved(
+                spec,
+                ResolutionStatus.AMBIGUOUS,
+                candidates,
+                "short-term borrowings prevent a non-overlapping debt total",
+            )
+        # Without commercial paper, current/noncurrent long-term components do
+        # not establish that they span a separately tagged carrying amount.
+        # Treat that amount as direct evidence rather than manufacturing a
+        # competing total from potentially narrower components.
+        if has_carrier and "CommercialPaper" not in component_concepts:
+            derived_result = None
+        if derived_result is not None and not has_carrier and not has_combined:
+            face_values = {fact.value for fact in direct if fact.concept == "LongTermDebt"}
+            if face_values and face_values != {derived_result.normalized_value}:
+                return self._unresolved(
+                    spec,
+                    ResolutionStatus.AMBIGUOUS,
+                    candidates,
+                    "direct and derived debt do not reconcile",
+                )
+        # A generic carrying-amount tag can describe a long-term subtotal.
+        # Prefer a complete component set when one is available; it exposes the
+        # coverage rather than assuming that a bare carrying amount is total debt.
+        direct = tuple(
+            fact
+            for fact in direct
+            if not (
+                (fact.concept == "DebtInstrumentCarryingAmount" and derived_result is not None)
+                or (
+                    fact.concept == "LongTermDebt"
+                    and (has_carrier or has_combined or derived_result is not None)
+                )
+            )
+        )
+        direct_result = self._direct(spec, direct, candidates)
+        if (
+            direct_result is not None
+            and direct_result.decision.status is not ResolutionStatus.RESOLVED
+        ):
+            return direct_result
+        if direct_result is not None and derived_result is not None:
+            direct_basis = direct_result.decision.debt_derivation
+            derived_basis = derived_result.decision.debt_derivation
+            assert direct_basis is not None and derived_basis is not None
+            if direct_basis.measurement_basis is not derived_basis.measurement_basis:
+                return self._unresolved(
+                    spec,
+                    ResolutionStatus.AMBIGUOUS,
+                    candidates,
+                    "direct and derived debt use different measurement bases",
+                )
+            if direct_result.normalized_value != derived_result.normalized_value:
+                return self._unresolved(
+                    spec,
+                    ResolutionStatus.CONFLICT,
+                    candidates,
+                    "direct and derived debt do not reconcile",
+                )
+            return direct_result
+        if direct_result is not None:
+            return direct_result
+        if derived_result is not None:
+            return derived_result
+        if any(fact.concept == "ShortTermBorrowings" for fact in components):
+            return self._unresolved(
+                spec,
+                ResolutionStatus.AMBIGUOUS,
+                candidates,
+                "short-term borrowings may overlap current long-term debt",
+            )
+        return self._unresolved(
+            spec, ResolutionStatus.MISSING, candidates, "no complete debt evidence"
+        )
+
+    def _candidate(self, fact: RawFact, context: FactContext) -> FactCandidate:
+        reasons: list[str] = []
+        authorized = fact.taxonomy == "us-gaap" and (
+            fact.concept in self._DIRECT_CONCEPTS or fact.concept in self._COMPONENT_CONCEPTS
+        )
+        if not authorized:
+            reasons.append("concept is not an approved debt component")
+        if fact.unit != "USD":
+            reasons.append("unit mismatch")
+        if fact.period_kind is not PeriodKind.INSTANT or fact.end != context.target_end:
+            reasons.append("period kind or end date mismatch")
+        if context.fiscal_year is not None and fact.fiscal_year != context.fiscal_year:
+            reasons.append("fiscal year mismatch")
+        if context.canonical_period is not None:
+            reasons.extend(
+                FinancialCanonicalizer._period_reasons(
+                    fact,
+                    context.canonical_period,
+                    MetricSpec("total_debt", "us-gaap", "", (), "USD", PeriodKind.INSTANT),
+                )
+            )
+        if not fact.consolidated or fact.dimensions:
+            reasons.append("non-consolidated or dimensional fact")
+        return FactCandidate(
+            fact,
+            ResolutionMethod.STANDARD_CONCEPT if authorized else None,
+            not reasons,
+            tuple(reasons),
+            (1, int(fact.restatement) * 2 + int(fact.amendment), fact.filing_date.toordinal()),
+        )
+
+    def _direct(
+        self, spec: MetricSpec, facts: tuple[RawFact, ...], candidates: tuple[FactCandidate, ...]
+    ) -> CanonicalMetric | None:
+        if not facts:
+            return None
+        values_by_basis: dict[DebtMeasurementBasis, set[float]] = {}
+        for fact in facts:
+            values_by_basis.setdefault(self._DIRECT_CONCEPTS[fact.concept], set()).add(fact.value)
+        if len(values_by_basis) != 1 or any(
+            len(values) != 1 for values in values_by_basis.values()
+        ):
+            return self._unresolved(
+                spec, ResolutionStatus.AMBIGUOUS, candidates, "direct debt measurements conflict"
+            )
+        basis, values = next(iter(values_by_basis.items()))
+        value = next(iter(values))
+        matching = tuple(fact for fact in facts if fact.value == value)
+        selected = max(matching, key=lambda fact: (fact.filing_date, fact.accession, fact.fact_id))
+        derivation = DebtDerivation(
+            basis,
+            tuple(
+                DebtComponent(fact, DebtComponentKind.COMBINED_TOTAL, basis, "combined-total")
+                for fact in matching
+            ),
+            "direct",
+            selected.fact_id,
+        )
+        return CanonicalMetric(
+            spec,
+            ResolutionDecision(
+                ResolutionStatus.RESOLVED,
+                ResolutionMethod.STANDARD_CONCEPT,
+                selected.fact_id,
+                candidates,
+                ("direct debt total validated", "measurement basis validated"),
+                derivation,
+            ),
+            selected,
+            value,
+            spec.unit,
+        )
+
+    def _derived(
+        self, spec: MetricSpec, facts: tuple[RawFact, ...], candidates: tuple[FactCandidate, ...]
+    ) -> CanonicalMetric | None:
+        if not facts:
+            return None
+        components = tuple(
+            DebtComponent(
+                fact,
+                self._COMPONENT_CONCEPTS[fact.concept][0],
+                DebtMeasurementBasis.CARRYING_AMOUNT,
+                self._COMPONENT_CONCEPTS[fact.concept][1],
+            )
+            for fact in facts
+        )
+        coverages = {component.coverage for component in components}
+        if len(coverages) != len(components):
+            return None  # Competing values for a coverage cannot be safely selected.
+        kinds = {component.kind for component in components}
+        if DebtComponentKind.SHORT_TERM_BORROWINGS in kinds:
+            return None
+        required = {DebtComponentKind.LONG_TERM_CURRENT, DebtComponentKind.LONG_TERM_NONCURRENT}
+        if not required.issubset(kinds):
+            return None
+        value = sum(component.fact.value for component in components)
+        first = components[0].fact
+        synthetic = RawFact(
+            "derived-total-debt",
+            "us-gaap",
+            "DerivedInterestBearingDebt",
+            value,
+            "USD",
+            PeriodKind.INSTANT,
+            None,
+            first.end,
+            first.fiscal_year,
+            first.fiscal_period,
+            first.filing_form,
+            first.accession,
+            first.filing_date,
+            first.source_identity,
+        )
+        derivation = DebtDerivation(DebtMeasurementBasis.CARRYING_AMOUNT, components, "sum")
+        return CanonicalMetric(
+            spec,
+            ResolutionDecision(
+                ResolutionStatus.RESOLVED,
+                ResolutionMethod.DERIVED,
+                synthetic.fact_id,
+                candidates,
+                ("non-overlapping debt components validated", "measurement basis validated"),
+                derivation,
+            ),
+            synthetic,
+            value,
+            spec.unit,
+        )
+
+    @staticmethod
+    def _unresolved(
+        spec: MetricSpec,
+        status: ResolutionStatus,
+        candidates: tuple[FactCandidate, ...],
+        message: str,
+    ) -> CanonicalMetric:
+        return CanonicalMetric(
+            spec,
+            ResolutionDecision(status, ResolutionMethod.UNRESOLVED, None, candidates, (message,)),
+            None,
+            None,
+            None,
+        )
 
 
 @dataclass(frozen=True)
@@ -685,6 +1002,7 @@ class CanonicalizationEngine:
             }
             return CanonicalFinancials(profile, invalid_metrics, ("source payload invalid",), True)
         resolver = FinancialCanonicalizer()
+        debt_policy = DebtResolutionPolicy()
         metrics: dict[str, CanonicalMetric] = {}
         for spec in INITIAL_METRIC_SPECS:
             candidates = tuple(fact for fact in facts if fact.period_kind is spec.period_kind)
@@ -694,7 +1012,11 @@ class CanonicalizationEngine:
                 fiscal_period="FY" if spec.period_kind is PeriodKind.DURATION else None,
                 canonical_period=period,
             )
-            metrics[spec.metric] = resolver.resolve(profile, context, spec, candidates)
+            metrics[spec.metric] = (
+                debt_policy.resolve(profile, context, spec, candidates)
+                if spec.metric == "total_debt"
+                else resolver.resolve(profile, context, spec, candidates)
+            )
         return (
             resolver.financials(profile, FactContext(date.min), (), ())
             if False

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from importlib.resources import files
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from .expectations import (
     ExpectationsError,
@@ -208,7 +209,14 @@ def build_one_model(
     thesis = _interpretation(record, "thesis") if record else None
     counterthesis = _interpretation(record, "counterthesis") if record else None
     invalidation = tuple(record.invalidation[:3]) if record else ()
-    what_matters = tuple(str(risk.get("title", "")) for risk in record.risks[:3]) if record else ()
+    what_matters = (
+        tuple(
+            _watch_question(str(risk.get("title", "")), str(risk.get("mechanism", "")))
+            for risk in record.risks[:3]
+        )
+        if record
+        else ()
+    )
 
     return OneModel(
         ticker=snapshot.ticker,
@@ -238,14 +246,16 @@ def build_one_model(
 def _money(value: float | None, currency: str = "USD") -> str:
     if value is None:
         return "—"
+    sign = "−" if value < 0 else ""
+    absolute = abs(value)
     prefix = "$" if currency.upper() == "USD" else f"{currency.upper()} "
-    if value >= 1_000_000_000_000:
-        return f"{prefix}{value / 1_000_000_000_000:.2f}T"
-    if value >= 1_000_000_000:
-        return f"{prefix}{value / 1_000_000_000:.1f}B"
-    if value >= 1_000_000:
-        return f"{prefix}{value / 1_000_000:.1f}M"
-    return f"{prefix}{value:,.2f}"
+    if absolute >= 1_000_000_000_000:
+        return f"{sign}{prefix}{absolute / 1_000_000_000_000:.2f}T"
+    if absolute >= 1_000_000_000:
+        return f"{sign}{prefix}{absolute / 1_000_000_000:.1f}B"
+    if absolute >= 1_000_000:
+        return f"{sign}{prefix}{absolute / 1_000_000:.1f}M"
+    return f"{sign}{prefix}{absolute:,.2f}"
 
 
 def _money_millions(value: float | None) -> str:
@@ -271,9 +281,10 @@ def _bridge_html(items: tuple[CashBridgeItem, ...]) -> str:
     rows = []
     for item in items:
         sign = "+" if item.amount > 0 else ""
+        label = item.label.replace("SBC economic-cost policy", "Stock-based compensation cost")
         rows.append(
             '<div class="bridge-row">'
-            f"<span>{html.escape(item.label)}</span>"
+            f"<span>{html.escape(label)}</span>"
             f"<strong>{sign}{_money_millions(item.amount)}</strong>"
             "</div>"
         )
@@ -288,13 +299,13 @@ def _sensitivity_html(points: tuple[SensitivityPoint, ...]) -> str:
     lookup = {
         (point.discount_rate, point.terminal_growth): point.implied_fcf_growth for point in points
     }
-    header = "".join(f"<th>{terminal * 100:.0f}% TG</th>" for terminal in terminals)
+    header = "".join(f"<th>{terminal * 100:.0f}% long-run</th>" for terminal in terminals)
     rows = []
     for discount in discounts:
         cells = "".join(
             f"<td>{_percent(lookup[(discount, terminal)])}</td>" for terminal in terminals
         )
-        rows.append(f"<tr><th>{discount * 100:.0f}% CoE</th>{cells}</tr>")
+        rows.append(f"<tr><th>{discount * 100:.0f}% return</th>{cells}</tr>")
     return (
         '<table class="sensitivity"><thead><tr><th></th>'
         + header
@@ -304,6 +315,60 @@ def _sensitivity_html(points: tuple[SensitivityPoint, ...]) -> str:
     )
 
 
+def _observed_label(value: datetime) -> str:
+    eastern = value.astimezone(ZoneInfo("America/New_York"))
+    hour = eastern.strftime("%I").lstrip("0") or "0"
+    return f"{eastern:%b} {eastern.day}, {eastern.year} · {hour}{eastern:%M %p} ET"
+
+
+def _market_freshness_label(model: OneModel) -> str:
+    observed = _observed_label(model.snapshot.observed_at)
+    if model.freshness is Freshness.FRESH:
+        return f"MARKET DATA FRESH · AS OF {observed}"
+    return f"MARKET DATA {model.freshness.value.upper()} · OBSERVED {observed}"
+
+
+def _watch_question(title: str, mechanism: str) -> str:
+    """Turn source-backed risk content into an explicit executive question."""
+    return f"What could change the case for {title.lower()}? {mechanism}"
+
+
+def _why_case_could_work(thesis: str | None) -> str:
+    if not thesis:
+        return "No validated research interpretation is available."
+    _, separator, supporting_evidence = thesis.partition(":")
+    return supporting_evidence.strip() if separator else thesis
+
+
+def _invalidation_copy(item: str) -> str:
+    """Translate stored invalidation language without changing its conditions."""
+    translated = item
+    translated = translated.replace("Reconsider the positive underwriting case if ", "")
+    translated = translated.replace("Reconsider if ", "")
+    translated = translated.replace("recent FCF-proxy growth", "cash-flow growth")
+    translated = translated.replace("the market-implied hurdle", "the rate required by valuation")
+    translated = translated.replace("compress structurally", "weaken for lasting reasons")
+    translated = translated.replace(
+        "the expected duration of current AI-infrastructure economics",
+        "whether current economics can last",
+    )
+    return translated[:1].upper() + translated[1:]
+
+
+def _period_descriptor(period: str) -> str:
+    """Produce a compact, readable period label from frozen cash-basis metadata."""
+    normalized = period.lower()
+    if normalized.startswith("six months"):
+        return "6-month"
+    if normalized.startswith("nine months"):
+        return "9-month"
+    if normalized.startswith("three months"):
+        return "3-month"
+    if normalized.startswith("year") or normalized.startswith("twelve months"):
+        return "annual"
+    return "reported-period"
+
+
 def render_one_html(model: OneModel, output_path: str | Path) -> Path:
     """Render a deterministic, self-contained decision surface."""
     output = Path(output_path)
@@ -311,12 +376,18 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
     snapshot = model.snapshot
     change = snapshot.change_from_previous_close
     price = f"{snapshot.price:,.2f}"
-    change_label = "—" if change is None else f"{change * 100:+.2f}%"
+    change_label = "—" if change is None else f"{change * 100:+.2f}%".replace("-", "−", 1)
     hurdle = _percent(model.implied_fcf_growth)
-    evidence = model.evidence_as_of.isoformat() if model.evidence_as_of else "Not available"
+    evidence = (
+        model.evidence_as_of.strftime("%b %d, %Y").replace(" 0", " ")
+        if model.evidence_as_of
+        else "Not available"
+    )
     source = html.escape(snapshot.source)
     matters = "".join(f"<li>{html.escape(item)}</li>" for item in model.what_matters)
-    invalidation = "".join(f"<li>{html.escape(item)}</li>" for item in model.invalidation)
+    invalidation = "".join(
+        f"<li>{html.escape(_invalidation_copy(item))}</li>" for item in model.invalidation
+    )
     if not matters:
         matters = "<li>No validated research risks available.</li>"
     if not invalidation:
@@ -329,27 +400,65 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
     annualization = cash_basis.annualization_factor if cash_basis else None
     basis_kind = cash_basis.basis_kind.value.upper().replace("_", "-") if cash_basis else "MISSING"
     policy_note = cash_basis.policy_notes[0] if cash_basis else "Cash basis unavailable."
-    scenario = {
-        "marketCap": model.effective_market_cap,
-        "startingFcf": model.cash_basis_value,
-        "discountRate": model.discount_rate,
-        "terminalGrowth": model.terminal_growth,
-        "years": model.years,
-    }
-    scenario_json = json.dumps(scenario, sort_keys=True, separators=(",", ":"))
-    scenario_enabled = model.cash_basis_value is not None and model.effective_market_cap is not None
-    scenario_disabled = "" if scenario_enabled else " disabled"
+    bottom_line = (
+        f"{model.company_name} enters this valuation test with evidence of current operating "
+        f"strength, but today’s valuation still requires that strength to persist for years."
+        if model.thesis
+        else (
+            "This valuation test needs validated research evidence before it can support a "
+            "conclusion."
+        )
+    )
+    primary_risk = (
+        "Duration is the key risk. If demand, margins, or cash conversion weaken too soon, today’s "
+        "valuation becomes harder to justify."
+        if model.counterthesis
+        else "No validated counter-case is available."
+    )
+    trust_evidence = (
+        f"FINANCIAL EVIDENCE VERIFIED<br><span>Research evidence through {evidence}</span>"
+        if model.research_ready
+        else (
+            "FINANCIAL EVIDENCE UNAVAILABLE<br><span>No checksum-validated evidence pack is "
+            "available.</span>"
+        )
+    )
+    trust_market = (
+        f"MARKET OBSERVATION FRESH<br><span>{_observed_label(snapshot.observed_at)}</span>"
+        if model.freshness is Freshness.FRESH
+        else (
+            f"MARKET OBSERVATION {model.freshness.value.upper()}<br>"
+            f"<span>{_observed_label(snapshot.observed_at)}</span>"
+        )
+    )
+    trust_cash = (
+        f"CASH-FLOW BASE TRACEABLE<br><span>"
+        f"{_money(model.cash_basis_value, snapshot.currency)} current run-rate basis</span>"
+        if model.cash_basis_value is not None
+        else (
+            "CASH-FLOW BASE UNAVAILABLE<br><span>No evidence-backed cash-flow base is "
+            "available.</span>"
+        )
+    )
+    trust_model = (
+        "VALUATION MODEL SOLVED<br><span>Base-case result reproducible from disclosed "
+        "assumptions</span>"
+        if model.implied_fcf_growth is not None
+        else (
+            "VALUATION MODEL NOT SOLVED<br><span>The disclosed inputs do not support a "
+            "base-case result.</span>"
+        )
+    )
     currency = "$" if snapshot.currency.upper() == "USD" else html.escape(snapshot.currency) + " "
 
     replacements = {
         "__TICKER__": html.escape(model.ticker),
         "__COMPANY__": html.escape(model.company_name),
-        "__FRESHNESS__": model.freshness.value.upper(),
-        "__MARKET_STATE__": snapshot.market_state.value.upper(),
+        "__MARKET_FRESHNESS__": _market_freshness_label(model),
         "__CURRENCY__": currency,
         "__PRICE__": price,
         "__CHANGE__": change_label,
-        "__OBSERVED_SHORT__": html.escape(snapshot.observed_at.strftime("%Y-%m-%d %H:%M %Z")),
+        "__OBSERVED_SHORT__": html.escape(_observed_label(snapshot.observed_at)),
         "__EVIDENCE_STATE__": "VERIFIED" if model.research_ready else "MISSING",
         "__EVIDENCE_AS_OF__": evidence,
         "__MARKET_CAP__": _money(model.effective_market_cap, snapshot.currency),
@@ -358,6 +467,7 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
         "__REPORTED_PERIOD_FCF__": _money_millions(reported_period),
         "__RUN_RATE_PERIOD_CASH__": _money_millions(run_rate_period),
         "__BASIS_PERIOD__": html.escape(basis_period),
+        "__PERIOD_DESCRIPTOR__": _period_descriptor(basis_period),
         "__ANNUALIZATION__": "—" if annualization is None else f"{annualization:.2f}×",
         "__BASIS_KIND__": html.escape(basis_kind),
         "__CASH_BASIS_BRIDGE__": _bridge_html(cash_basis.bridge if cash_basis else ()),
@@ -368,18 +478,20 @@ def render_one_html(model: OneModel, output_path: str | Path) -> Path:
         "__DR_PCT__": _percent(model.discount_rate),
         "__TG_PCT__": _percent(model.terminal_growth),
         "__YEARS__": str(model.years),
-        "__SCENARIO_DISABLED__": scenario_disabled,
-        "__DR_VALUE__": f"{model.discount_rate * 100:.1f}",
-        "__TG_VALUE__": f"{model.terminal_growth * 100:.1f}",
         "__STATUS__": html.escape(model.status),
         "__STATUS_DETAIL__": html.escape(model.status_detail),
-        "__THESIS__": _safe(model.thesis),
+        "__BOTTOM_LINE__": _safe(bottom_line),
+        "__WHY_CASE__": _safe(_why_case_could_work(model.thesis)),
+        "__PRIMARY_RISK__": _safe(primary_risk),
         "__COUNTER__": _safe(model.counterthesis),
+        "__TRUST_EVIDENCE__": trust_evidence,
+        "__TRUST_MARKET__": trust_market,
+        "__TRUST_CASH__": trust_cash,
+        "__TRUST_MODEL__": trust_model,
         "__MATTERS__": matters,
         "__INVALIDATION__": invalidation,
         "__OBSERVED__": html.escape(snapshot.observed_at.isoformat()),
         "__RETRIEVED__": html.escape(snapshot.retrieved_at.isoformat()),
-        "__SCENARIO_JSON__": scenario_json,
     }
     rendered = _template()
     for token, value in replacements.items():

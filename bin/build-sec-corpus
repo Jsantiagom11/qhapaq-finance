@@ -9,15 +9,14 @@ _TICKERS = ("AAPL", "QCOM", "NVDA", "COST", "AMZN", "VRTX")
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Build the fixed offline SEC corpus from live SEC responses."
+        description="Build an offline SEC corpus from live SEC responses."
     )
     parser.add_argument(
         "tickers",
         nargs="*",
         type=str.upper,
-        choices=_TICKERS,
         metavar="TICKER",
-        help="issuer ticker(s) to acquire (default: all supported tickers)",
+        help="issuer ticker(s) to acquire (default: legacy configured corpus)",
     )
     args = parser.parse_args()
 

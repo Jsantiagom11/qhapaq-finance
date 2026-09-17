@@ -1,0 +1,995 @@
+<?xml version='1.0' encoding='utf-8'?>
+<FilingSummary>
+  <Version>3.26.1</Version>
+  <ProcessingTime/>
+  <ReportFormat>html</ReportFormat>
+  <ContextCount>409</ContextCount>
+  <ElementCount>372</ElementCount>
+  <EntityCount>1</EntityCount>
+  <FootnotesReported>true</FootnotesReported>
+  <SegmentCount>105</SegmentCount>
+  <ScenarioCount>0</ScenarioCount>
+  <TuplesReported>false</TuplesReported>
+  <UnitCount>6</UnitCount>
+  <MyReports>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R1.htm</HtmlFileName>
+      <LongName>75000 - Document - Document and Entity Information</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DocumentDocumentAndEntityInformation</Role>
+      <ShortName>Document and Entity Information</ShortName>
+      <MenuCategory>Cover</MenuCategory>
+      <Position>1</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R2.htm</HtmlFileName>
+      <LongName>75010 - Statement - INCOME STATEMENTS</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_StatementINCOMESTATEMENTS</Role>
+      <ShortName>INCOME STATEMENTS</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>2</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R3.htm</HtmlFileName>
+      <LongName>75020 - Statement - COMPREHENSIVE INCOME STATEMENTS</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_StatementCOMPREHENSIVEINCOMESTATEMENTS</Role>
+      <ShortName>COMPREHENSIVE INCOME STATEMENTS</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>3</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R4.htm</HtmlFileName>
+      <LongName>75030 - Statement - BALANCE SHEETS</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_StatementBALANCESHEETS</Role>
+      <ShortName>BALANCE SHEETS</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>4</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R5.htm</HtmlFileName>
+      <LongName>75040 - Statement - BALANCE SHEETS (Parenthetical)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_StatementBALANCESHEETSParenthetical</Role>
+      <ShortName>BALANCE SHEETS (Parenthetical)</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>5</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R6.htm</HtmlFileName>
+      <LongName>75050 - Statement - CASH FLOWS STATEMENTS</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_StatementCASHFLOWSSTATEMENTS</Role>
+      <ShortName>CASH FLOWS STATEMENTS</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>6</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R7.htm</HtmlFileName>
+      <LongName>75060 - Statement - STOCKHOLDERS' EQUITY STATEMENTS</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_StatementSTOCKHOLDERSEQUITYSTATEMENTS</Role>
+      <ShortName>STOCKHOLDERS' EQUITY STATEMENTS</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>7</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R8.htm</HtmlFileName>
+      <LongName>995410 - Disclosure - Pay vs Performance Disclosure</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://xbrl.sec.gov/ecd/role/PvpDisclosure</Role>
+      <ShortName>Pay vs Performance Disclosure</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>8</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R9.htm</HtmlFileName>
+      <LongName>995445 - Disclosure - Insider Trading Arrangements</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://xbrl.sec.gov/ecd/role/InsiderTradingArrangements</Role>
+      <ShortName>Insider Trading Arrangements</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>9</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R10.htm</HtmlFileName>
+      <LongName>995455 - Disclosure - ACCOUNTING POLICIES</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureACCOUNTINGPOLICIES</Role>
+      <ShortName>ACCOUNTING POLICIES</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>10</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R11.htm</HtmlFileName>
+      <LongName>995465 - Disclosure - EARNINGS PER SHARE</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureEARNINGSPERSHARE</Role>
+      <ShortName>EARNINGS PER SHARE</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>11</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R12.htm</HtmlFileName>
+      <LongName>995475 - Disclosure - OTHER INCOME (EXPENSE), NET</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureOTHERINCOMEEXPENSENET</Role>
+      <ShortName>OTHER INCOME (EXPENSE), NET</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>12</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R13.htm</HtmlFileName>
+      <LongName>995485 - Disclosure - INVESTMENTS</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureINVESTMENTS</Role>
+      <ShortName>INVESTMENTS</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>13</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R14.htm</HtmlFileName>
+      <LongName>995495 - Disclosure - DERIVATIVES</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureDERIVATIVES</Role>
+      <ShortName>DERIVATIVES</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>14</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R15.htm</HtmlFileName>
+      <LongName>995505 - Disclosure - PROPERTY AND EQUIPMENT</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosurePropertyAndEquipment</Role>
+      <ShortName>PROPERTY AND EQUIPMENT</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>15</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R16.htm</HtmlFileName>
+      <LongName>995515 - Disclosure - GOODWILL</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureGOODWILL</Role>
+      <ShortName>GOODWILL</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>16</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R17.htm</HtmlFileName>
+      <LongName>995525 - Disclosure - INTANGIBLE ASSETS</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureINTANGIBLEASSETS</Role>
+      <ShortName>INTANGIBLE ASSETS</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>17</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R18.htm</HtmlFileName>
+      <LongName>995535 - Disclosure - DEBT</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureDEBT</Role>
+      <ShortName>DEBT</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>18</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R19.htm</HtmlFileName>
+      <LongName>995545 - Disclosure - INCOME TAXES</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureINCOMETAXES</Role>
+      <ShortName>INCOME TAXES</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>19</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R20.htm</HtmlFileName>
+      <LongName>995555 - Disclosure - UNEARNED REVENUE</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureUNEARNEDREVENUE</Role>
+      <ShortName>UNEARNED REVENUE</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>20</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R21.htm</HtmlFileName>
+      <LongName>995565 - Disclosure - LEASES</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureLEASES</Role>
+      <ShortName>LEASES</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>21</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R22.htm</HtmlFileName>
+      <LongName>995575 - Disclosure - CONTINGENCIES</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureCONTINGENCIES</Role>
+      <ShortName>CONTINGENCIES</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>22</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R23.htm</HtmlFileName>
+      <LongName>995585 - Disclosure - STOCKHOLDERS' EQUITY</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSTOCKHOLDERSEQUITY</Role>
+      <ShortName>STOCKHOLDERS' EQUITY</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>23</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R24.htm</HtmlFileName>
+      <LongName>995595 - Disclosure - ACCUMULATED OTHER COMPREHENSIVE INCOME (LOSS)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureACCUMULATEDOTHERCOMPREHENSIVEINCOMELOSS</Role>
+      <ShortName>ACCUMULATED OTHER COMPREHENSIVE INCOME (LOSS)</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>24</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R25.htm</HtmlFileName>
+      <LongName>995605 - Disclosure - SEGMENT INFORMATION AND GEOGRAPHIC DATA</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSEGMENTINFORMATIONANDGEOGRAPHICDATA</Role>
+      <ShortName>SEGMENT INFORMATION AND GEOGRAPHIC DATA</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>25</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R26.htm</HtmlFileName>
+      <LongName>995615 - Disclosure - ACCOUNTING POLICIES (Policies)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureACCOUNTINGPOLICIESPolicies</Role>
+      <ShortName>ACCOUNTING POLICIES (Policies)</ShortName>
+      <MenuCategory>Policies</MenuCategory>
+      <Position>26</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R27.htm</HtmlFileName>
+      <LongName>995625 - Disclosure - EARNINGS PER SHARE (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureEARNINGSPERSHARETables</Role>
+      <ShortName>EARNINGS PER SHARE (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureEARNINGSPERSHARE</ParentRole>
+      <Position>27</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R28.htm</HtmlFileName>
+      <LongName>995635 - Disclosure - OTHER INCOME (EXPENSE), NET (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureOTHERINCOMEEXPENSENETTables</Role>
+      <ShortName>OTHER INCOME (EXPENSE), NET (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureOTHERINCOMEEXPENSENET</ParentRole>
+      <Position>28</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R29.htm</HtmlFileName>
+      <LongName>995645 - Disclosure - INVESTMENTS (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureINVESTMENTSTables</Role>
+      <ShortName>INVESTMENTS (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureINVESTMENTS</ParentRole>
+      <Position>29</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R30.htm</HtmlFileName>
+      <LongName>995655 - Disclosure - DERIVATIVES (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureDERIVATIVESTables</Role>
+      <ShortName>DERIVATIVES (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureDERIVATIVES</ParentRole>
+      <Position>30</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R31.htm</HtmlFileName>
+      <LongName>995665 - Disclosure - PROPERTY AND EQUIPMENT (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosurePropertyAndEquipmentTables</Role>
+      <ShortName>PROPERTY AND EQUIPMENT (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/DisclosurePropertyAndEquipment</ParentRole>
+      <Position>31</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R32.htm</HtmlFileName>
+      <LongName>995675 - Disclosure - GOODWILL (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureGOODWILLTables</Role>
+      <ShortName>GOODWILL (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureGOODWILL</ParentRole>
+      <Position>32</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R33.htm</HtmlFileName>
+      <LongName>995685 - Disclosure - INTANGIBLE ASSETS (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureINTANGIBLEASSETSTables</Role>
+      <ShortName>INTANGIBLE ASSETS (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureINTANGIBLEASSETS</ParentRole>
+      <Position>33</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R34.htm</HtmlFileName>
+      <LongName>995695 - Disclosure - DEBT (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureDEBTTables</Role>
+      <ShortName>DEBT (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureDEBT</ParentRole>
+      <Position>34</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R35.htm</HtmlFileName>
+      <LongName>995705 - Disclosure - UNEARNED REVENUE (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureUNEARNEDREVENUETables</Role>
+      <ShortName>UNEARNED REVENUE (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureUNEARNEDREVENUE</ParentRole>
+      <Position>35</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R36.htm</HtmlFileName>
+      <LongName>995715 - Disclosure - LEASES (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureLEASESTables</Role>
+      <ShortName>LEASES (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureLEASES</ParentRole>
+      <Position>36</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R37.htm</HtmlFileName>
+      <LongName>995725 - Disclosure - STOCKHOLDERS' EQUITY (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSTOCKHOLDERSEQUITYTables</Role>
+      <ShortName>STOCKHOLDERS' EQUITY (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSTOCKHOLDERSEQUITY</ParentRole>
+      <Position>37</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R38.htm</HtmlFileName>
+      <LongName>995735 - Disclosure - ACCUMULATED OTHER COMPREHENSIVE INCOME (LOSS) (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureAccumulatedOtherComprehensiveIncomeLossTables</Role>
+      <ShortName>ACCUMULATED OTHER COMPREHENSIVE INCOME (LOSS) (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureACCUMULATEDOTHERCOMPREHENSIVEINCOMELOSS</ParentRole>
+      <Position>38</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R39.htm</HtmlFileName>
+      <LongName>995745 - Disclosure - SEGMENT INFORMATION AND GEOGRAPHIC DATA (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSEGMENTINFORMATIONANDGEOGRAPHICDATATables</Role>
+      <ShortName>SEGMENT INFORMATION AND GEOGRAPHIC DATA (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSEGMENTINFORMATIONANDGEOGRAPHICDATA</ParentRole>
+      <Position>39</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R40.htm</HtmlFileName>
+      <LongName>995755 - Disclosure - Accounting Policies - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureAccountingPoliciesAdditionalInformationDetail</Role>
+      <ShortName>Accounting Policies - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>40</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R41.htm</HtmlFileName>
+      <LongName>995765 - Disclosure - Basic and Diluted Earnings Per Share (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureBasicAndDilutedEarningsPerShareDetail</Role>
+      <ShortName>Basic and Diluted Earnings Per Share (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>41</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R42.htm</HtmlFileName>
+      <LongName>995775 - Disclosure - Components of Other Income (Expense), Net (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureComponentsOfOtherIncomeExpenseNetDetail</Role>
+      <ShortName>Components of Other Income (Expense), Net (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>42</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R43.htm</HtmlFileName>
+      <LongName>995785 - Disclosure - Other Income (Expense), Net - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureOtherIncomeExpenseNetAdditionalInformationDetails</Role>
+      <ShortName>Other Income (Expense), Net - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>43</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R44.htm</HtmlFileName>
+      <LongName>995795 - Disclosure - Net Recognized Gains (Losses) on Debt Investments (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureNetRecognizedGainsLossesOnDebtInvestmentsDetail</Role>
+      <ShortName>Net Recognized Gains (Losses) on Debt Investments (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>44</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R45.htm</HtmlFileName>
+      <LongName>995805 - Disclosure - Net Recognized Gains (Losses) on Equity Investments (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureNetRecognizedGainsLossesOnEquityInvestmentsDetail</Role>
+      <ShortName>Net Recognized Gains (Losses) on Equity Investments (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>45</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R46.htm</HtmlFileName>
+      <LongName>995815 - Disclosure - Investment Components (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureInvestmentComponentsDetail</Role>
+      <ShortName>Investment Components (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>46</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R47.htm</HtmlFileName>
+      <LongName>995825 - Disclosure - Investments - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureInvestmentsAdditionalInformationDetail</Role>
+      <ShortName>Investments - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>47</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R48.htm</HtmlFileName>
+      <LongName>995835 - Disclosure - Unrealized Losses on Debt Investments (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureUnrealizedLossesOnDebtInvestmentsDetail</Role>
+      <ShortName>Unrealized Losses on Debt Investments (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>48</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R49.htm</HtmlFileName>
+      <LongName>995845 - Disclosure - Debt Investment Maturities (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureDebtInvestmentMaturitiesDetail</Role>
+      <ShortName>Debt Investment Maturities (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>49</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R50.htm</HtmlFileName>
+      <LongName>995855 - Disclosure - Derivatives - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureDerivativesAdditionalInformationDetail</Role>
+      <ShortName>Derivatives - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>50</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R51.htm</HtmlFileName>
+      <LongName>995865 - Disclosure - Notional Amounts of Outstanding Derivative Instruments Measured in U.S. Dollar Equivalents (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureNotionalAmountsOfOutstandingDerivativeInstrumentsMeasuredInUsDollarEquivalentsDetail</Role>
+      <ShortName>Notional Amounts of Outstanding Derivative Instruments Measured in U.S. Dollar Equivalents (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>51</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R52.htm</HtmlFileName>
+      <LongName>995875 - Disclosure - Fair Values of Derivative Instruments (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureFairValuesOfDerivativeInstrumentsDetail</Role>
+      <ShortName>Fair Values of Derivative Instruments (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>52</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R53.htm</HtmlFileName>
+      <LongName>995885 - Disclosure - Gains (Losses) on Derivative Instruments Recognized in Other Income (Expense), Net (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureGainsLossesOnDerivativeInstrumentsRecognizedInOtherIncomeExpenseNetDetail</Role>
+      <ShortName>Gains (Losses) on Derivative Instruments Recognized in Other Income (Expense), Net (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>53</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R54.htm</HtmlFileName>
+      <LongName>995895 - Disclosure - Gains (Losses), Net of Tax, on Derivative Instruments Recognized in Consolidated Comprehensive Income Statements (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureGainsLossesNetOfTaxOnDerivativeInstrumentsRecognizedInConsolidatedComprehensiveIncomeStatementsDetail</Role>
+      <ShortName>Gains (Losses), Net of Tax, on Derivative Instruments Recognized in Consolidated Comprehensive Income Statements (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>54</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R55.htm</HtmlFileName>
+      <LongName>995905 - Disclosure - Components of Property and Equipment (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureComponentsOfPropertyAndEquipmentDetail</Role>
+      <ShortName>Components of Property and Equipment (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>55</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R56.htm</HtmlFileName>
+      <LongName>995915 - Disclosure - Property and Equipment - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosurePropertyAndEquipmentAdditionalInformationDetail</Role>
+      <ShortName>Property and Equipment - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>56</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R57.htm</HtmlFileName>
+      <LongName>995925 - Disclosure - Carrying Amount of Goodwill (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureCarryingAmountOfGoodwillDetail</Role>
+      <ShortName>Carrying Amount of Goodwill (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>57</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R58.htm</HtmlFileName>
+      <LongName>995935 - Disclosure - Finite-Lived Intangible Assets (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureFiniteLivedIntangibleAssetsDetail</Role>
+      <ShortName>Finite-Lived Intangible Assets (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>58</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R59.htm</HtmlFileName>
+      <LongName>995945 - Disclosure - Intangible Assets - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureIntangibleAssetsAdditionalInformationDetail</Role>
+      <ShortName>Intangible Assets - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>59</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R60.htm</HtmlFileName>
+      <LongName>995955 - Disclosure - Estimated Future Amortization Expense Related to Intangible Assets (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureEstimatedFutureAmortizationExpenseRelatedToIntangibleAssetsDetail</Role>
+      <ShortName>Estimated Future Amortization Expense Related to Intangible Assets (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>60</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R61.htm</HtmlFileName>
+      <LongName>995965 - Disclosure - Components of Long-term Debt (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureComponentsOfLongtermDebtDetail</Role>
+      <ShortName>Components of Long-term Debt (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>61</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R62.htm</HtmlFileName>
+      <LongName>995985 - Disclosure - Components of Long-term Debt (Parenthetical) (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureComponentsOfLongtermDebtParentheticalDetail</Role>
+      <ShortName>Components of Long-term Debt (Parenthetical) (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>62</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R63.htm</HtmlFileName>
+      <LongName>995995 - Disclosure - Debt - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureDebtAdditionalInformationDetail</Role>
+      <ShortName>Debt - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>63</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R64.htm</HtmlFileName>
+      <LongName>996005 - Disclosure - Maturities of Long-term Debt Including Current Portion (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureMaturitiesOfLongtermDebtIncludingCurrentPortionDetail</Role>
+      <ShortName>Maturities of Long-term Debt Including Current Portion (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>64</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R65.htm</HtmlFileName>
+      <LongName>996015 - Disclosure - Income Taxes - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureIncomeTaxesAdditionalInformationDetail</Role>
+      <ShortName>Income Taxes - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>65</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R66.htm</HtmlFileName>
+      <LongName>996025 - Disclosure - Income Taxes - Additional Information Regarding Examinations (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureIncomeTaxesAdditionalInformationRegardingExaminationsDetail</Role>
+      <ShortName>Income Taxes - Additional Information Regarding Examinations (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>66</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R67.htm</HtmlFileName>
+      <LongName>996035 - Disclosure - Unearned Revenue by Segment (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureUnearnedRevenueBySegmentDetail</Role>
+      <ShortName>Unearned Revenue by Segment (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>67</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R68.htm</HtmlFileName>
+      <LongName>996045 - Disclosure - Changes in Unearned Revenue (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureChangesInUnearnedRevenueDetail</Role>
+      <ShortName>Changes in Unearned Revenue (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>68</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R69.htm</HtmlFileName>
+      <LongName>996055 - Disclosure - Unearned Revenue - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureUnearnedRevenueAdditionalInformationDetail</Role>
+      <ShortName>Unearned Revenue - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>69</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R70.htm</HtmlFileName>
+      <LongName>996065 - Disclosure - Unearned Revenue - Remaining Performance Obligation - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureUnearnedRevenueRemainingPerformanceObligationAdditionalInformationDetail</Role>
+      <ShortName>Unearned Revenue - Remaining Performance Obligation - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>70</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R71.htm</HtmlFileName>
+      <LongName>996075 - Disclosure - Leases - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureLeasesAdditionalInformationDetail</Role>
+      <ShortName>Leases - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>71</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R72.htm</HtmlFileName>
+      <LongName>996085 - Disclosure - Components of Lease Expense (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureComponentsOfLeaseExpenseDetail</Role>
+      <ShortName>Components of Lease Expense (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>72</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R73.htm</HtmlFileName>
+      <LongName>996095 - Disclosure - Supplemental Cash Flow Information Related to Leases (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSupplementalCashFlowInformationRelatedToLeasesDetail</Role>
+      <ShortName>Supplemental Cash Flow Information Related to Leases (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>73</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R74.htm</HtmlFileName>
+      <LongName>996105 - Disclosure - Supplemental Balance Sheet Information Related to Leases (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSupplementalBalanceSheetInformationRelatedToLeasesDetail</Role>
+      <ShortName>Supplemental Balance Sheet Information Related to Leases (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>74</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R75.htm</HtmlFileName>
+      <LongName>996115 - Disclosure - Maturities of Lease Liabilities (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureMaturitiesOfLeaseLiabilitiesDetail</Role>
+      <ShortName>Maturities of Lease Liabilities (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>75</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R76.htm</HtmlFileName>
+      <LongName>996135 - Disclosure - Contingencies - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureContingenciesAdditionalInformationDetail</Role>
+      <ShortName>Contingencies - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>76</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R77.htm</HtmlFileName>
+      <LongName>996145 - Disclosure - Stockholders' Equity - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureStockholdersEquityAdditionalInformationDetail</Role>
+      <ShortName>Stockholders' Equity - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>77</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R78.htm</HtmlFileName>
+      <LongName>996155 - Disclosure - Share Repurchases (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureShareRepurchasesDetail</Role>
+      <ShortName>Share Repurchases (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>78</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R79.htm</HtmlFileName>
+      <LongName>996165 - Disclosure - Dividends Declared (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureDividendsDeclaredDetail</Role>
+      <ShortName>Dividends Declared (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>79</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R80.htm</HtmlFileName>
+      <LongName>996175 - Disclosure - Summary of Changes in Accumulated Other Comprehensive Income (Loss) by Component (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSummaryOfChangesInAccumulatedOtherComprehensiveIncomeLossByComponentDetail</Role>
+      <ShortName>Summary of Changes in Accumulated Other Comprehensive Income (Loss) by Component (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>80</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R81.htm</HtmlFileName>
+      <LongName>996185 - Disclosure - Summary of Changes in Accumulated Other Comprehensive Income (Loss) by Component (Parenthetical) (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSummaryOfChangesInAccumulatedOtherComprehensiveIncomeLossByComponentParentheticalDetail</Role>
+      <ShortName>Summary of Changes in Accumulated Other Comprehensive Income (Loss) by Component (Parenthetical) (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>81</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R82.htm</HtmlFileName>
+      <LongName>996195 - Disclosure - Segment Revenue, Cost of Revenue, Operating Expenses and Operating Income (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/DisclosureSegmentRevenueCostOfRevenueOperatingExpensesAndOperatingIncomeDetail</Role>
+      <ShortName>Segment Revenue, Cost of Revenue, Operating Expenses and Operating Income (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>82</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R83.htm</HtmlFileName>
+      <LongName>996205 - Disclosure - Segment Information and Geographic Data - Additional Information (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureSegmentInformationAndGeographicDataAdditionalInformationDetail</Role>
+      <ShortName>Segment Information and Geographic Data - Additional Information (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>83</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R84.htm</HtmlFileName>
+      <LongName>996215 - Disclosure - Revenue Classified by Major Geographic Areas (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureRevenueClassifiedByMajorGeographicAreasDetail</Role>
+      <ShortName>Revenue Classified by Major Geographic Areas (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>84</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R85.htm</HtmlFileName>
+      <LongName>996225 - Disclosure - Revenue Classified by Significant Product and Service Offerings (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureRevenueClassifiedBySignificantProductAndServiceOfferingsDetail</Role>
+      <ShortName>Revenue Classified by Significant Product and Service Offerings (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>85</Position>
+    </Report>
+    <Report instance="msft-20260331.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R86.htm</HtmlFileName>
+      <LongName>996235 - Disclosure - Revenue Classified by Significant Product and Service Offerings (Parenthetical) (Detail)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.microsoft.com/20260331/taxonomy/role/Role_DisclosureRevenueClassifiedBySignificantProductAndServiceOfferingsParentheticalDetail</Role>
+      <ShortName>Revenue Classified by Significant Product and Service Offerings (Parenthetical) (Detail)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>86</Position>
+    </Report>
+    <Report>
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <LongName>All Reports</LongName>
+      <ReportType>Book</ReportType>
+      <ShortName>All Reports</ShortName>
+    </Report>
+  </MyReports>
+  <InputFiles>
+    <File doctype="10-Q" isDefinitelyFs="true" isUsgaap="true" original="msft-20260331.htm">msft-20260331.htm</File>
+    <File>msft-20260331.xsd</File>
+  </InputFiles>
+  <SupplementalFiles/>
+  <BaseTaxonomies>
+    <BaseTaxonomy items="3">http://fasb.org/srt/2025</BaseTaxonomy>
+    <BaseTaxonomy items="1466">http://fasb.org/us-gaap/2025</BaseTaxonomy>
+    <BaseTaxonomy items="36">http://xbrl.sec.gov/dei/2025</BaseTaxonomy>
+    <BaseTaxonomy items="12">http://xbrl.sec.gov/ecd/2025</BaseTaxonomy>
+  </BaseTaxonomies>
+  <HasPresentationLinkbase>false</HasPresentationLinkbase>
+  <HasCalculationLinkbase>false</HasCalculationLinkbase>
+</FilingSummary>

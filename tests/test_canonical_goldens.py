@@ -80,26 +80,11 @@ def engine_outputs() -> dict[str, object]:
     return outputs
 
 
-_KNOWN_NON_PERIOD_MISMATCHES = {
-    ("AAPL", "total_debt"): "DERIVATION: no approved total-debt derivation",
-    ("QCOM", "total_debt"): "DERIVATION: current debt is not total debt",
-    ("NVDA", "total_debt"): "DERIVATION: current debt is not total debt",
-    ("COST", "total_debt"): "DERIVATION: current debt is not total debt",
-    ("AMZN", "total_debt"): "DERIVATION: total-debt ambiguity policy is not implemented",
-}
-
-
 def _comparison_parameter(ticker: str, metric: str) -> object:
-    reason = _KNOWN_NON_PERIOD_MISMATCHES.get((ticker, metric))
-    return (
-        pytest.param(ticker, metric, marks=pytest.mark.xfail(strict=True, reason=reason))
-        if reason
-        else pytest.param(ticker, metric)
-    )
+    return pytest.param(ticker, metric)
 
 
-# Only independently classified, non-period mismatches remain strict xfails.
-# A fixed period-selection regression is an ordinary passing assertion.
+# The production engine must match the independently established frozen goldens.
 @pytest.mark.parametrize(
     ("ticker", "metric"),
     [
@@ -131,7 +116,11 @@ def test_engine_matches_independently_established_golden(
     assert actual.normalized_unit == expected["normalized_unit"]
     assert actual.raw_fact is not None
     assert actual.raw_fact.accession == expected["source_accession"]
-    assert actual.raw_fact.concept == expected["source_concept_qname"].split(":", 1)[1]
+    if actual.decision.method.value != "DERIVED":
+        assert actual.raw_fact.concept == expected["source_concept_qname"].split(":", 1)[1]
+    else:
+        assert actual.decision.debt_derivation is not None
+        assert actual.decision.debt_derivation.operator == "sum"
     assert actual.raw_fact.end.isoformat() == expected["report_date"]
     assert actual.raw_fact.filing_form == expected["filing_form"]
     if "start_date" in expected["period"]:

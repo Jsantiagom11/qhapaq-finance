@@ -28,7 +28,10 @@ def test_nvda_empirical_evidence_normalizes_to_complete_ttm_snapshot() -> None:
     assert snapshot.capex == 7_354
     assert snapshot.change_in_working_capital == 34_102
     assert snapshot.fcff == pytest.approx(124_245.78)
-    assert snapshot.invested_capital == pytest.approx(49_153.5)
+    assert snapshot.invested_capital is not None
+    assert snapshot.invested_capital.opening.top_down.value == pytest.approx(28_409)
+    assert snapshot.invested_capital.closing.top_down.value == pytest.approx(69_898)
+    assert snapshot.invested_capital.average == pytest.approx(49_153.5)
     assert snapshot.cash == 22_443
     assert snapshot.marketable_securities == 76_926
     assert snapshot.debt == 33_366

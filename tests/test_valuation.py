@@ -1,5 +1,6 @@
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -27,6 +28,58 @@ def test_fcff_reconstruction_and_normalization_bridge_conservation() -> None:
     result = analyze_case(load_fixture_case("QCOM", ROOT))
     assert result.normalized_fcff == result.reconstructed_fcff + sum(
         item.amount for item in result.case.normalization_adjustments
+    )
+
+
+def test_analyze_case_uses_the_nopat_primitive(monkeypatch: pytest.MonkeyPatch) -> None:
+    import qhapaq_finance.valuation as valuation_module
+
+    monkeypatch.setattr(
+        valuation_module,
+        "calculate_nopat",
+        lambda *, ebit, tax_rate: 9_000.0,
+        raising=False,
+    )
+
+    result = analyze_case(load_fixture_case("QCOM", ROOT))
+
+    assert result.nopat == 9_000.0
+
+
+def test_analyze_case_uses_the_roic_primitive(monkeypatch: pytest.MonkeyPatch) -> None:
+    import qhapaq_finance.valuation as valuation_module
+
+    monkeypatch.setattr(
+        valuation_module,
+        "calculate_roic",
+        lambda *, nopat, invested_capital: 0.123,
+        raising=False,
+    )
+
+    result = analyze_case(load_fixture_case("QCOM", ROOT))
+
+    assert result.roic == 0.123
+
+
+def test_fcff_inputs_uses_the_fcff_primitive(monkeypatch: pytest.MonkeyPatch) -> None:
+    import qhapaq_finance.valuation as valuation_module
+
+    monkeypatch.setattr(
+        valuation_module,
+        "calculate_fcff",
+        lambda *, nopat, depreciation_amortization, capex, change_in_working_capital: 777.0,
+        raising=False,
+    )
+
+    assert (
+        FcffInputs(
+            ebit=100.0,
+            tax_rate=0.2,
+            depreciation_amortization=10.0,
+            capex=15.0,
+            change_in_nwc=5.0,
+        ).reconstructed_fcff()
+        == 777.0
     )
 
 
@@ -273,6 +326,76 @@ def test_reverse_dcf_convergence_boundary_and_no_solution() -> None:
             terminal_growth=base.terminal_growth,
             years=base.years,
         )
+
+
+def test_forward_and_reverse_fcff_use_the_same_present_value_engine(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import qhapaq_finance.valuation as valuation_module
+
+    expected = SimpleNamespace(
+        pv_explicit_period=80_000.0,
+        pv_terminal_value=120_000.0,
+        enterprise_value=200_000.0,
+    )
+    monkeypatch.setattr(
+        valuation_module,
+        "_value_fcff",
+        lambda **kwargs: expected,
+        raising=False,
+    )
+    case = load_fixture_case("QCOM", ROOT)
+    base = next(item for item in case.scenarios if item.name == "base")
+
+    forward = value_scenario(case, base)
+    reverse_engine_value = _pv_fcff(
+        100.0,
+        base.explicit_growth,
+        base.terminal_growth,
+        case.capital_cost.wacc,
+        base.years,
+    )
+
+    assert forward.enterprise_value == 200_000.0
+    assert forward.pv_explicit_period == 80_000.0
+    assert forward.pv_terminal_value == 120_000.0
+    assert reverse_engine_value == 200_000.0
+
+
+def test_forward_and_reverse_fcff_growth_round_trip() -> None:
+    case = load_fixture_case("QCOM", ROOT)
+    base = next(item for item in case.scenarios if item.name == "base")
+    forward = value_scenario(case, base)
+    starting_fcff = case.financial_inputs.reconstructed_fcff() + sum(
+        item.amount for item in case.normalization_adjustments
+    )
+
+    recovered_growth = solve_fcff_implied_growth(
+        market_enterprise_value=forward.enterprise_value,
+        starting_fcff=starting_fcff,
+        wacc=case.capital_cost.wacc,
+        terminal_growth=base.terminal_growth,
+        years=base.years,
+    )
+    reproduced_enterprise_value = _pv_fcff(
+        starting_fcff,
+        recovered_growth,
+        base.terminal_growth,
+        case.capital_cost.wacc,
+        base.years,
+    )
+
+    assert recovered_growth == pytest.approx(base.explicit_growth, abs=1e-10)
+    assert reproduced_enterprise_value == pytest.approx(forward.enterprise_value, rel=1e-10)
+
+
+def test_fcff_present_value_monotonicity() -> None:
+    base = _pv_fcff(100.0, 0.05, 0.03, 0.09, 8)
+
+    assert _pv_fcff(100.0, 0.05, 0.03, 0.12, 8) < base
+    assert _pv_fcff(100.0, 0.08, 0.03, 0.09, 8) > base
+    assert _pv_fcff(100.0, 0.05, 0.04, 0.09, 8) > base
+    assert _pv_fcff(120.0, 0.05, 0.03, 0.09, 8) > base
 
 
 def test_fcff_implied_discount_rate_convergence_and_no_solution() -> None:

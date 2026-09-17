@@ -14,6 +14,9 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from . import capital_cost
+from .accounting import InvestedCapitalPair
+from .financial_primitives import calculate_fcff, calculate_nopat, calculate_roic
 from .market_inputs import MarketProvenance, compatibility_market_provenance
 
 
@@ -96,13 +99,19 @@ class CapitalCost:
             raise ValuationError(
                 "beta must be non-negative; market_equity positive; debt non-negative"
             )
-        total = equity + debt_value
-        if total <= 0:
+        if equity + debt_value <= 0:
             raise ValuationError("capital must be positive")
-        ke = rf + beta_value * erp
+        ke, ew, dw, wacc = capital_cost._calculate_wacc_components(
+            risk_free_rate=rf,
+            equity_risk_premium=erp,
+            beta=beta_value,
+            pre_tax_cost_of_debt=kd,
+            tax_rate=tax,
+            market_equity=equity,
+            debt=debt_value,
+        )
         if ke <= -1 or not math.isfinite(ke):
             raise ValuationError("cost_of_equity is invalid")
-        ew, dw = equity / total, debt_value / total
         return cls(
             rf,
             erp,
@@ -114,7 +123,7 @@ class CapitalCost:
             debt_value,
             ew,
             dw,
-            ew * ke + dw * kd * (1 - tax),
+            wacc,
             "legacy",
             None,
         )
@@ -168,11 +177,11 @@ class FcffInputs:
     change_in_nwc: float
 
     def reconstructed_fcff(self) -> float:
-        return (
-            self.ebit * (1 - self.tax_rate)
-            + self.depreciation_amortization
-            - self.capex
-            - self.change_in_nwc
+        return calculate_fcff(
+            nopat=calculate_nopat(ebit=self.ebit, tax_rate=self.tax_rate),
+            depreciation_amortization=self.depreciation_amortization,
+            capex=self.capex,
+            change_in_working_capital=self.change_in_nwc,
         )
 
 
@@ -211,6 +220,84 @@ class MarketSnapshot:
     @property
     def enterprise_value(self) -> float:
         return self.equity_value - self.liquid_assets + self.debt + self.other_senior_claims
+
+
+@dataclass(frozen=True)
+class ValuationInput:
+    # Single pure input contract for the canonical valuation kernel.
+    fcff: float
+    nopat: float
+    wacc: float
+    market_equity: float
+    debt: float
+    cash: float
+    marketable_securities: float
+    invested_capital: InvestedCapitalPair | None
+    reinvestment_rate: float | None = None
+    other_senior_claims: float = 0.0
+
+
+@dataclass(frozen=True)
+class ValuationOutput:
+    # Pure metrics; optional extensions disappear without invested capital.
+    fcff: float
+    wacc: float
+    enterprise_value: float
+    fcff_yield: float
+    roic: float | None
+    implied_growth_from_reinvestment: float | None
+    roic_minus_wacc: float | None
+
+
+def run_valuation(inputs: ValuationInput) -> ValuationOutput:
+    # Run FCFF/WACC metrics without requiring invested-capital evidence.
+    fcff = _number(inputs.fcff, "fcff")
+    nopat = _number(inputs.nopat, "nopat")
+    wacc = _rate(inputs.wacc, "wacc")
+    if wacc < 0:
+        raise ValuationError("wacc must be non-negative")
+
+    market_equity = _number(inputs.market_equity, "market_equity")
+    debt = _number(inputs.debt, "debt")
+    cash = _number(inputs.cash, "cash")
+    securities = _number(inputs.marketable_securities, "marketable_securities")
+    senior_claims = _number(inputs.other_senior_claims, "other_senior_claims")
+
+    if market_equity <= 0:
+        raise ValuationError("market_equity must be positive")
+    if min(debt, cash, securities, senior_claims) < 0:
+        raise ValuationError("capital-structure inputs must be non-negative")
+
+    enterprise_value = market_equity + debt + senior_claims - cash - securities
+    if enterprise_value <= 0:
+        raise ValuationError("enterprise_value must be positive")
+
+    reinvestment_rate = None
+    if inputs.reinvestment_rate is not None:
+        reinvestment_rate = _rate(inputs.reinvestment_rate, "reinvestment_rate")
+
+    roic = implied_growth = roic_minus_wacc = None
+    if inputs.invested_capital is not None:
+        try:
+            roic = calculate_roic(
+                nopat=nopat,
+                invested_capital=inputs.invested_capital.average,
+            )
+        except ValueError as exc:
+            raise ValuationError(str(exc)) from exc
+        roic_minus_wacc = roic - wacc
+        if reinvestment_rate is not None:
+            implied_growth = reinvestment_rate * roic
+
+    return ValuationOutput(
+        fcff=fcff,
+        wacc=wacc,
+        enterprise_value=enterprise_value,
+        fcff_yield=fcff / enterprise_value,
+        roic=roic,
+        implied_growth_from_reinvestment=implied_growth,
+        roic_minus_wacc=roic_minus_wacc,
+    )
 
 
 @dataclass(frozen=True)
@@ -262,6 +349,13 @@ class ResearchResult:
     expectation_growth_gap: float
     fcff_yield: float
     diagnostics: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class _FcffPresentValue:
+    pv_explicit_period: float
+    pv_terminal_value: float
+    enterprise_value: float
 
 
 def _validate_case(case: ResearchCase) -> None:
@@ -346,6 +440,38 @@ def _validate_case(case: ResearchCase) -> None:
         raise ValuationError("capital-cost components are not internally coherent")
 
 
+def _value_fcff(
+    *,
+    starting_fcff: float,
+    growth: float,
+    terminal_growth: float,
+    discount_rate: float,
+    years: int,
+) -> _FcffPresentValue:
+    """Value FCFF through an explicit period plus a Gordon-growth terminal value."""
+    starting_fcff = _number(starting_fcff, "starting_fcff")
+    growth = _rate(growth, "growth")
+    terminal_growth = _rate(terminal_growth, "terminal_growth")
+    discount_rate = _rate(discount_rate, "discount_rate")
+    _positive_int(years, "years")
+    if discount_rate - terminal_growth < MIN_TERMINAL_SPREAD:
+        raise ValuationError("terminal_growth must be at least 1 bp below discount_rate")
+    pv_explicit_period, cash_flow = 0.0, starting_fcff
+    for year in range(1, years + 1):
+        cash_flow *= 1 + growth
+        pv_explicit_period += cash_flow / (1 + discount_rate) ** year
+    pv_terminal_value = (
+        cash_flow
+        * (1 + terminal_growth)
+        / (discount_rate - terminal_growth)
+        / (1 + discount_rate) ** years
+    )
+    enterprise_value = pv_explicit_period + pv_terminal_value
+    if not math.isfinite(enterprise_value) or enterprise_value <= 0:
+        raise ValuationError("FCFF present value must be positive and finite")
+    return _FcffPresentValue(pv_explicit_period, pv_terminal_value, enterprise_value)
+
+
 def value_scenario(case: ResearchCase, scenario: ScenarioAssumptions) -> ScenarioValuation:
     _validate_case(case)
     _positive_int(scenario.years, "scenario years")
@@ -362,16 +488,18 @@ def value_scenario(case: ResearchCase, scenario: ScenarioAssumptions) -> Scenari
     normalized = case.financial_inputs.reconstructed_fcff() + sum(adjustments)
     if not math.isfinite(normalized):
         raise ValuationError("normalized FCFF must be finite")
-    pv_explicit = 0.0
-    fcff = normalized
-    for year in range(1, scenario.years + 1):
-        fcff *= 1 + growth
-        pv_explicit += fcff / (1 + wacc) ** year
-    terminal_value = fcff * (1 + terminal_growth) / (wacc - terminal_growth)
-    pv_terminal = terminal_value / (1 + wacc) ** scenario.years
-    enterprise = pv_explicit + pv_terminal
-    if not math.isfinite(enterprise) or enterprise <= 0:
-        raise ValuationError("FCFF valuation produced non-positive or non-finite enterprise value")
+    present_value = _value_fcff(
+        starting_fcff=normalized,
+        growth=growth,
+        terminal_growth=terminal_growth,
+        discount_rate=wacc,
+        years=scenario.years,
+    )
+    pv_explicit, pv_terminal, enterprise = (
+        present_value.pv_explicit_period,
+        present_value.pv_terminal_value,
+        present_value.enterprise_value,
+    )
     market = case.market_snapshot
     equity = enterprise + market.liquid_assets - market.debt - market.other_senior_claims
     if equity <= 0:
@@ -433,27 +561,13 @@ def price_value_classification(price: float, intrinsic_value: float) -> str:
 def _pv_fcff(
     starting_fcff: float, growth: float, terminal_growth: float, discount_rate: float, years: int
 ) -> float:
-    starting_fcff = _number(starting_fcff, "starting_fcff")
-    growth = _rate(growth, "growth")
-    terminal_growth = _rate(terminal_growth, "terminal_growth")
-    discount_rate = _rate(discount_rate, "discount_rate")
-    _positive_int(years, "years")
-    if discount_rate - terminal_growth < MIN_TERMINAL_SPREAD:
-        raise ValuationError("terminal_growth must be at least 1 bp below discount_rate")
-    pv, cash_flow = 0.0, starting_fcff
-    for year in range(1, years + 1):
-        cash_flow *= 1 + growth
-        pv += cash_flow / (1 + discount_rate) ** year
-    result = (
-        pv
-        + cash_flow
-        * (1 + terminal_growth)
-        / (discount_rate - terminal_growth)
-        / (1 + discount_rate) ** years
-    )
-    if not math.isfinite(result) or result <= 0:
-        raise ValuationError("FCFF present value must be positive and finite")
-    return result
+    return _value_fcff(
+        starting_fcff=starting_fcff,
+        growth=growth,
+        terminal_growth=terminal_growth,
+        discount_rate=discount_rate,
+        years=years,
+    ).enterprise_value
 
 
 def _bisect(target: float, evaluate: Any, lower: float, upper: float, label: str) -> float:
@@ -530,8 +644,11 @@ def analyze_case(case: ResearchCase) -> ResearchResult:
     _validate_case(case)
     reconstructed = case.financial_inputs.reconstructed_fcff()
     normalized = reconstructed + sum(item.amount for item in case.normalization_adjustments)
-    nopat = case.financial_inputs.ebit * (1 - case.financial_inputs.tax_rate)
-    roic = nopat / case.invested_capital
+    nopat = calculate_nopat(
+        ebit=case.financial_inputs.ebit,
+        tax_rate=case.financial_inputs.tax_rate,
+    )
+    roic = calculate_roic(nopat=nopat, invested_capital=case.invested_capital)
     implied_growth = case.reinvestment_rate * roic
     base = next(s for s in case.scenarios if s.name == "base")
     diagnostic = (

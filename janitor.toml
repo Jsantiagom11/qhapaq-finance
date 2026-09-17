@@ -1,0 +1,25 @@
+[debt]
+max_p0 = 0
+max_p1 = 0
+max_new_p2_per_feature = 2
+block_on_expired_p2 = true
+
+[delivery]
+require_user_visible_result = true
+evidence_paths = [
+  "output/qhapaq-one/qcom.html",
+  "output/qhapaq-one/nvda.html",
+]
+
+[environment]
+uv_extras = ["dev"]
+
+[validation]
+timeout_seconds = 180
+commands = [
+  "uv lock --check",
+  "uv run --no-sync ruff check .",
+  "uv run --no-sync mypy src",
+  "uv run --no-sync pytest -q",
+  "git diff --check",
+]

@@ -6,16 +6,27 @@
 <title>Qhapaq One · __TICKER__</title>
 <style>
 :root {
-  --bg: #09090a;
-  --surface: #111113;
-  --surface-2: #151518;
-  --line: #29292d;
-  --text: #f3f1eb;
-  --muted: #999893;
-  --accent: #d8c49a;
-  --accent-soft: rgba(216,196,154,.08);
-  --max: 1160px;
-  --r: 18px;
+  --charcoal: #111315;
+  --paper: #E4E0D6;
+  --paper-elevated: #ECE8DE;
+  --paper-ink: #202124;
+  --terracotta: #C66A45;
+  --terracotta-soft: #B97A61;
+  --rule-dark: #343536;
+  --rule-paper: #C5BEB3;
+  --bg: var(--charcoal);
+  --surface: #161816;
+  --surface-2: #191A18;
+  --line: var(--rule-dark);
+  --text: #F2F0EA;
+  --text-secondary: #CFCCC3;
+  --text-subtle: #AAA79F;
+  --ink: var(--paper-ink);
+  --ink-secondary: #4E4E49;
+  --ink-muted: #68665E;
+  --paper-rule: var(--rule-paper);
+  --max: clamp(0px, 78vw, 1500px);
+  --r: 0;
 }
 * { box-sizing: border-box; }
 html {
@@ -25,11 +36,9 @@ html {
 }
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at 72% -15%, rgba(216,196,154,.08), transparent 30rem),
-    var(--bg);
+  background: var(--bg);
 }
-main { max-width: var(--max); margin: auto; padding: 28px 28px 56px; }
+main { max-width: var(--max); margin: auto; padding: 24px 32px 32px; }
 .top {
   display: flex;
   justify-content: space-between;
@@ -40,16 +49,16 @@ main { max-width: var(--max); margin: auto; padding: 28px 28px 56px; }
 .brand { font-size: 11px; font-weight: 800; letter-spacing: .24em; }
 .live,
 .label,
-.eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: .15em; }
-.live { color: var(--accent); }
+.eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .13em; }
+.live { color: var(--terracotta); }
 .label,
-.eyebrow { color: var(--muted); }
+.eyebrow { color: var(--text-subtle); }
 .hero {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: end;
-  gap: 30px;
-  padding: 38px 0 26px;
+  gap: 32px;
+  padding: 30px 0 22px;
 }
 .ticker {
   margin: 8px 0 6px;
@@ -57,73 +66,86 @@ main { max-width: var(--max); margin: auto; padding: 28px 28px 56px; }
   letter-spacing: -.06em;
   line-height: .92;
 }
-.company { color: var(--muted); font-size: 14px; }
+.company { color: var(--text-secondary); font-size: 16px; }
 .quote { text-align: right; }
-.price { font-size: clamp(42px, 6vw, 64px); letter-spacing: -.05em; line-height: 1; }
-.change { margin-top: 8px; color: var(--accent); font-size: 11px; }
+.price { font-size: clamp(42px, 6vw, 64px); letter-spacing: -.05em; line-height: 1; font-variant-numeric: tabular-nums; }
+.change { margin-top: 8px; color: var(--terracotta); font-size: 13px; }
+.executive {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(280px, 1fr);
+  gap: 28px;
+  align-items: stretch;
+}
+.executive-main { padding: 30px 0 24px; border: 0; background: none; border-radius: 0; }
+.executive-hurdle {
+  margin-top: 15px;
+  font-size: clamp(72px, 10vw, 112px);
+  letter-spacing: -.07em;
+  line-height: .82;
+  font-variant-numeric: tabular-nums;
+}
+.hurdle-meaning { margin-top: 12px; font-size: 20px; letter-spacing: -.03em; }
+.hurdle-years { margin-top: 4px; color: var(--terracotta); font-size: 14px; letter-spacing: .04em; }
+.assumptions { display: grid; gap: 1px; margin-top: 16px; border-top: 1px solid var(--line); }
+.assumption { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.assumption strong { display: block; margin-top: 6px; font-size: 22px; letter-spacing: -.035em; font-variant-numeric: tabular-nums; }
+.assumptions-panel { align-self: center; padding: 18px 0; }
+.basis-line { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); color: var(--text-secondary); font-size: 14px; line-height: 1.5; }
+.basis-line strong { color: var(--text); }
+.trust-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; margin-top: 4px; }
+.trust-item { min-width: 0; padding: 14px 0; font-size: 13px; line-height: 1.4; }
+.trust-item span { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 13px; }
+.calculation-bridge { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+.calculation-bridge h2 { margin: 0; }
+.calculation-inputs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin: 14px 0 0;
+}
+.calculation-inputs > div { min-width: 0; }
+.calculation-inputs dt { color: var(--text-subtle); font-size: 10px; font-weight: 500; letter-spacing: .1em; line-height: 1.35; }
+.calculation-inputs dd { margin: 5px 0 0; color: var(--text); font-size: 20px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.calculation-solve { margin-top: 18px; color: var(--text-secondary); font-size: 12px; line-height: 1.45; }
+.calculation-solve span { color: var(--terracotta); }
+.calculation-result { margin-top: 4px; }
+.calculation-result strong { display: block; margin-top: 3px; color: var(--text); font-size: 30px; letter-spacing: -.045em; line-height: 1; font-variant-numeric: tabular-nums; }
+.bottom-line { margin-top: 26px; padding: 18px 0 0; }
+.bottom-line .label { color: var(--terracotta); }
+.bottom-line .copy { max-width: 72ch; }
+.case-risk { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 24px; }
+.case-risk > article { padding-top: 16px; border-top: 1px solid var(--line); }
+.watch { margin-top: 10px; }
+.analysis-heading { margin: 40px 0 -8px; font-size: 12px; font-weight: 800; letter-spacing: .18em; color: var(--terracotta); }
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 .metric-card,
 .panel {
   border: 1px solid var(--line);
-  background: linear-gradient(160deg, var(--accent-soft), transparent 48%), var(--surface);
+  background: var(--surface);
   border-radius: var(--r);
 }
-.metric-card { padding: 17px 18px; min-height: 112px; }
-.metric-value { margin-top: 10px; font-size: 22px; letter-spacing: -.025em; }
-.metric-sub { margin-top: 7px; color: var(--muted); font-size: 10px; line-height: 1.45; }
-.section { padding-top: 28px; }
+.metric-card { padding: 16px 18px; min-height: 108px; }
+.metric-value { margin-top: 10px; font-size: 22px; letter-spacing: -.025em; font-variant-numeric: tabular-nums; }
+.metric-sub { margin-top: 7px; color: var(--text-secondary); font-size: 13px; line-height: 1.5; }
+.section { padding-top: 24px; }
 .decision-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
-.panel { padding: 22px; }
+.decision-grid > *,
+.bridge-grid > *,
+.columns > *,
+.executive > * { min-width: 0; }
+.panel { padding: 20px; }
 .market-hurdle {
   margin-top: 14px;
   font-size: clamp(60px, 8vw, 86px);
   letter-spacing: -.06em;
   line-height: .92;
 }
-.market-copy { max-width: 600px; margin-top: 13px; color: var(--muted); font-size: 12px; line-height: 1.6; }
-.state { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
-.state strong { font-size: 12px; letter-spacing: .06em; color: var(--accent); }
-.state p { margin: 8px 0 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
-.actions { margin-top: 18px; }
-button {
-  appearance: none;
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--text);
-  border-radius: 999px;
-  padding: 9px 14px;
-  font: inherit;
-  font-size: 11px;
-  cursor: pointer;
-}
-button:hover { border-color: var(--accent); }
-button:disabled { opacity: .35; cursor: not-allowed; }
-.scenario { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
-.scenario.open { display: block; }
-.control {
-  display: grid;
-  grid-template-columns: 120px 1fr 60px;
-  gap: 12px;
-  align-items: center;
-  padding: 8px 0;
-}
-.control label,
-.control output { color: var(--muted); font-size: 11px; }
-.control output { text-align: right; }
-input[type="range"] { width: 100%; accent-color: var(--accent); }
-.scenario-result {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  margin-top: 12px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-}
-.scenario-result strong { font-size: 30px; letter-spacing: -.04em; }
+.market-copy { max-width: 62ch; margin-top: 13px; color: var(--text-secondary); font-size: 16px; line-height: 1.55; }
+.sensitivity-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .sensitivity {
   width: 100%;
   margin-top: 14px;
@@ -135,18 +157,18 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
   padding: 9px 8px;
   border-bottom: 1px solid var(--line);
   text-align: right;
-  font-size: 11px;
+  font-size: 13px;
 }
 .sensitivity th:first-child { text-align: left; }
-.sensitivity thead th { color: var(--muted); font-weight: 500; }
+.sensitivity thead th { color: var(--text-secondary); font-weight: 500; }
 .caution {
   margin-top: 15px;
   padding: 12px 13px;
-  border: 1px solid var(--accent);
-  border-radius: 12px;
-  background: var(--accent-soft);
-  color: var(--muted);
-  font-size: 11px;
+  border: 1px solid var(--terracotta);
+  border-radius: 0;
+  background: var(--surface-2);
+  color: var(--text-secondary);
+  font-size: 13px;
   line-height: 1.5;
 }
 .caution strong { color: var(--text); }
@@ -160,46 +182,144 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .mini {
   padding: 13px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 0;
   background: var(--surface-2);
 }
-.mini strong { display: block; margin-top: 7px; font-size: 18px; }
+.mini strong { display: block; margin-top: 7px; font-size: 18px; font-variant-numeric: tabular-nums; }
 .bridge-row {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   padding: 10px 0;
   border-bottom: 1px solid var(--line);
-  font-size: 12px;
+  font-size: 14px;
 }
 .bridge-row:last-child { border-bottom: 0; }
-.bridge-row span { color: var(--muted); }
+.bridge-row span { color: var(--text-secondary); }
 .bridge-row strong { font-variant-numeric: tabular-nums; }
-.note { margin-top: 12px; color: var(--muted); font-size: 10px; line-height: 1.55; }
+.note { margin-top: 12px; color: var(--text-secondary); font-size: 13px; line-height: 1.55; }
 .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.copy { margin-top: 13px; font-size: 15px; line-height: 1.65; }
-.copy.muted { color: #b9b7b1; }
+.copy { margin-top: 13px; font-size: 16px; line-height: 1.6; }
+.copy.muted { color: var(--text-secondary); }
 .clean { list-style: none; margin: 12px 0 0; padding: 0; }
 .clean li {
   padding: 10px 0;
   border-bottom: 1px solid var(--line);
-  font-size: 12px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.5;
 }
 .clean li:last-child { border-bottom: 0; }
-.empty { color: var(--muted); font-size: 11px; margin-top: 12px; }
-.foot { padding-top: 24px; color: var(--muted); font-size: 9px; line-height: 1.65; }
-.foot span { color: #bbb9b3; }
-@media (max-width: 900px) { .metric-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 720px) {
-  main { padding: 22px 16px 42px; }
+.empty { color: var(--text-secondary); font-size: 13px; margin-top: 12px; }
+.foot { padding-top: 28px; color: var(--text-secondary); font-size: 13px; line-height: 1.65; }
+.foot span { color: var(--text); }
+.reading-surface {
+  padding: 30px 32px 52px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.reading-surface > * { width: min(100%, 1120px); margin-inline: auto; }
+.reading-surface .label { color: var(--ink-muted); }
+.reading-surface .copy,
+.reading-surface .market-copy,
+.reading-surface .note,
+.reading-surface .foot { font-family: Georgia, Cambria, "Times New Roman", serif; }
+.reading-surface .copy { max-width: 70ch; font-size: 18px; line-height: 1.7; }
+.reading-surface .copy.muted,
+.reading-surface .note,
+.reading-surface .metric-sub,
+.reading-surface .bridge-row span,
+.reading-surface .empty,
+.reading-surface .foot { color: var(--ink-secondary); }
+.reading-surface .case-risk { gap: 40px; margin-top: 30px; }
+.reading-surface .case-risk > article,
+.reading-surface .section,
+.reading-surface .analysis-heading,
+.reading-surface .foot { border-top: 1px solid var(--paper-rule); }
+.reading-surface .case-risk > article { border-top-color: var(--paper-rule); }
+.reading-surface .section { padding-top: 30px; }
+.reading-surface .analysis-heading {
+  margin: 44px auto 0;
+  padding-top: 30px;
+  color: var(--ink-muted);
+}
+.reading-surface .metric-grid { gap: 0; }
+.reading-surface .metric-card,
+.reading-surface .panel,
+.reading-surface .mini {
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+.reading-surface .metric-card {
+  min-height: 0;
+  padding: 16px 18px 16px 0;
+  border-bottom: 1px solid var(--paper-rule);
+}
+.reading-surface .metric-card + .metric-card { padding-left: 18px; border-left: 1px solid var(--paper-rule); }
+.reading-surface .decision-grid,
+.reading-surface .bridge-grid,
+.reading-surface .columns { grid-template-columns: 1fr; gap: 30px; }
+.reading-surface .panel { padding: 0; }
+.reading-surface .decision-grid .panel {
+  padding: 22px;
+  border: 1px solid var(--paper-rule);
+  background: var(--paper-elevated);
+}
+.reading-surface .market-copy,
+.reading-surface .note { max-width: 70ch; color: var(--ink-secondary); font-size: 17px; line-height: 1.7; }
+.reading-surface .bridge-row,
+.reading-surface .clean li,
+.reading-surface .sensitivity th,
+.reading-surface .sensitivity td { border-color: var(--paper-rule); }
+.reading-surface .sensitivity thead th { color: var(--ink-secondary); }
+.reading-surface .caution {
+  border-color: var(--terracotta-soft);
+  background: var(--paper-elevated);
+  color: var(--ink-secondary);
+}
+.reading-surface .caution strong,
+.reading-surface .foot span { color: var(--ink); }
+.reading-surface .clean li { font-size: 16px; line-height: 1.6; }
+.reading-surface .foot { max-width: 70ch; padding-top: 30px; font-size: 16px; line-height: 1.7; }
+.reading-surface .foot > strong,
+.reading-surface .foot span {
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 1279px) {
+  main { max-width: none; width: 100%; padding-inline: clamp(24px, 4vw, 48px); }
+  .trust-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; }
+  .calculation-inputs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 28px; }
+  .metric-grid { grid-template-columns: 1fr 1fr; }
+  .reading-surface { padding-inline: clamp(24px, 4vw, 48px); }
+}
+@media (max-width: 767px) {
+  main { padding: 18px 16px 24px; }
+  .top, .hero { align-items: start; }
+  .hero { grid-template-columns: 1fr; gap: 18px; padding: 24px 0 18px; }
   .hero,
+  .executive,
+  .case-risk,
   .decision-grid,
   .bridge-grid,
   .columns { grid-template-columns: 1fr; }
   .quote { text-align: left; }
+  .trust-strip { grid-template-columns: 1fr; gap: 0; }
+  .trust-item { padding: 12px 0; }
+  .calculation-bridge { margin-top: 14px; padding-top: 14px; }
+  .calculation-inputs { grid-template-columns: 1fr; gap: 13px; }
+  .calculation-solve { margin-top: 16px; }
   .metric-grid { grid-template-columns: 1fr; }
+  .ticker { font-size: clamp(50px, 20vw, 72px); }
+  .price { font-size: clamp(38px, 14vw, 56px); }
+  .executive-hurdle { font-size: clamp(68px, 25vw, 100px); }
+  .market-copy { font-size: 15px; }
   .control { grid-template-columns: 100px 1fr 52px; }
+  .reading-surface { padding: 24px 16px 38px; }
+  .reading-surface .case-risk { gap: 24px; }
+  .reading-surface .metric-card,
+  .reading-surface .metric-card + .metric-card { padding: 16px 0; border-left: 0; }
+  .reading-surface .decision-grid .panel { padding: 18px; }
 }
 </style>
 </head>
@@ -207,97 +327,167 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 <main>
 <header class="top">
   <div class="brand">QHAPAQ ONE</div>
-  <div class="live">__FRESHNESS__ · __MARKET_STATE__</div>
+  <div class="live">__MARKET_FRESHNESS__</div>
 </header>
 
 <section class="hero">
   <div>
-    <div class="eyebrow">Reverse-engineering workstation</div>
+    <div class="eyebrow">EXECUTIVE INVESTMENT BRIEF</div>
     <div class="ticker">__TICKER__</div>
     <div class="company">__COMPANY__</div>
   </div>
   <div class="quote">
     <div class="price">__CURRENCY____PRICE__</div>
-    <div class="change">__CHANGE__ · observed __OBSERVED_SHORT__</div>
+    <div class="change">__CHANGE__ vs. previous close · __OBSERVED_SHORT__</div>
   </div>
 </section>
 
-<section class="metric-grid">
+<section class="executive">
+  <article class="panel executive-main">
+    <div class="label">WHAT TODAY'S VALUATION IMPLIES</div>
+    <div class="executive-hurdle" id="executive-hurdle">__HURDLE__</div>
+    <div class="hurdle-meaning">annual cash-flow growth</div>
+    <div class="hurdle-years">for __YEARS__ years</div>
+    <div class="market-copy">
+      Under the base case, __COMPANY__'s current valuation is consistent with its cash-flow base
+      growing about __HURDLE__ per year for the next __YEARS__ years.
+      This is not our forecast. It is the growth rate that makes today’s valuation fit the assumptions shown.
+    </div>
+    <div class="basis-line">
+      <strong>Basis:</strong> current run-rate cash flow · not a full-cycle estimate
+    </div>
+  </article>
+  <aside class="assumptions-panel">
+    <div class="label">BASE ASSUMPTIONS</div>
+    <div class="assumptions">
+      <div class="assumption">
+        <div class="label">REQUIRED RETURN</div>
+        <strong>__DR_PCT__</strong>
+        <div class="metric-sub">Base-case assumption used to discount future shareholder cash flows.</div>
+      </div>
+      <div class="assumption">
+        <div class="label">LONG-RUN GROWTH</div>
+        <strong>__TG_PCT__</strong>
+        <div class="metric-sub">Base-case assumption used after the explicit __YEARS__-year period to calculate terminal value.</div>
+      </div>
+    </div>
+  </aside>
+</section>
+
+<section class="trust-strip" aria-label="Trust and evidence status">
+  <article class="trust-item">__TRUST_EVIDENCE__</article>
+  <article class="trust-item">__TRUST_MARKET__</article>
+  <article class="trust-item">__TRUST_CASH__</article>
+  <article class="trust-item">__TRUST_MODEL__</article>
+</section>
+
+<section class="bottom-line">
+  <article>
+    <div class="label">BOTTOM LINE</div>
+    <div class="copy">__BOTTOM_LINE__</div>
+  </article>
+</section>
+</main>
+
+<div class="reading-surface">
+
+<section class="case-risk">
+  <article>
+    <div class="label">WHY THE CASE COULD WORK</div>
+    <div class="copy">__WHY_CASE__</div>
+  </article>
+  <article>
+    <div class="label">PRIMARY RISK</div>
+    <div class="copy muted">__PRIMARY_RISK__</div>
+    <div class="note">__COUNTER__</div>
+  </article>
+</section>
+
+<section class="section">
+  <article>
+    <div class="label">WATCH NEXT</div>
+    <ul class="clean watch">__MATTERS__</ul>
+  </article>
+</section>
+
+<section class="calculation-bridge" aria-labelledby="calculation-bridge-heading">
+  <h2 class="label" id="calculation-bridge-heading">HOW QHAPAQ GETS TO __HURDLE__</h2>
+  <dl class="calculation-inputs">
+    <div>
+      <dt>TODAY'S PRICE</dt>
+      <dd>__CURRENCY____PRICE__</dd>
+      <div class="metric-sub">Market observation</div>
+    </div>
+    <div>
+      <dt>CASH-FLOW BASE</dt>
+      <dd>__CASH_BASIS__</dd>
+      <div class="metric-sub">Evidence-backed current run-rate basis</div>
+    </div>
+    <div>
+      <dt>REQUIRED RETURN</dt>
+      <dd>__DR_PCT__</dd>
+      <div class="metric-sub">Base-case assumption</div>
+    </div>
+    <div>
+      <dt>LONG-RUN GROWTH</dt>
+      <dd>__TG_PCT__</dd>
+      <div class="metric-sub">Base-case assumption</div>
+    </div>
+  </dl>
+  <div class="calculation-solve">Qhapaq <span>solves backwards</span> from today’s price for</div>
+  <div class="calculation-result">
+    <div class="label">IMPLIED __YEARS__-YEAR CASH-FLOW GROWTH</div>
+    <strong>__HURDLE__</strong>
+    <div class="metric-sub">Model result</div>
+  </div>
+</section>
+
+<section class="section metric-grid">
   <article class="metric-card">
-    <div class="label">Evidence</div>
+    <div class="label">FINANCIAL EVIDENCE</div>
     <div class="metric-value">__EVIDENCE_STATE__</div>
-    <div class="metric-sub">Cutoff · __EVIDENCE_AS_OF__</div>
+    <div class="metric-sub">Research evidence through __EVIDENCE_AS_OF__<br>Source-backed and checksum-validated</div>
   </article>
   <article class="metric-card">
-    <div class="label">Equity value</div>
+    <div class="label">MARKET CAPITALIZATION</div>
     <div class="metric-value">__MARKET_CAP__</div>
-    <div class="metric-sub">__MARKET_CAP_SOURCE__</div>
+    <div class="metric-sub">Value of all outstanding shares · __MARKET_CAP_SOURCE__</div>
   </article>
   <article class="metric-card">
-    <div class="label">Analytical cash basis</div>
+    <div class="label">STARTING CASH-FLOW BASE</div>
     <div class="metric-value">__CASH_BASIS__</div>
-    <div class="metric-sub">__BASIS_KIND__ · annualized · cycle not validated</div>
+    <div class="metric-sub">Annualized current run rate · not a full-cycle estimate</div>
   </article>
   <article class="metric-card">
-    <div class="label">Market requires</div>
-    <div class="metric-value" id="top-hurdle">__HURDLE__</div>
-    <div class="metric-sub">10Y growth · __DR_PCT__ cost of equity · __TG_PCT__ terminal</div>
+    <div class="label">IMPLIED __YEARS__-YEAR GROWTH</div>
+    <div class="metric-value">__HURDLE__</div>
+    <div class="metric-sub">Base case: __DR_PCT__ required return · __TG_PCT__ long-run growth</div>
   </article>
 </section>
 
 <section class="section decision-grid">
-  <article class="panel">
-    <div class="label">Market requires</div>
-    <div class="market-hurdle" id="hero-hurdle">__HURDLE__</div>
-    <div class="market-copy">
-      Constant annual growth required from the current run-rate cash basis over __YEARS__ years.
-      This is an expectations hurdle, not a forecast, rating, or target price.
-    </div>
-    <div class="state">
-      <strong>__STATUS__</strong>
-      <p>__STATUS_DETAIL__</p>
-    </div>
-    <div class="actions">
-      <button id="scenario-toggle"__SCENARIO_DISABLED__>Scenario</button>
-    </div>
-    <div id="scenario" class="scenario">
-      <div class="control">
-        <label for="discount">Cost of equity</label>
-        <input id="discount" type="range" min="6" max="14" step="0.1" value="__DR_VALUE__">
-        <output id="discount-out">__DR_PCT__</output>
-      </div>
-      <div class="control">
-        <label for="terminal">Terminal growth</label>
-        <input id="terminal" type="range" min="0" max="5" step="0.1" value="__TG_VALUE__">
-        <output id="terminal-out">__TG_PCT__</output>
-      </div>
-      <div class="scenario-result">
-        <span>Implied 10Y cash growth</span>
-        <strong id="scenario-hurdle">__HURDLE__</strong>
-      </div>
-    </div>
-  </article>
-
   <aside class="panel">
-    <div class="label">Sensitivity · implied 10Y growth</div>
-    __SENSITIVITY_TABLE__
+    <div class="label">HOW THE REQUIRED GROWTH CHANGES WHEN ASSUMPTIONS CHANGE</div>
+    <div class="metric-sub">Rows: required return<br>Columns: long-run growth after year 10</div>
+    <div class="sensitivity-scroll">__SENSITIVITY_TABLE__</div>
     <div class="caution">
-      <strong>RUN-RATE BASIS ONLY.</strong> Working-capital and timing adjustments do not normalize
-      the business cycle. Qhapaq does not yet claim that the business can sustain this hurdle.
+      <strong>IMPORTANT LIMITATION</strong><br>The starting cash-flow base is a current run-rate estimate,
+      not a full-cycle forecast. The headline result shows what today’s valuation implies under the stated
+      assumptions; it does not prove the company can sustain that growth.
     </div>
   </aside>
 </section>
 
 <section class="section bridge-grid">
   <article class="panel">
-    <div class="label">Analytical cash basis · __BASIS_KIND__</div>
+    <div class="label">HOW THE STARTING CASH-FLOW BASE IS BUILT</div>
     <div class="bridge-summary">
       <div class="mini">
-        <div class="label">Reported period FCF</div>
+        <div class="label">Reported __PERIOD_DESCRIPTOR__ free-cash-flow proxy</div>
         <strong>__REPORTED_PERIOD_FCF__</strong>
       </div>
       <div class="mini">
-        <div class="label">Run-rate period cash</div>
+        <div class="label">Adjusted __PERIOD_DESCRIPTOR__ cash base</div>
         <strong>__RUN_RATE_PERIOD_CASH__</strong>
       </div>
       <div class="mini">
@@ -305,103 +495,35 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
         <strong style="font-size:13px">__BASIS_PERIOD__</strong>
       </div>
       <div class="mini">
-        <div class="label">Annualization</div>
+        <div class="label">Annualization factor</div>
         <strong>__ANNUALIZATION__</strong>
       </div>
     </div>
-    <div class="note">__CASH_BASIS_NOTE__</div>
+    <div class="note">Qhapaq adjusts selected timing effects and then annualizes the period result. It does not assume the current business cycle is normal or permanent.</div>
   </article>
   <article class="panel">
-    <div class="label">Run-rate bridge · period values</div>
+    <div class="label">ADJUSTMENTS TO THE PERIOD CASH BASE</div>
     __CASH_BASIS_BRIDGE__
   </article>
 </section>
 
 <section class="section columns">
   <article class="panel">
-    <div class="label">Thesis</div>
-    <div class="copy">__THESIS__</div>
-  </article>
-  <article class="panel">
-    <div class="label">Counterthesis</div>
-    <div class="copy muted">__COUNTER__</div>
-  </article>
-</section>
-
-<section class="section columns">
-  <article class="panel">
-    <div class="label">What matters now</div>
-    <ul class="clean">__MATTERS__</ul>
-  </article>
-  <article class="panel">
-    <div class="label">Invalidates</div>
+    <div class="label">WHAT WOULD MAKE US RECONSIDER</div>
     <ul class="clean">__INVALIDATION__</ul>
   </article>
 </section>
 
 <footer class="foot">
-  Price observation: <span>__OBSERVED__</span> · retrieved <span>__RETRIEVED__</span> · source
-  <span>__SOURCE__</span>.<br>
-  Qhapaq One separates live market observations from checksum-gated evidence and an explicit
-  run-rate cash-basis policy. The current basis is not a through-cycle normalization. The reverse
-  DCF uses equity cash flow and therefore interprets the discount rate as cost of equity, not WACC.
-  This page is research software, not investment advice.
+  <strong>DATA &amp; METHODOLOGY</strong><br>
+  Market data: <span>__SOURCE__ · observed __OBSERVED_SHORT__</span><br>
+  Financial evidence: stored separately from live market data and checksum-validated<br>
+  Cash-flow basis: current run-rate estimate, not a full-cycle forecast<br>
+  Valuation model: compares cash flow available to shareholders with the market value of equity and discounts those cash flows using the required shareholder return<br>
+  Base assumptions: required return and long-run growth are configurable model inputs. Qhapaq does not currently store a company- or market-specific derivation for these values.<br>
+  Qhapaq is research software, not investment advice.
 </footer>
-</main>
+</div>
 
-<script>
-const scenario = __SCENARIO_JSON__;
-const toggle = document.getElementById('scenario-toggle');
-const panel = document.getElementById('scenario');
-if (toggle) toggle.addEventListener('click', () => panel.classList.toggle('open'));
-
-function pv(g, r, tg, years, fcf) {
-  let value = 0;
-  let cashFlow = fcf;
-  let discountFactor = 1;
-  for (let i = 0; i < years; i += 1) {
-    cashFlow *= 1 + g;
-    discountFactor *= 1 + r;
-    value += cashFlow / discountFactor;
-  }
-  const terminal = cashFlow * (1 + tg) / (r - tg);
-  return value + terminal / discountFactor;
-}
-
-function solve(r, tg) {
-  if (scenario.marketCap === null || scenario.startingFcf === null || r <= tg) return null;
-  let lo = -.95;
-  let hi = .5;
-  while (pv(hi, r, tg, scenario.years, scenario.startingFcf) < scenario.marketCap && hi < 10) {
-    hi = hi * 2 + .1;
-  }
-  for (let i = 0; i < 160; i += 1) {
-    const mid = (lo + hi) / 2;
-    if (pv(mid, r, tg, scenario.years, scenario.startingFcf) < scenario.marketCap) lo = mid;
-    else hi = mid;
-  }
-  return (lo + hi) / 2;
-}
-
-function update() {
-  const discount = document.getElementById('discount');
-  const terminal = document.getElementById('terminal');
-  if (!discount || !terminal) return;
-  const r = Number(discount.value) / 100;
-  const tg = Number(terminal.value) / 100;
-  document.getElementById('discount-out').textContent = discount.value + '%';
-  document.getElementById('terminal-out').textContent = terminal.value + '%';
-  const growth = solve(r, tg);
-  const label = growth === null ? '—' : (growth * 100).toFixed(1) + '%';
-  document.getElementById('scenario-hurdle').textContent = label;
-  document.getElementById('hero-hurdle').textContent = label;
-  document.getElementById('top-hurdle').textContent = label;
-}
-
-for (const id of ['discount', 'terminal']) {
-  const element = document.getElementById(id);
-  if (element) element.addEventListener('input', update);
-}
-</script>
 </body>
 </html>

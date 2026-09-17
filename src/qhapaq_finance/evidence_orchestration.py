@@ -252,6 +252,31 @@ class EvidencePlanner:
                     True,
                 ),
             )
+            # A complete, checksum-verified issuer corpus is stronger than the
+            # staging inventory: it has already bound both SEC payloads and
+            # selected filings to the resolved company identity.  Keep the
+            # established requirement shape so downstream planning remains
+            # unchanged, but never fall through to network-backed staging.
+            try:
+                from .local_sec_corpus import LocalSecCorpus, LocalSecCorpusError
+
+                LocalSecCorpus(self.root).evidence(company)
+            except LocalSecCorpusError:
+                pass
+            else:
+                corpus_root = self.root / "data/cache/sec_corpus_live" / company.ticker
+                return EvidencePlan(
+                    "evidence-plan-v1",
+                    tuple(
+                        EvidenceItem(
+                            item,
+                            EvidenceState.VERIFIED,
+                            "validated local SEC corpus",
+                            corpus_root / "manifest.json",
+                        )
+                        for item in requirements
+                    ),
+                )
             current = now or datetime.now(timezone.utc)
             return EvidencePlan(
                 "evidence-plan-v1",

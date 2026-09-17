@@ -189,3 +189,184 @@ def test_reconciliation_has_deterministic_configured_order(tmp_path: Path) -> No
     )
 
     assert [entry["ticker"] for entry in manifest["issuers"]] == list(_CORPUS_TICKERS)
+
+
+
+def test_live_sec_corpus_builder_accepts_resolved_ticker_outside_legacy_allowlist(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import qhapaq_finance.sec_corpus as sec_corpus
+    from qhapaq_finance.company_resolver import (
+        CompanyProvenance,
+        ResolvedCompany,
+    )
+
+    class FakeResolver:
+        def resolve(self, ticker: str) -> ResolvedCompany | None:
+            assert ticker == "MSFT"
+            return ResolvedCompany(
+                "MSFT",
+                "Microsoft Corporation",
+                "0000789019",
+                "NASDAQ",
+                CompanyProvenance(
+                    "https://www.sec.gov/files/company_tickers.json",
+                    None,
+                    None,
+                    None,
+                ),
+            )
+
+    submissions = {
+        "cik": "0000789019",
+        "tickers": ["MSFT"],
+        "filings": {
+            "recent": {
+                "accessionNumber": [
+                    "0001564590-26-000001",
+                    "0001564590-26-000002",
+                ],
+                "form": ["10-K", "10-Q"],
+                "filingDate": ["2026-07-30", "2026-04-30"],
+                "reportDate": ["2026-06-30", "2026-03-31"],
+                "primaryDocument": [
+                    "msft-20260630.htm",
+                    "msft-20260331.htm",
+                ],
+            }
+        },
+    }
+    companyfacts = {
+        "cik": 789019,
+        "facts": {},
+    }
+
+    def fake_fetch_json(
+        _client: object,
+        _staging: Path,
+        _issuer_root: Path,
+        ticker: str,
+        cik: str,
+        kind: str,
+        _url: str,
+    ) -> tuple[dict[str, object], dict[str, object]]:
+        assert ticker == "MSFT"
+        assert cik == "0000789019"
+
+        payload = submissions if kind == "submissions" else companyfacts
+        return payload, {
+            "artifact_kind": kind,
+            "ticker": ticker,
+            "cik": cik,
+            "path": f"{kind}.json",
+        }
+
+    monkeypatch.setattr(sec_corpus, "_fetch_json", fake_fetch_json)
+    monkeypatch.setattr(
+        sec_corpus,
+        "_export_filing",
+        lambda *_args, **_kwargs: [],
+    )
+
+    result = sec_corpus.build_sec_corpus(
+        object(),  # type: ignore[arg-type]
+        corpus_root=tmp_path / "corpus",
+        staging_root=tmp_path / "staging",
+        tickers=("MSFT",),
+        resolver=FakeResolver(),
+    )
+
+    assert result["issuers"][0]["ticker"] == "MSFT"
+    assert result["issuers"][0]["cik"] == "0000789019"
+
+
+def test_targeted_sec_corpus_build_preserves_existing_root_manifest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import qhapaq_finance.sec_corpus as sec_corpus
+    from qhapaq_finance.company_resolver import (
+        CompanyProvenance,
+        ResolvedCompany,
+    )
+
+    class FakeResolver:
+        def resolve(self, ticker: str) -> ResolvedCompany | None:
+            assert ticker == "MSFT"
+            return ResolvedCompany(
+                "MSFT",
+                "Microsoft Corporation",
+                "0000789019",
+                "NASDAQ",
+                CompanyProvenance(
+                    "https://www.sec.gov/files/company_tickers.json",
+                    None,
+                    None,
+                    None,
+                ),
+            )
+
+    submissions = {
+        "cik": "0000789019",
+        "tickers": ["MSFT"],
+        "filings": {
+            "recent": {
+                "accessionNumber": [
+                    "0001564590-26-000001",
+                    "0001564590-26-000002",
+                ],
+                "form": ["10-K", "10-Q"],
+                "filingDate": ["2026-07-30", "2026-04-30"],
+                "reportDate": ["2026-06-30", "2026-03-31"],
+                "primaryDocument": [
+                    "msft-20260630.htm",
+                    "msft-20260331.htm",
+                ],
+            }
+        },
+    }
+    companyfacts = {"cik": 789019, "facts": {}}
+
+    def fake_fetch_json(
+        _client: object,
+        _staging: Path,
+        _issuer_root: Path,
+        ticker: str,
+        cik: str,
+        kind: str,
+        _url: str,
+    ) -> tuple[dict[str, object], dict[str, object]]:
+        payload = submissions if kind == "submissions" else companyfacts
+        return payload, {
+            "artifact_kind": kind,
+            "ticker": ticker,
+            "cik": cik,
+            "path": f"{kind}.json",
+        }
+
+    monkeypatch.setattr(sec_corpus, "_fetch_json", fake_fetch_json)
+    monkeypatch.setattr(
+        sec_corpus,
+        "_export_filing",
+        lambda *_args, **_kwargs: [],
+    )
+
+    root = tmp_path / "corpus"
+    root.mkdir()
+
+    root_manifest = root / "manifest.json"
+    original = b'{"schema_version":"sec-corpus-v2","created_at":"frozen","issuers":[]}\n'
+    root_manifest.write_bytes(original)
+
+    result = sec_corpus.build_sec_corpus(
+        object(),  # type: ignore[arg-type]
+        corpus_root=root,
+        staging_root=tmp_path / "staging",
+        tickers=("MSFT",),
+        resolver=FakeResolver(),
+    )
+
+    assert result["issuers"][0]["ticker"] == "MSFT"
+    assert (root / "MSFT" / "manifest.json").is_file()
+    assert root_manifest.read_bytes() == original

@@ -32,6 +32,8 @@ QCOM_ACCOUNTING_SPEC = AccountingEvidenceSpec(
     ebit=TtmFactSpec("ebit_fy25", "ebit_9m25", "ebit_9m26"),
     depreciation_amortization=TtmFactSpec("da_fy25", "da_9m25", "da_9m26"),
     capex=TtmFactSpec("capex_fy25", "capex_9m25", "capex_9m26"),
+    income_tax_expense=None,
+    pretax_income=None,
     capex_source_sign="negative_cash_outflow",
     operating_nwc_opening_assets=("ar_fy25", "inventory_fy25"),
     operating_nwc_opening_liabilities=("ap_fy25", "accruals_fy25"),
@@ -44,6 +46,7 @@ QCOM_ACCOUNTING_SPEC = AccountingEvidenceSpec(
     debt=("short_term_debt_q3fy26", "long_term_debt_q3fy26"),
     valuation_shares="shares_cover_q3fy26",
     valuation_share_basis="common_shares_outstanding",
+    legacy_invested_capital_adapter=True,
 )
 
 
@@ -119,7 +122,7 @@ def load_qcom_case(repository_root: str | Path = ".") -> ResearchCase:
             ),
         ),
         cost,
-        snapshot.invested_capital,
+        snapshot.invested_capital.average,
         0.32,
         (
             ScenarioAssumptions("bear", 0.01, 0.02, 8),

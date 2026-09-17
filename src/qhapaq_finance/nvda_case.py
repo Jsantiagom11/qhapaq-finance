@@ -33,6 +33,8 @@ NVDA_ACCOUNTING_SPEC = AccountingEvidenceSpec(
     ebit=TtmFactSpec("ebit_fy26", "ebit_h1fy26", "ebit_h1fy27"),
     depreciation_amortization=TtmFactSpec("da_fy26", "da_h1fy26", "da_h1fy27"),
     capex=TtmFactSpec("capex_fy26", "capex_h1fy26", "capex_h1fy27"),
+    income_tax_expense=None,
+    pretax_income=None,
     capex_source_sign="negative_cash_outflow",
     operating_nwc_opening_assets=("ar_q2fy26", "inventory_q2fy26"),
     operating_nwc_opening_liabilities=("ap_q2fy26", "accruals_q2fy26"),
@@ -46,6 +48,7 @@ NVDA_ACCOUNTING_SPEC = AccountingEvidenceSpec(
     valuation_shares="shares_diluted_h1fy27",
     valuation_share_basis="diluted_weighted_average",
     require_ttm_endpoint_alignment=True,
+    legacy_invested_capital_adapter=True,
 )
 
 
@@ -121,7 +124,7 @@ def load_nvda_case(repository_root: str | Path = ".") -> ResearchCase:
             ),
         ),
         cost,
-        snapshot.invested_capital,
+        snapshot.invested_capital.average,
         0.25,
         (
             ScenarioAssumptions("bear", 0.07, 0.02, 8),
@@ -150,6 +153,7 @@ def _obsolete_pre_period_alignment_audit(repository_root: str | Path = ".") -> d
     _require_reconciled(facts)
     snapshot = _accounting_snapshot(facts)
     assert snapshot.valuation_shares is not None
+    assert snapshot.invested_capital is not None
     frozen_market = load_market_snapshot(
         Path(repository_root) / "data/research/nvda/market-2026-09-04.json"
     )
@@ -223,7 +227,7 @@ def _obsolete_pre_period_alignment_audit(repository_root: str | Path = ".") -> d
             "closing_net_operating_assets": closing_operating_assets,
             "opening_net_operating_capital": opening_trade_nwc + opening_operating_assets,
             "closing_net_operating_capital": closing_trade_nwc + closing_operating_assets,
-            "reported_average": snapshot.invested_capital,
+            "reported_average": snapshot.invested_capital.average,
             "average_treatment": "simple average of 2026-01-25 and 2026-07-26 balances",
             "excluded": (
                 "cash and cash equivalents",
@@ -361,7 +365,7 @@ def nvda_audit(repository_root: str | Path = ".") -> dict[str, object]:
             },
             "opening_net_operating_capital": opening_capital,
             "closing_net_operating_capital": closing_capital,
-            "reported_average": snapshot.invested_capital,
+            "reported_average": snapshot.invested_capital.average,
             "average_treatment": (
                 "simple average of 2025-07-27 and 2026-07-26 operating-capital endpoints"
             ),

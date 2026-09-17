@@ -87,6 +87,36 @@ class RateEvidence:
 
 
 @dataclass(frozen=True)
+class CostOfDebtEvidence:
+    """Issuer-specific pre-tax cost-of-debt rate with explicit methodology."""
+
+    identity: str
+    issuer_id: str
+    value: float
+    unit: str
+    observed_at: date
+    source_identity: str
+    authority: str
+    quality_identity: str
+    methodology: str
+
+    def __post_init__(self) -> None:
+        if self.unit != "decimal_rate" or not math.isfinite(self.value) or not 0 <= self.value < 1:
+            raise CapitalCostError("COST_OF_DEBT_RATE_INVALID")
+        if not all(
+            (
+                self.identity,
+                self.issuer_id,
+                self.source_identity,
+                self.authority,
+                self.quality_identity,
+                self.methodology,
+            )
+        ):
+            raise CapitalCostError("COST_OF_DEBT_PROVENANCE_INCOMPLETE")
+
+
+@dataclass(frozen=True)
 class BetaEvidence:
     identity: str
     security_id: str
@@ -240,6 +270,7 @@ class CapitalCostResult:
     beta: float
     cost_of_equity: float
     pre_tax_cost_of_debt: float
+    after_tax_cost_of_debt: float
     tax_rate: float
     market_equity: float
     debt: float
@@ -259,6 +290,26 @@ def _gate(identifier: str, passed: bool, *references: str) -> Gate:
     )
 
 
+def _calculate_wacc_components(
+    *,
+    risk_free_rate: float,
+    equity_risk_premium: float,
+    beta: float,
+    pre_tax_cost_of_debt: float,
+    tax_rate: float,
+    market_equity: float,
+    debt: float,
+) -> tuple[float, float, float, float]:
+    """Calculate CAPM cost of equity, capital weights, and WACC from validated inputs."""
+    total = market_equity + debt
+    if debt < 0 or total <= 0:
+        raise CapitalCostError("CAPITAL_STRUCTURE_DENOMINATOR_INVALID")
+    equity_weight, debt_weight = market_equity / total, debt / total
+    cost_of_equity = risk_free_rate + beta * equity_risk_premium
+    wacc = equity_weight * cost_of_equity + debt_weight * pre_tax_cost_of_debt * (1 - tax_rate)
+    return cost_of_equity, equity_weight, debt_weight, wacc
+
+
 def derive_wacc(
     *,
     research_as_of: date,
@@ -267,13 +318,37 @@ def derive_wacc(
     risk_free: RateEvidence,
     equity_risk_premium: RateEvidence,
     beta: BetaEvidence,
-    interest_expense: IssuerValueEvidence,
-    average_debt: IssuerValueEvidence,
+    interest_expense: IssuerValueEvidence | None,
+    average_debt: IssuerValueEvidence | None,
+    cost_of_debt: CostOfDebtEvidence | None = None,
     tax_rate: TaxRateEvidence,
     market_equity: IssuerValueEvidence,
-    debt: IssuerValueEvidence,
+    debt: IssuerValueEvidence | None,
 ) -> CapitalCostResult:
     """Derive CAPM/WACC with explicit inputs, gates, and stable lineage."""
+    if debt is None:
+        raise CapitalCostError("DEBT_EVIDENCE_REQUIRED")
+    if debt.value < 0:
+        raise CapitalCostError("CAPITAL_STRUCTURE_DENOMINATOR_INVALID")
+    debt_is_zero = debt.value == 0
+    cost_of_debt_methodology = requirements.cost_of_debt_methodology
+    debt_cost_inputs: tuple[IssuerValueEvidence | CostOfDebtEvidence, ...]
+    if cost_of_debt_methodology == "interest_expense_over_average_debt":
+        debt_cost_inputs = tuple(
+            item for item in (interest_expense, average_debt) if item is not None
+        )
+    elif cost_of_debt_methodology == "market_debt_yield":
+        debt_cost_inputs = () if cost_of_debt is None else (cost_of_debt,)
+    else:
+        raise CapitalCostError("COST_OF_DEBT_METHODOLOGY_UNSUPPORTED")
+    temporal_inputs = (
+        risk_free,
+        equity_risk_premium,
+        beta,
+        tax_rate,
+        market_equity,
+        debt,
+    ) + (() if debt_is_zero else debt_cost_inputs)
     gates = (
         _gate("provenance", True, risk_free.identity, equity_risk_premium.identity, beta.identity),
         _gate(
@@ -293,9 +368,16 @@ def derive_wacc(
         _gate(
             "debt_semantics",
             debt.semantic_type in requirements.debt_semantics
-            and average_debt.semantic_type in requirements.debt_semantics,
+            and (
+                debt_is_zero
+                or cost_of_debt_methodology == "market_debt_yield"
+                or (
+                    average_debt is not None
+                    and average_debt.semantic_type in requirements.debt_semantics
+                )
+            ),
             debt.identity,
-            average_debt.identity,
+            *(() if average_debt is None else (average_debt.identity,)),
         ),
         _gate(
             "tax_semantics", tax_rate.semantic_type in requirements.tax_semantics, tax_rate.identity
@@ -307,38 +389,32 @@ def derive_wacc(
         ),
         _gate(
             "cost_of_debt_input_completeness",
-            interest_expense.metric == "interest_expense" and average_debt.value > 0,
-            interest_expense.identity,
-            average_debt.identity,
+            debt_is_zero
+            or (
+                cost_of_debt_methodology == "interest_expense_over_average_debt"
+                and interest_expense is not None
+                and average_debt is not None
+                and interest_expense.metric == "interest_expense"
+                and average_debt.value > 0
+            )
+            or (
+                cost_of_debt_methodology == "market_debt_yield"
+                and cost_of_debt is not None
+                and cost_of_debt.issuer_id == security_id
+                and cost_of_debt.methodology == cost_of_debt_methodology
+            ),
+            debt.identity,
+            *(item.identity for item in debt_cost_inputs),
         ),
         _gate(
             "temporal_compatibility",
             all(
                 (research_as_of - item.observed_at).days >= 0
                 and (research_as_of - item.observed_at).days <= requirements.max_age_days
-                for item in (
-                    risk_free,
-                    equity_risk_premium,
-                    beta,
-                    interest_expense,
-                    average_debt,
-                    tax_rate,
-                    market_equity,
-                    debt,
-                )
+                for item in temporal_inputs
             ),
             *(
-                item.identity
-                for item in (
-                    risk_free,
-                    equity_risk_premium,
-                    beta,
-                    interest_expense,
-                    average_debt,
-                    tax_rate,
-                    market_equity,
-                    debt,
-                )
+                item.identity for item in temporal_inputs
             ),
         ),
     )
@@ -347,33 +423,71 @@ def derive_wacc(
         if "cost_of_debt_input_completeness" in failures:
             raise CapitalCostError("COST_OF_DEBT_UNAVAILABLE")
         raise CapitalCostError(f"CAPITAL_COST_GATE_FAILED:{failures}")
-    pre_tax_cost_of_debt = interest_expense.value / average_debt.value
-    total = market_equity.value + debt.value
-    if debt.value < 0 or total <= 0:
-        raise CapitalCostError("CAPITAL_STRUCTURE_DENOMINATOR_INVALID")
-    equity_weight, debt_weight = market_equity.value / total, debt.value / total
-    cost_of_equity = risk_free.value + beta.value * equity_risk_premium.value
-    wacc = equity_weight * cost_of_equity + debt_weight * pre_tax_cost_of_debt * (
-        1 - tax_rate.value
+    if debt_is_zero:
+        pre_tax_cost_of_debt = 0.0
+    elif cost_of_debt_methodology == "market_debt_yield":
+        if cost_of_debt is None:
+            raise CapitalCostError("COST_OF_DEBT_UNAVAILABLE")
+        pre_tax_cost_of_debt = cost_of_debt.value
+    else:
+        if interest_expense is None or average_debt is None:
+            raise CapitalCostError("COST_OF_DEBT_UNAVAILABLE")
+        pre_tax_cost_of_debt = interest_expense.value / average_debt.value
+    after_tax_cost_of_debt = pre_tax_cost_of_debt * (1 - tax_rate.value)
+    cost_of_equity, equity_weight, debt_weight, wacc = _calculate_wacc_components(
+        risk_free_rate=risk_free.value,
+        equity_risk_premium=equity_risk_premium.value,
+        beta=beta.value,
+        pre_tax_cost_of_debt=pre_tax_cost_of_debt,
+        tax_rate=tax_rate.value,
+        market_equity=market_equity.value,
+        debt=debt.value,
     )
+    input_items: tuple[
+        tuple[
+            str,
+            RateEvidence
+            | CostOfDebtEvidence
+            | BetaEvidence
+            | TaxRateEvidence
+            | IssuerValueEvidence,
+        ],
+        ...
+    ] = (
+        ("risk_free", risk_free),
+        ("equity_risk_premium", equity_risk_premium),
+        ("beta", beta),
+        ("tax_rate", tax_rate),
+        ("market_equity", market_equity),
+        ("debt", debt),
+    )
+    if not debt_is_zero:
+        if cost_of_debt_methodology == "market_debt_yield":
+            if cost_of_debt is None:
+                raise CapitalCostError("COST_OF_DEBT_UNAVAILABLE")
+            input_items += (("cost_of_debt", cost_of_debt),)
+        else:
+            if interest_expense is None or average_debt is None:
+                raise CapitalCostError("COST_OF_DEBT_UNAVAILABLE")
+            input_items += (
+                ("interest_expense", interest_expense),
+                ("average_debt", average_debt),
+            )
     inputs = tuple(
-        (name, item.identity)
-        for name, item in (
-            ("risk_free", risk_free),
-            ("equity_risk_premium", equity_risk_premium),
-            ("beta", beta),
-            ("interest_expense", interest_expense),
-            ("average_debt", average_debt),
-            ("tax_rate", tax_rate),
-            ("market_equity", market_equity),
-            ("debt", debt),
-        )
+        (name, item.identity) for name, item in input_items
     )
     payload = {
         "research_as_of": research_as_of.isoformat(),
         "methodology": requirements.methodology_id,
         "inputs": inputs,
-        "values": [cost_of_equity, pre_tax_cost_of_debt, equity_weight, debt_weight, wacc],
+        "values": [
+            cost_of_equity,
+            pre_tax_cost_of_debt,
+            after_tax_cost_of_debt,
+            equity_weight,
+            debt_weight,
+            wacc,
+        ],
     }
     provenance = CapitalCostProvenance(
         research_as_of,
@@ -389,6 +503,7 @@ def derive_wacc(
         beta.value,
         cost_of_equity,
         pre_tax_cost_of_debt,
+        after_tax_cost_of_debt,
         tax_rate.value,
         market_equity.value,
         debt.value,

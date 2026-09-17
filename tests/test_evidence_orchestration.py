@@ -5,6 +5,8 @@ import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import pytest
+
 from qhapaq_finance.analysis import CompanyIdentity
 from qhapaq_finance.evidence_orchestration import (
     AcquisitionCoordinator,
@@ -78,6 +80,29 @@ def test_trusted_requirement_is_available_without_promoting_staged_bytes(tmp_pat
     plan = planner.plan(IDENTITY, trusted_path="data/research/acme/financial-evidence.json")
     assert plan.items[0].state is EvidenceState.AVAILABLE
     assert plan.critical_ready
+
+
+def test_planner_accepts_a_validated_local_sec_corpus_without_network(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    identity = CompanyIdentity("ACME", "acme:ACME", "acme", "Acme", None, None, "0000000123", None)
+
+    class Corpus:
+        def evidence(self, company: CompanyIdentity) -> object:
+            assert company == identity
+            return object()
+
+    monkeypatch.setattr("qhapaq_finance.local_sec_corpus.LocalSecCorpus", lambda root: Corpus())
+    plan = EvidencePlanner(tmp_path).plan(identity)
+
+    assert plan.critical_ready
+    assert {item.requirement.artifact_kind for item in plan.items} == {
+        "SEC_COMPANY_FACTS",
+        "SEC_SUBMISSIONS",
+        "SEC_LATEST_10K_METADATA",
+        "SEC_LATEST_10Q_METADATA",
+    }
+    assert {item.state for item in plan.items} == {EvidenceState.VERIFIED}
 
 
 class FakeProvider:

@@ -5,6 +5,8 @@ from datetime import date
 
 from qhapaq_finance.financial_canonicalization import (
     CanonicalPeriodContext,
+    DebtMeasurementBasis,
+    DebtResolutionPolicy,
     ExtensionMapping,
     FactContext,
     FinancialCanonicalizer,
@@ -371,3 +373,77 @@ def test_generic_us_gaap_revenues_alias_requires_valid_annual_entity_context() -
         ).decision.status
         is ResolutionStatus.CONFLICT
     )
+
+
+DEBT_SPEC = MetricSpec("total_debt", "us-gaap", "", (), "USD", PeriodKind.INSTANT)
+
+
+def _debt_fact(concept: str, value: float, **changes: object) -> RawFact:
+    return _fact(
+        concept=concept,
+        value=value,
+        period_kind=PeriodKind.INSTANT,
+        start=None,
+        **changes,
+    )
+
+
+def test_debt_policy_derives_only_complete_non_overlapping_components() -> None:
+    policy = DebtResolutionPolicy()
+    result = policy.resolve(
+        classify_issuer(sic=3570),
+        FactContext(date(2025, 12, 31), fiscal_year=2025),
+        DEBT_SPEC,
+        (
+            _debt_fact("LongTermDebtCurrent", 10),
+            _debt_fact("LongTermDebtNoncurrent", 90),
+            _debt_fact("CommercialPaper", 5),
+        ),
+    )
+    assert result.decision.status is ResolutionStatus.RESOLVED
+    assert result.decision.method is ResolutionMethod.DERIVED
+    assert result.normalized_value == 105
+    assert result.decision.debt_derivation is not None
+    assert result.decision.debt_derivation.measurement_basis is DebtMeasurementBasis.CARRYING_AMOUNT
+    assert [component.coverage for component in result.decision.debt_derivation.components] == [
+        "long-term-current",
+        "long-term-noncurrent",
+        "commercial-paper",
+    ]
+
+
+def test_debt_policy_fails_closed_for_overlap_and_measurement_basis_conflict() -> None:
+    policy = DebtResolutionPolicy()
+    context = FactContext(date(2025, 12, 31), fiscal_year=2025)
+    ambiguous = policy.resolve(
+        classify_issuer(sic=3570),
+        context,
+        DEBT_SPEC,
+        (
+            _debt_fact("LongTermDebt", 101),
+            _debt_fact("LongTermDebtCurrent", 10),
+            _debt_fact("LongTermDebtNoncurrent", 90),
+        ),
+    )
+    assert ambiguous.decision.status is ResolutionStatus.AMBIGUOUS
+    overlapping = policy.resolve(
+        classify_issuer(sic=3570),
+        context,
+        DEBT_SPEC,
+        (
+            _debt_fact("LongTermDebtCurrent", 10),
+            _debt_fact("LongTermDebtNoncurrent", 90),
+            _debt_fact("ShortTermBorrowings", 5),
+        ),
+    )
+    assert overlapping.decision.status is ResolutionStatus.AMBIGUOUS
+
+
+def test_debt_policy_does_not_substitute_lease_liabilities() -> None:
+    result = DebtResolutionPolicy().resolve(
+        classify_issuer(sic=3570),
+        FactContext(date(2025, 12, 31), fiscal_year=2025),
+        DEBT_SPEC,
+        (_debt_fact("FinanceLeaseLiabilityCurrent", 20),),
+    )
+    assert result.decision.status is ResolutionStatus.MISSING
