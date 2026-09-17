@@ -1,4 +1,3 @@
-import json
 from dataclasses import fields, replace
 from datetime import date
 from pathlib import Path
@@ -199,11 +198,10 @@ def test_direct_instant_promotes_one_unique_lineaged_fact() -> None:
     assert result.value == 10 and result.filing.accession_number == "0000000000-25-000001"
 
 
-def test_composite_instant_promotes_aapl_total_debt_with_each_source_lineage() -> None:
-    payload = json.loads(
-        (Path("data/cache/sec_corpus_live/AAPL") / "companyfacts.json").read_text(encoding="utf-8")
-    )
-    facts = extract_company_facts(payload, source_identity="aapl-companyfacts")
+def test_composite_instant_promotes_aapl_total_debt_with_each_source_lineage(
+    aapl_companyfacts: dict[str, object],
+) -> None:
+    facts = extract_company_facts(aapl_companyfacts, source_identity="aapl-companyfacts")
     policy = MetricPromotionPolicy(
         "total_debt",
         ("LongTermDebtCurrent", "LongTermDebtNoncurrent"),
@@ -223,11 +221,10 @@ def test_composite_instant_promotes_aapl_total_debt_with_each_source_lineage() -
     assert result.source_accessions == ("0000320193-26-000020", "0000320193-26-000020")
 
 
-def test_derived_instant_promotes_aapl_operating_nwc_with_dependency_lineage() -> None:
-    payload = json.loads(
-        (Path("data/cache/sec_corpus_live/AAPL") / "companyfacts.json").read_text(encoding="utf-8")
-    )
-    facts = extract_company_facts(payload, source_identity="aapl-companyfacts")
+def test_derived_instant_promotes_aapl_operating_nwc_with_dependency_lineage(
+    aapl_companyfacts: dict[str, object],
+) -> None:
+    facts = extract_company_facts(aapl_companyfacts, source_identity="aapl-companyfacts")
     operating_assets = MetricPromotionPolicy(
         "operating_current_assets",
         ("AccountsReceivableNetCurrent", "InventoryNet"),
@@ -390,11 +387,10 @@ def _aapl_debt_policy(end: date) -> MetricPromotionPolicy:
     )
 
 
-def test_instant_context_pair_promotes_real_aapl_nwc_and_debt_endpoints() -> None:
-    payload = json.loads(
-        (Path("data/cache/sec_corpus_live/AAPL") / "companyfacts.json").read_text(encoding="utf-8")
-    )
-    facts = extract_company_facts(payload, source_identity="aapl-companyfacts")
+def test_instant_context_pair_promotes_real_aapl_nwc_and_debt_endpoints(
+    aapl_companyfacts: dict[str, object],
+) -> None:
+    facts = extract_company_facts(aapl_companyfacts, source_identity="aapl-companyfacts")
     opening_end, closing_end = date(2025, 9, 27), date(2026, 6, 27)
     promoter = MultiPeriodFinancialPromoter()
 
@@ -478,14 +474,11 @@ def test_accounting_evidence_policy_registry_rejects_duplicate_or_unknown_depend
         )
 
 
-def test_accounting_evidence_policy_registry_promotes_aapl_nwc_components_at_both_endpoints() -> (
-    None
-):
-    payload = json.loads(
-        (Path("data/cache/sec_corpus_live/AAPL") / "companyfacts.json").read_text(encoding="utf-8")
-    )
+def test_accounting_evidence_policy_registry_promotes_aapl_nwc_components_at_both_endpoints(
+    aapl_companyfacts: dict[str, object],
+) -> None:
     facts = extract_company_facts(
-        payload,
+        aapl_companyfacts,
         source_identity="aapl-companyfacts",
     )
 

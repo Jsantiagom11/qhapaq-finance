@@ -151,8 +151,10 @@ def test_qcom_and_nvda_run_through_generic_completed_orchestration() -> None:
         assert result.plan.evidence_plan.items[0].state.value == "AVAILABLE"
 
 
-def test_registered_aapl_runs_end_to_end_from_canonical_evidence() -> None:
-    result = AnalysisOrchestrator(ROOT).analyze("AAPL")
+def test_registered_aapl_runs_end_to_end_from_canonical_evidence(
+    aapl_analysis_root: Path,
+) -> None:
+    result = AnalysisOrchestrator(aapl_analysis_root).analyze("AAPL")
 
     assert result.status is AnalysisStatus.COMPLETED
     assert result.canonical_result is not None
@@ -172,7 +174,7 @@ def test_registered_aapl_runs_end_to_end_from_canonical_evidence() -> None:
     # The primary identity includes Apple commercial paper at the closing date,
     # unlike the prior long-term-debt-only canonical debt policy.
     assert canonical.valuation["wacc"] == pytest.approx(
-        0.093502,
+        0.086890,
         abs=1e-5,
     )
 

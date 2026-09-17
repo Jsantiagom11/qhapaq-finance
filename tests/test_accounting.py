@@ -97,9 +97,11 @@ def test_promoted_evidence_adapter_fails_closed_when_a_canonical_metric_is_missi
         accounting.accounting_evidence_spec_from_promoted_facts({})
 
 
-def test_local_sec_corpus_promotes_aapl_to_accounting_evidence_spec() -> None:
+def test_local_sec_corpus_promotes_aapl_to_accounting_evidence_spec(
+    aapl_sec_corpus_root: Path,
+) -> None:
     facts, spec = accounting.promote_local_sec_accounting_evidence(
-        LocalSecCorpus(ROOT),
+        LocalSecCorpus(aapl_sec_corpus_root),
         CompanyIdentity("AAPL", None, None, None, None, None, "0000320193", None),
     )
 
@@ -108,9 +110,11 @@ def test_local_sec_corpus_promotes_aapl_to_accounting_evidence_spec() -> None:
     assert spec.debt == ("total_debt",)
 
 
-def test_local_sec_corpus_promotes_aapl_to_accounting_snapshot() -> None:
+def test_local_sec_corpus_promotes_aapl_to_accounting_snapshot(
+    aapl_sec_corpus_root: Path,
+) -> None:
     facts, spec = accounting.promote_local_sec_accounting_evidence(
-        LocalSecCorpus(ROOT),
+        LocalSecCorpus(aapl_sec_corpus_root),
         CompanyIdentity("AAPL", None, None, None, None, None, "0000320193", None),
     )
 
@@ -119,9 +123,11 @@ def test_local_sec_corpus_promotes_aapl_to_accounting_snapshot() -> None:
     assert snapshot.cash is not None
 
 
-def test_local_sec_corpus_promotes_aapl_effective_tax_rate_from_compatible_ttm_facts() -> None:
+def test_local_sec_corpus_promotes_aapl_effective_tax_rate_from_compatible_ttm_facts(
+    aapl_sec_corpus_root: Path,
+) -> None:
     facts, spec = accounting.promote_local_sec_accounting_evidence(
-        LocalSecCorpus(ROOT),
+        LocalSecCorpus(aapl_sec_corpus_root),
         CompanyIdentity("AAPL", None, None, None, None, None, "0000320193", None),
     )
 
@@ -231,11 +237,13 @@ def test_ttm_rejects_unit_mismatch_and_nonfinite_evidence() -> None:
         replace(facts["revenue_fy25"], value=float("nan"))
 
 
-def test_local_sec_accounting_derives_balance_sheet_endpoints_from_ttm_period() -> None:
+def test_local_sec_accounting_derives_balance_sheet_endpoints_from_ttm_period(
+    aapl_sec_corpus_root: Path,
+) -> None:
     from datetime import timedelta
 
     facts, spec = accounting.promote_local_sec_accounting_evidence(
-        LocalSecCorpus(ROOT),
+        LocalSecCorpus(aapl_sec_corpus_root),
         CompanyIdentity("AAPL", None, None, None, None, None, "0000320193", None),
     )
 
@@ -285,9 +293,11 @@ def test_accounting_snapshot_can_omit_invested_capital_when_noa_pair_is_unavaila
     assert snapshot.fcff == pytest.approx(7_981.4)
 
 
-def test_aapl_financing_identity_remains_complete_when_opening_intangibles_are_missing() -> None:
+def test_aapl_financing_identity_remains_complete_when_opening_intangibles_are_missing(
+    aapl_sec_corpus_root: Path,
+) -> None:
     facts, spec = accounting.promote_local_sec_accounting_evidence(
-        LocalSecCorpus(ROOT),
+        LocalSecCorpus(aapl_sec_corpus_root),
         CompanyIdentity("AAPL", None, None, None, None, None, "0000320193", None),
     )
 
