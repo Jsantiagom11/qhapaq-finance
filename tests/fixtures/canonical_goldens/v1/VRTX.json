@@ -1,0 +1,329 @@
+{
+  "CIK": "0000875320",
+  "evidence_notes": [
+    "Frozen companyfacts and selected filing inline XBRL were reviewed; no dimensional observation is selected."
+  ],
+  "metrics": [
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000875320-26-000056",
+          "end": "2025-12-31",
+          "filed": "2026-02-13",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2025-01-01",
+          "val": 12001300000
+        },
+        "path": "companyfacts.json",
+        "sha256": "3f73be48f9279b6b1c07339b9c5ea0e2a7f5d757cd6f8c4015e141ec7ed8e4b8"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 12001300000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-13",
+      "filing_form": "10-K",
+      "metric": "revenue",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-12-31",
+        "start_date": "2025-01-01"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000875320-26-000056",
+      "source_artifact_path": "filings/0000875320-26-000056/filing-artifact/vrtx-20251231.htm",
+      "source_artifact_sha256": "e2f747bf54df77ca0941cc70a8e57d7399c7675094da5ac5a684ba10ec537726",
+      "source_concept_qname": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "taxonomy": "us-gaap",
+      "ticker": "VRTX"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000875320-26-000056",
+          "end": "2025-12-31",
+          "filed": "2026-02-13",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2025-01-01",
+          "val": 4173300000
+        },
+        "path": "companyfacts.json",
+        "sha256": "3f73be48f9279b6b1c07339b9c5ea0e2a7f5d757cd6f8c4015e141ec7ed8e4b8"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 4173300000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-13",
+      "filing_form": "10-K",
+      "metric": "operating_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-12-31",
+        "start_date": "2025-01-01"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000875320-26-000056",
+      "source_artifact_path": "filings/0000875320-26-000056/filing-artifact/vrtx-20251231.htm",
+      "source_artifact_sha256": "e2f747bf54df77ca0941cc70a8e57d7399c7675094da5ac5a684ba10ec537726",
+      "source_concept_qname": "us-gaap:OperatingIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "VRTX"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000875320-26-000056",
+          "end": "2025-12-31",
+          "filed": "2026-02-13",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2025-01-01",
+          "val": 3953200000
+        },
+        "path": "companyfacts.json",
+        "sha256": "3f73be48f9279b6b1c07339b9c5ea0e2a7f5d757cd6f8c4015e141ec7ed8e4b8"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 3953200000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-13",
+      "filing_form": "10-K",
+      "metric": "net_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-12-31",
+        "start_date": "2025-01-01"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000875320-26-000056",
+      "source_artifact_path": "filings/0000875320-26-000056/filing-artifact/vrtx-20251231.htm",
+      "source_artifact_sha256": "e2f747bf54df77ca0941cc70a8e57d7399c7675094da5ac5a684ba10ec537726",
+      "source_concept_qname": "us-gaap:NetIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "VRTX"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000875320-26-000056",
+          "end": "2025-12-31",
+          "filed": "2026-02-13",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 5084800000
+        },
+        "path": "companyfacts.json",
+        "sha256": "3f73be48f9279b6b1c07339b9c5ea0e2a7f5d757cd6f8c4015e141ec7ed8e4b8"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 5084800000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-13",
+      "filing_form": "10-K",
+      "metric": "cash_and_equivalents",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-12-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000875320-26-000056",
+      "source_artifact_path": "filings/0000875320-26-000056/filing-artifact/vrtx-20251231.htm",
+      "source_artifact_sha256": "e2f747bf54df77ca0941cc70a8e57d7399c7675094da5ac5a684ba10ec537726",
+      "source_concept_qname": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+      "taxonomy": "us-gaap",
+      "ticker": "VRTX"
+    },
+    {
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_status": "MISSING",
+      "filed_date": "2026-02-13",
+      "filing_form": "10-K",
+      "metric": "total_debt",
+      "period_kind": "INSTANT",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "MISSING: no quantified debt or borrowing balance in the selected 10-K; lease liabilities are not substituted.",
+      "source_accession": "0000875320-26-000056",
+      "source_artifact_path": "filings/0000875320-26-000056/filing-artifact/vrtx-20251231.htm",
+      "source_artifact_sha256": "e2f747bf54df77ca0941cc70a8e57d7399c7675094da5ac5a684ba10ec537726",
+      "source_concept_qname": null,
+      "ticker": "VRTX"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000875320-26-000056",
+          "end": "2025-12-31",
+          "filed": "2026-02-13",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 25643000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "3f73be48f9279b6b1c07339b9c5ea0e2a7f5d757cd6f8c4015e141ec7ed8e4b8"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 25643000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-13",
+      "filing_form": "10-K",
+      "metric": "total_assets",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-12-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000875320-26-000056",
+      "source_artifact_path": "filings/0000875320-26-000056/filing-artifact/vrtx-20251231.htm",
+      "source_artifact_sha256": "e2f747bf54df77ca0941cc70a8e57d7399c7675094da5ac5a684ba10ec537726",
+      "source_concept_qname": "us-gaap:Assets",
+      "taxonomy": "us-gaap",
+      "ticker": "VRTX"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000875320-26-000056",
+          "end": "2025-12-31",
+          "filed": "2026-02-13",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 6977200000
+        },
+        "path": "companyfacts.json",
+        "sha256": "3f73be48f9279b6b1c07339b9c5ea0e2a7f5d757cd6f8c4015e141ec7ed8e4b8"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 6977200000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-13",
+      "filing_form": "10-K",
+      "metric": "total_liabilities",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-12-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000875320-26-000056",
+      "source_artifact_path": "filings/0000875320-26-000056/filing-artifact/vrtx-20251231.htm",
+      "source_artifact_sha256": "e2f747bf54df77ca0941cc70a8e57d7399c7675094da5ac5a684ba10ec537726",
+      "source_concept_qname": "us-gaap:Liabilities",
+      "taxonomy": "us-gaap",
+      "ticker": "VRTX"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000875320-26-000056",
+          "end": "2025-12-31",
+          "filed": "2026-02-13",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 18665800000
+        },
+        "path": "companyfacts.json",
+        "sha256": "3f73be48f9279b6b1c07339b9c5ea0e2a7f5d757cd6f8c4015e141ec7ed8e4b8"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 18665800000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-13",
+      "filing_form": "10-K",
+      "metric": "shareholders_equity",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-12-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000875320-26-000056",
+      "source_artifact_path": "filings/0000875320-26-000056/filing-artifact/vrtx-20251231.htm",
+      "source_artifact_sha256": "e2f747bf54df77ca0941cc70a8e57d7399c7675094da5ac5a684ba10ec537726",
+      "source_concept_qname": "us-gaap:StockholdersEquity",
+      "taxonomy": "us-gaap",
+      "ticker": "VRTX"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000875320-26-000056",
+          "end": "2025-12-31",
+          "filed": "2026-02-13",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2025-01-01",
+          "val": 258000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "3f73be48f9279b6b1c07339b9c5ea0e2a7f5d757cd6f8c4015e141ec7ed8e4b8"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 258000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-13",
+      "filing_form": "10-K",
+      "metric": "diluted_shares",
+      "normalized_unit": "shares",
+      "period": {
+        "end_date": "2025-12-31",
+        "start_date": "2025-01-01"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-12-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000875320-26-000056",
+      "source_artifact_path": "filings/0000875320-26-000056/filing-artifact/vrtx-20251231.htm",
+      "source_artifact_sha256": "e2f747bf54df77ca0941cc70a8e57d7399c7675094da5ac5a684ba10ec537726",
+      "source_concept_qname": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding",
+      "taxonomy": "us-gaap",
+      "ticker": "VRTX"
+    }
+  ],
+  "schema_version": "canonical-golden-v1",
+  "source_corpus_version": "sec-corpus-v2",
+  "source_issuer_manifest_sha256": "33687d6c4d03cb73605d5298c56dd289d8c39393bc2ce2d557e0547bb6f2949c",
+  "target_fiscal_year": 2025,
+  "target_report_date": "2025-12-31",
+  "ticker": "VRTX"
+}

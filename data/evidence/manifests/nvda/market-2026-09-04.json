@@ -1,0 +1,8 @@
+{
+  "schema_version": "market-source-manifest-v1",
+  "security_id": "nvidia-corporation:NVDA",
+  "source_id": "nvda-market-2026-09-04",
+  "provider": "FinanceCharts NVDA historical daily close; https://www.financecharts.com/compare/NVDA/summary/price",
+  "raw_artifact": "data/research/nvda/market-2026-09-04.json",
+  "raw_artifact_sha256": "7c116b0c8f62887256f3022dd77e75c892a2aab0d01801e9275d1b52c056a472"
+}

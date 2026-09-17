@@ -54,6 +54,8 @@ class FinancialFact:
     filing: FilingRef
     locator: str
     method: str
+    source_fact_ids: tuple[str, ...] = ()
+    source_accessions: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if self.kind is not EvidenceKind.FACT:
@@ -66,6 +68,10 @@ class FinancialFact:
             raise EvidenceError("financial fact value must be finite")
         if not self.unit.strip():
             raise EvidenceError("financial fact unit must be present")
+        if bool(self.source_fact_ids) != bool(self.source_accessions):
+            raise EvidenceError("financial fact source lineage must be complete")
+        if self.source_fact_ids and len(self.source_fact_ids) != len(self.source_accessions):
+            raise EvidenceError("financial fact source lineage must align")
 
 
 @dataclass(frozen=True)

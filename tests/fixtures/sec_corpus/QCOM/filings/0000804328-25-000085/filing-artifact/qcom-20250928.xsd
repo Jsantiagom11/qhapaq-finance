@@ -1,0 +1,499 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--XBRL Document Created with the Workiva Platform-->
+<!--Copyright 2025 Workiva-->
+<!--r:eec856ef-2023-4768-87d8-1e464db7b7bc,g:6bfa3336-011b-4e2e-8c4a-5c6c71ee2472-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:qcom="http://www.qualcomm.com/20250928" xmlns:xbrli="http://www.xbrl.org/2003/instance" xmlns:dtr-types="http://www.xbrl.org/dtr/type/2024-01-31" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.qualcomm.com/20250928">
+  <xs:import namespace="http://fasb.org/srt/2025" schemaLocation="https://xbrl.fasb.org/srt/2025/elts/srt-2025.xsd"/>
+  <xs:import namespace="http://fasb.org/us-gaap/2025" schemaLocation="https://xbrl.fasb.org/us-gaap/2025/elts/us-gaap-2025.xsd"/>
+  <xs:import namespace="http://www.xbrl.org/2003/instance" schemaLocation="http://www.xbrl.org/2003/xbrl-instance-2003-12-31.xsd"/>
+  <xs:import namespace="http://www.xbrl.org/2003/linkbase" schemaLocation="http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd"/>
+  <xs:import namespace="http://www.xbrl.org/dtr/type/2024-01-31" schemaLocation="https://www.xbrl.org/dtr/type/2024-01-31/types.xsd"/>
+  <xs:import namespace="http://xbrl.sec.gov/country/2025" schemaLocation="https://xbrl.sec.gov/country/2025/country-2025.xsd"/>
+  <xs:import namespace="http://xbrl.sec.gov/currency/2025" schemaLocation="https://xbrl.sec.gov/currency/2025/currency-2025.xsd"/>
+  <xs:import namespace="http://xbrl.sec.gov/cyd-af-sub/2025" schemaLocation="https://xbrl.sec.gov/cyd/2025/cyd-af-sub-2025.xsd"/>
+  <xs:import namespace="http://xbrl.sec.gov/dei/2025" schemaLocation="https://xbrl.sec.gov/dei/2025/dei-2025.xsd"/>
+  <xs:import namespace="http://xbrl.sec.gov/ecd/2025" schemaLocation="https://xbrl.sec.gov/ecd/2025/ecd-2025.xsd"/>
+  <xs:annotation>
+    <xs:appinfo>
+      <link:linkbaseRef xmlns:xlink="http://www.w3.org/1999/xlink" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="qcom-20250928_pre.xml" xlink:role="http://www.xbrl.org/2003/role/presentationLinkbaseRef" xlink:type="simple"/>
+      <link:linkbaseRef xmlns:xlink="http://www.w3.org/1999/xlink" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="qcom-20250928_def.xml" xlink:role="http://www.xbrl.org/2003/role/definitionLinkbaseRef" xlink:type="simple"/>
+      <link:linkbaseRef xmlns:xlink="http://www.w3.org/1999/xlink" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="qcom-20250928_lab.xml" xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef" xlink:type="simple"/>
+      <link:linkbaseRef xmlns:xlink="http://www.w3.org/1999/xlink" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="qcom-20250928_cal.xml" xlink:role="http://www.xbrl.org/2003/role/calculationLinkbaseRef" xlink:type="simple"/>
+      <link:roleType id="CoverPage" roleURI="http://www.qualcomm.com/role/CoverPage">
+        <link:definition>0000001 - Document - Cover Page</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AuditInformation" roleURI="http://www.qualcomm.com/role/AuditInformation">
+        <link:definition>0000002 - Document - Audit Information</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CONSOLIDATEDBALANCESHEETS" roleURI="http://www.qualcomm.com/role/CONSOLIDATEDBALANCESHEETS">
+        <link:definition>9952151 - Statement - CONSOLIDATED BALANCE SHEETS</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CONSOLIDATEDSTATEMENTSOFOPERATIONS" roleURI="http://www.qualcomm.com/role/CONSOLIDATEDSTATEMENTSOFOPERATIONS">
+        <link:definition>9952152 - Statement - CONSOLIDATED STATEMENTS OF OPERATIONS</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CONSOLIDATEDSTATEMENTSOFCOMPREHENSIVEINCOME" roleURI="http://www.qualcomm.com/role/CONSOLIDATEDSTATEMENTSOFCOMPREHENSIVEINCOME">
+        <link:definition>9952153 - Statement - CONSOLIDATED STATEMENTS OF COMPREHENSIVE INCOME</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CONSOLIDATEDSTATEMENTSOFCASHFLOWS" roleURI="http://www.qualcomm.com/role/CONSOLIDATEDSTATEMENTSOFCASHFLOWS">
+        <link:definition>9952154 - Statement - CONSOLIDATED STATEMENTS OF CASH FLOWS</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CONDENSEDCONSOLIDATEDSTATEMENTSOFSTOCKHOLDERSEQUITY" roleURI="http://www.qualcomm.com/role/CONDENSEDCONSOLIDATEDSTATEMENTSOFSTOCKHOLDERSEQUITY">
+        <link:definition>9952155 - Statement - CONDENSED CONSOLIDATED STATEMENTS OF STOCKHOLDERS' EQUITY</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="RisksandUncertainties" roleURI="http://www.qualcomm.com/role/RisksandUncertainties">
+        <link:definition>9952156 - Disclosure - Risks and Uncertainties</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SignificantAccountingPolicies" roleURI="http://www.qualcomm.com/role/SignificantAccountingPolicies">
+        <link:definition>9952157 - Disclosure - Significant Accounting Policies</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItems" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItems">
+        <link:definition>9952158 - Disclosure - Composition of Certain Financial Statement Items</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxes" roleURI="http://www.qualcomm.com/role/IncomeTaxes">
+        <link:definition>9952159 - Disclosure - Income Taxes</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CapitalStock" roleURI="http://www.qualcomm.com/role/CapitalStock">
+        <link:definition>9952160 - Disclosure - Capital Stock</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="EmployeeBenefitPlans" roleURI="http://www.qualcomm.com/role/EmployeeBenefitPlans">
+        <link:definition>9952161 - Disclosure - Employee Benefit Plans</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="Debt" roleURI="http://www.qualcomm.com/role/Debt">
+        <link:definition>9952162 - Disclosure - Debt</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommitmentsandContingencies" roleURI="http://www.qualcomm.com/role/CommitmentsandContingencies">
+        <link:definition>9952163 - Disclosure - Commitments and Contingencies</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformation" roleURI="http://www.qualcomm.com/role/SegmentInformation">
+        <link:definition>9952164 - Disclosure - Segment Information</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="Acquisitions" roleURI="http://www.qualcomm.com/role/Acquisitions">
+        <link:definition>9952165 - Disclosure - Acquisitions</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="FairValueMeasurements" roleURI="http://www.qualcomm.com/role/FairValueMeasurements">
+        <link:definition>9952166 - Disclosure - Fair Value Measurements</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="ScheduleIIValuationandQualifyingAccounts" roleURI="http://www.qualcomm.com/role/ScheduleIIValuationandQualifyingAccounts">
+        <link:definition>9952167 - Disclosure - Schedule II - Valuation and Qualifying Accounts</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SignificantAccountingPoliciesPolicies" roleURI="http://www.qualcomm.com/role/SignificantAccountingPoliciesPolicies">
+        <link:definition>9955511 - Disclosure - Significant Accounting Policies (Policies)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="RisksandUncertaintiesTables" roleURI="http://www.qualcomm.com/role/RisksandUncertaintiesTables">
+        <link:definition>9955512 - Disclosure - Risks and Uncertainties (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SignificantAccountingPoliciesTables" roleURI="http://www.qualcomm.com/role/SignificantAccountingPoliciesTables">
+        <link:definition>9955513 - Disclosure - Significant Accounting Policies (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsTables" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsTables">
+        <link:definition>9955514 - Disclosure - Composition of Certain Financial Statement Items (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxesTables" roleURI="http://www.qualcomm.com/role/IncomeTaxesTables">
+        <link:definition>9955515 - Disclosure - Income Taxes (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CapitalStockSharesOutstandingTables" roleURI="http://www.qualcomm.com/role/CapitalStockSharesOutstandingTables">
+        <link:definition>9955516 - Disclosure - Capital Stock Shares Outstanding (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="EmployeeBenefitPlansTables" roleURI="http://www.qualcomm.com/role/EmployeeBenefitPlansTables">
+        <link:definition>9955517 - Disclosure - Employee Benefit Plans (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="DebtTables" roleURI="http://www.qualcomm.com/role/DebtTables">
+        <link:definition>9955518 - Disclosure - Debt (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommitmentsandContingenciesTables" roleURI="http://www.qualcomm.com/role/CommitmentsandContingenciesTables">
+        <link:definition>9955519 - Disclosure - Commitments and Contingencies (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformationTables" roleURI="http://www.qualcomm.com/role/SegmentInformationTables">
+        <link:definition>9955520 - Disclosure - Segment Information (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="FairValueMeasurementsTables" roleURI="http://www.qualcomm.com/role/FairValueMeasurementsTables">
+        <link:definition>9955521 - Disclosure - Fair Value Measurements (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="ScheduleIIValuationandQualifyingAccountsTables" roleURI="http://www.qualcomm.com/role/ScheduleIIValuationandQualifyingAccountsTables">
+        <link:definition>9955522 - Disclosure - Schedule II - Valuation and Qualifying Accounts (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="RisksandUncertaintiesDetails" roleURI="http://www.qualcomm.com/role/RisksandUncertaintiesDetails">
+        <link:definition>9955523 - Disclosure - Risks and Uncertainties (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SignificantAccountingPoliciesDerivativesandOtherHedgingActivitiesDetails" roleURI="http://www.qualcomm.com/role/SignificantAccountingPoliciesDerivativesandOtherHedgingActivitiesDetails">
+        <link:definition>9955524 - Disclosure - Significant Accounting Policies Derivatives and Other Hedging Activities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SignificantAccountingPoliciesPropertyPlantandEquipmentDetails" roleURI="http://www.qualcomm.com/role/SignificantAccountingPoliciesPropertyPlantandEquipmentDetails">
+        <link:definition>9955525 - Disclosure - Significant Accounting Policies Property, Plant and Equipment (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SignificantAccountingPoliciesRevenueRecognitionDetails" roleURI="http://www.qualcomm.com/role/SignificantAccountingPoliciesRevenueRecognitionDetails">
+        <link:definition>9955526 - Disclosure - Significant Accounting Policies Revenue Recognition (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SignificantAccountingPoliciesEarningsPerCommonShareDetails" roleURI="http://www.qualcomm.com/role/SignificantAccountingPoliciesEarningsPerCommonShareDetails">
+        <link:definition>9955527 - Disclosure - Significant Accounting Policies Earnings Per Common Share (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsAccountsReceivableDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsAccountsReceivableDetails">
+        <link:definition>9955528 - Disclosure - Composition of Certain Financial Statement Items Accounts Receivable (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsInventoriesDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsInventoriesDetails">
+        <link:definition>9955529 - Disclosure - Composition of Certain Financial Statement Items Inventories (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsPropertyPlantandEquipmentDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsPropertyPlantandEquipmentDetails">
+        <link:definition>9955530 - Disclosure - Composition of Certain Financial Statement Items Property, Plant and Equipment (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsGoodwillDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsGoodwillDetails">
+        <link:definition>9955531 - Disclosure - Composition of Certain Financial Statement Items Goodwill (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsOtherIntangibleAssetsDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsOtherIntangibleAssetsDetails">
+        <link:definition>9955532 - Disclosure - Composition of Certain Financial Statement Items Other Intangible Assets (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsEquityMethodandNonmarketableEquityInvestmentsDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsEquityMethodandNonmarketableEquityInvestmentsDetails">
+        <link:definition>9955533 - Disclosure - Composition of Certain Financial Statement Items Equity Method and Non-marketable Equity Investments (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsOtherCurrentLiabilitiesDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsOtherCurrentLiabilitiesDetails">
+        <link:definition>9955534 - Disclosure - Composition of Certain Financial Statement Items Other Current Liabilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsRevenuesDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsRevenuesDetails">
+        <link:definition>9955535 - Disclosure - Composition of Certain Financial Statement Items Revenues (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsConcentrationsDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsConcentrationsDetails">
+        <link:definition>9955536 - Disclosure - Composition of Certain Financial Statement Items Concentrations (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsOtherIncomeCostsandExpensesDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsOtherIncomeCostsandExpensesDetails">
+        <link:definition>9955537 - Disclosure - Composition of Certain Financial Statement Items Other Income, Costs and Expenses (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsDiscontinuedOperationsDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsDiscontinuedOperationsDetails">
+        <link:definition>9955538 - Disclosure - Composition of Certain Financial Statement Items Discontinued Operations (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompositionofCertainFinancialStatementItemsInvestmentandOtherIncomeNetDetails" roleURI="http://www.qualcomm.com/role/CompositionofCertainFinancialStatementItemsInvestmentandOtherIncomeNetDetails">
+        <link:definition>9955539 - Disclosure - Composition of Certain Financial Statement Items Investment and Other Income, Net (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxesDetails" roleURI="http://www.qualcomm.com/role/IncomeTaxesDetails">
+        <link:definition>9955540 - Disclosure - Income Taxes (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CapitalStockStockRepurchaseProgramDetails" roleURI="http://www.qualcomm.com/role/CapitalStockStockRepurchaseProgramDetails">
+        <link:definition>9955541 - Disclosure - Capital Stock Stock Repurchase Program (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CapitalStockSharesOutstandingDetails" roleURI="http://www.qualcomm.com/role/CapitalStockSharesOutstandingDetails">
+        <link:definition>9955542 - Disclosure - Capital Stock Shares Outstanding (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="EmployeeBenefitPlansEquityCompensationPlansDetails" roleURI="http://www.qualcomm.com/role/EmployeeBenefitPlansEquityCompensationPlansDetails">
+        <link:definition>9955543 - Disclosure - Employee Benefit Plans Equity Compensation Plans (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="EmployeeBenefitPlansRestrictedStockUnitsDetails" roleURI="http://www.qualcomm.com/role/EmployeeBenefitPlansRestrictedStockUnitsDetails">
+        <link:definition>9955544 - Disclosure - Employee Benefit Plans Restricted Stock Units (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="EmployeeBenefitPlansEmployeeStockPurchasePlanDetails" roleURI="http://www.qualcomm.com/role/EmployeeBenefitPlansEmployeeStockPurchasePlanDetails">
+        <link:definition>9955545 - Disclosure - Employee Benefit Plans Employee Stock Purchase Plan (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CompensationRelatedCostsShareBasedPaymentsDetails" roleURI="http://www.qualcomm.com/role/CompensationRelatedCostsShareBasedPaymentsDetails">
+        <link:definition>9955546 - Disclosure - Compensation Related Costs, Share Based Payments (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="DebtLongtermDebtDetails" roleURI="http://www.qualcomm.com/role/DebtLongtermDebtDetails">
+        <link:definition>9955547 - Disclosure - Debt Long-term Debt (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="InterestRateSwapDetails" roleURI="http://www.qualcomm.com/role/InterestRateSwapDetails">
+        <link:definition>9955548 - Disclosure - Interest Rate Swap (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="DebtCreditFacilitiesDetails" roleURI="http://www.qualcomm.com/role/DebtCreditFacilitiesDetails">
+        <link:definition>9955549 - Disclosure - Debt Credit Facilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommitmentsandContingenciesLegalandRegulatoryProceedingsDetails" roleURI="http://www.qualcomm.com/role/CommitmentsandContingenciesLegalandRegulatoryProceedingsDetails">
+        <link:definition>9955550 - Disclosure - Commitments and Contingencies Legal and Regulatory Proceedings (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommitmentsandContingenciesPurchaseObligationsDetails" roleURI="http://www.qualcomm.com/role/CommitmentsandContingenciesPurchaseObligationsDetails">
+        <link:definition>9955551 - Disclosure - Commitments and Contingencies Purchase Obligations (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommitmentsandContingenciesOperatingLeasesDetails" roleURI="http://www.qualcomm.com/role/CommitmentsandContingenciesOperatingLeasesDetails">
+        <link:definition>9955552 - Disclosure - Commitments and Contingencies Operating Leases (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformationDetails" roleURI="http://www.qualcomm.com/role/SegmentInformationDetails">
+        <link:definition>9955553 - Disclosure - Segment Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentReportingLonglivedIntangiblesNBVDetails" roleURI="http://www.qualcomm.com/role/SegmentReportingLonglivedIntangiblesNBVDetails">
+        <link:definition>9955554 - Disclosure - Segment Reporting - Long-lived Intangibles NBV (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentReportingRevenuebyCountryDetails" roleURI="http://www.qualcomm.com/role/SegmentReportingRevenuebyCountryDetails">
+        <link:definition>9955555 - Disclosure - Segment Reporting - Revenue by Country (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AcquisitionsDetails" roleURI="http://www.qualcomm.com/role/AcquisitionsDetails">
+        <link:definition>9955556 - Disclosure - Acquisitions (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="FairValueMeasurementsFairValueHierarchyDetails" roleURI="http://www.qualcomm.com/role/FairValueMeasurementsFairValueHierarchyDetails">
+        <link:definition>9955557 - Disclosure - Fair Value Measurements Fair Value Hierarchy (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="MarketableSecuritiesDetails" roleURI="http://www.qualcomm.com/role/MarketableSecuritiesDetails">
+        <link:definition>9955558 - Disclosure - Marketable Securities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="ScheduleIIValuationandQualifyingAccountsDetails" roleURI="http://www.qualcomm.com/role/ScheduleIIValuationandQualifyingAccountsDetails">
+        <link:definition>9955559 - Disclosure - Schedule II - Valuation and Qualifying Accounts (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element id="qcom_AuditorInformationAbstract" abstract="true" name="AuditorInformationAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="qcom_EquipmentAndServices" abstract="false" name="EquipmentAndServices" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_LicensingRevenues" abstract="false" name="LicensingRevenues" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_IncomeTaxProvisionLessThanInExcessOfIncomeTaxPayments" abstract="false" name="IncomeTaxProvisionLessThanInExcessOfIncomeTaxPayments" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_ImpairmentLossesOnOtherInvestmentsWithoutReadilyDeterminableFairValue" abstract="false" name="ImpairmentLossesOnOtherInvestmentsWithoutReadilyDeterminableFairValue" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_AcquisitionsAndOtherInvestmentsNetofCashAcquired" abstract="false" name="AcquisitionsAndOtherInvestmentsNetofCashAcquired" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_Proceedsfromotherinvestments" abstract="false" name="Proceedsfromotherinvestments" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_StockholdersEquityPolicyStockRepurchasesPolicyTextBlock" abstract="false" name="StockholdersEquityPolicyStockRepurchasesPolicyTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="qcom_SegmentReportingEBTPolicyPolicyTextBlock" abstract="false" name="SegmentReportingEBTPolicyPolicyTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="qcom_RevenueRecognizedFromPerformanceObligationsSatisfiedInPreviousPeriodsTableTextBlock" abstract="false" name="RevenueRecognizedFromPerformanceObligationsSatisfiedInPreviousPeriodsTableTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="qcom_CustomerConcentrationsRevenuesTableTextBlock" abstract="false" name="CustomerConcentrationsRevenuesTableTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="qcom_SharesOutstandingAbstract" abstract="true" name="SharesOutstandingAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="qcom_ForeignCurrencyHedgesAbstract" abstract="true" name="ForeignCurrencyHedgesAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="qcom_RevenuesFromProvidingServicesAndLicensingSystemSoftwarePercentage" abstract="false" name="RevenuesFromProvidingServicesAndLicensingSystemSoftwarePercentage" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="qcom_ComputerEquipmentAndSoftwareGross" abstract="false" name="ComputerEquipmentAndSoftwareGross" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_GoodwillAbstract" abstract="true" name="GoodwillAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="qcom_QctMember" abstract="true" name="QctMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_QtlMember" abstract="true" name="QtlMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_OtherintangibleassetsAbstract" abstract="true" name="OtherintangibleassetsAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="qcom_EquityMethodandNonMarketableEquityInvestmentsAbstract" abstract="true" name="EquityMethodandNonMarketableEquityInvestmentsAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="qcom_MobileHandsetsMember" abstract="true" name="MobileHandsetsMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_AutomotiveMember" abstract="true" name="AutomotiveMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_IoTMember" abstract="true" name="IoTMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_PatentLicenseAgreementExpirationPeriod" abstract="false" name="PatentLicenseAgreementExpirationPeriod" nillable="true" xbrli:periodType="instant" substitutionGroup="xbrli:item" type="xbrli:gYearItemType"/>
+  <xs:element id="qcom_ConcentrationsAbstract" abstract="true" name="ConcentrationsAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="qcom_CustomerOneMember" abstract="true" name="CustomerOneMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_CustomerTwoMember" abstract="true" name="CustomerTwoMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_CustomerthreeMember" abstract="true" name="CustomerthreeMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_SecuritiesClassActionMember" abstract="true" name="SecuritiesClassActionMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_VeoneersActiveSafetyMember" abstract="true" name="VeoneersActiveSafetyMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_VeoneerMember" abstract="true" name="VeoneerMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_PaymentsToAcquireBusinessIncludingDebtAssumed" abstract="false" name="PaymentsToAcquireBusinessIncludingDebtAssumed" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_NetLossesGainsOnDeferredCompensationPlanAssets" abstract="false" name="NetLossesGainsOnDeferredCompensationPlanAssets" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_FDIIEffectiveTaxRateMember" abstract="true" name="FDIIEffectiveTaxRateMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_FDDEIEffectiveTaxRateRenamedFromFDIIMember" abstract="true" name="FDDEIEffectiveTaxRateRenamedFromFDIIMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_FDIIEffectiveTaxFutureRateMember" abstract="true" name="FDIIEffectiveTaxFutureRateMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_CorporateAlternativeMinimumTaxMember" abstract="true" name="CorporateAlternativeMinimumTaxMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_U.S.FederalMember" abstract="true" name="U.S.FederalMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_EffectiveIncomeTaxRateReconciliationChangeInDeferredTaxAssetsValuationAllowanceAmountOBBB" abstract="false" name="EffectiveIncomeTaxRateReconciliationChangeInDeferredTaxAssetsValuationAllowanceAmountOBBB" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_BenefitFromFDIIDeductionExcludingTheImpactOfCapitalizingResearchAndDevelopmentExpenditures" abstract="false" name="BenefitFromFDIIDeductionExcludingTheImpactOfCapitalizingResearchAndDevelopmentExpenditures" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_EffectiveIncomeTaxRateReconciliationBenefitRelatedToTheTransferOfIntellectualPropertyBetweenForeignSubsidiaries" abstract="false" name="EffectiveIncomeTaxRateReconciliationBenefitRelatedToTheTransferOfIntellectualPropertyBetweenForeignSubsidiaries" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_EffectiveIncomeTaxRateReconciliationForeignCurrencyLossesGainsRelatedToWithholdingTaxReceivable" abstract="false" name="EffectiveIncomeTaxRateReconciliationForeignCurrencyLossesGainsRelatedToWithholdingTaxReceivable" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_BenefitFromFiscal2021And2022FDIIDeductionsRelatedToAChangeInSourcingOfResearchAndDevelopmentExpenditures" abstract="false" name="BenefitFromFiscal2021And2022FDIIDeductionsRelatedToAChangeInSourcingOfResearchAndDevelopmentExpenditures" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_A10BStockRepurchaseProgramAnnouncedOctober122021Member" abstract="true" name="A10BStockRepurchaseProgramAnnouncedOctober122021Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_A15BStockRepurchaseProgramAnnouncedNovember62024Member" abstract="true" name="A15BStockRepurchaseProgramAnnouncedNovember62024Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_The2023LongTermIncentivePlanAbstract" abstract="true" name="The2023LongTermIncentivePlanAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="qcom_EquityCompensationPlansAbstract" abstract="true" name="EquityCompensationPlansAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="qcom_ShareBasedCompensationArrangementByShareBasedPaymentAwardFairValueAssumptionsPrevestingForfeitureRate" abstract="false" name="ShareBasedCompensationArrangementByShareBasedPaymentAwardFairValueAssumptionsPrevestingForfeitureRate" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="qcom_EmployeeStockPurchasePlansMember" abstract="true" name="EmployeeStockPurchasePlansMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_FixedRateNotesDueMay2025Member" abstract="true" name="FixedRateNotesDueMay2025Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_May2025NotesMember" abstract="true" name="May2025NotesMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_May2025NotesFixedRate4.50DueMay2030Member" abstract="true" name="May2025NotesFixedRate4.50DueMay2030Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_May2025NotesFixedRate4.75DueMay2032Member" abstract="true" name="May2025NotesFixedRate4.75DueMay2032Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_May2025NotesFixedRate5.00DueMay2035Member" abstract="true" name="May2025NotesFixedRate5.00DueMay2035Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_FixedRateNotesMember" abstract="true" name="FixedRateNotesMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_HedgeAccountingAdjustmentsRelatedToLongTermDebt" abstract="false" name="HedgeAccountingAdjustmentsRelatedToLongTermDebt" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_Interestpaidnetofinterestreceived" abstract="false" name="Interestpaidnetofinterestreceived" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_DebtInstrumentMaturityDateRangeStart" abstract="false" name="DebtInstrumentMaturityDateRangeStart" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:gYearItemType"/>
+  <xs:element id="qcom_DebtInstrumentMaturityDateRangeEnd" abstract="false" name="DebtInstrumentMaturityDateRangeEnd" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:gYearItemType"/>
+  <xs:element id="qcom_AdvancePaymentRelatedToMultiYearCapacityCommitments" abstract="false" name="AdvancePaymentRelatedToMultiYearCapacityCommitments" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="qcom_QsiMember" abstract="true" name="QsiMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_OtherForeignMember" abstract="true" name="OtherForeignMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_AlphawaveMember" abstract="true" name="AlphawaveMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_A2025BusinessAcquisitionsMember" abstract="true" name="A2025BusinessAcquisitionsMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_MortgageandassetbackedandauctionratesecuritiesMember" abstract="true" name="MortgageandassetbackedandauctionratesecuritiesMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="qcom_HeatherAceMember" abstract="true" name="HeatherAceMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+</xs:schema>

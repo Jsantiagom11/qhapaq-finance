@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any
 
 from .dashboard import build_company_artifact, render_company_dashboard
+from .universe import DomainRegistry, UniverseError
 
 PRIMARY_VIEWPORTS = (("portrait", 1024, 1366), ("landscape", 1366, 1024))
 # Crosses the dashboard's 850px responsive breakpoint without expanding the matrix.
@@ -221,7 +222,14 @@ def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
         description="Run offline WebKit visual QA for a Qhapaq dashboard"
     )
-    parser.add_argument("ticker", choices=("QCOM", "VRTX", "CSCO"), type=str.upper)
+
+    def security(value: str) -> str:
+        try:
+            return DomainRegistry().security(value).ticker
+        except UniverseError as exc:
+            raise argparse.ArgumentTypeError(str(exc)) from exc
+
+    parser.add_argument("ticker", type=security)
     parser.add_argument("--device", default="ipad-pro-13", choices=("ipad-pro-13",))
     parser.add_argument("--output-root", type=Path, default=Path("output/visual-audit"))
     args = parser.parse_args(argv)

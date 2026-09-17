@@ -1,0 +1,349 @@
+{
+  "CIK": "0000804328",
+  "evidence_notes": [
+    "Frozen companyfacts and selected filing inline XBRL were reviewed; no dimensional observation is selected."
+  ],
+  "metrics": [
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000804328-25-000085",
+          "end": "2025-09-28",
+          "filed": "2025-11-05",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-30",
+          "val": 44284000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "a466da4777ec1202313896d695272832882fd9875e955bab974ce9185bf4a8e7"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 44284000000,
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-11-05",
+      "filing_form": "10-K",
+      "metric": "revenue",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-09-28",
+        "start_date": "2024-09-30"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-09-28",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000804328-25-000085",
+      "source_artifact_path": "filings/0000804328-25-000085/filing-artifact/qcom-20250928.htm",
+      "source_artifact_sha256": "da5ced9e61dfdd634360fda810c173c66c230e95fea9643979862b6564fbb814",
+      "source_concept_qname": "us-gaap:Revenues",
+      "taxonomy": "us-gaap",
+      "ticker": "QCOM"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000804328-25-000085",
+          "end": "2025-09-28",
+          "filed": "2025-11-05",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-30",
+          "val": 12355000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "a466da4777ec1202313896d695272832882fd9875e955bab974ce9185bf4a8e7"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 12355000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-11-05",
+      "filing_form": "10-K",
+      "metric": "operating_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-09-28",
+        "start_date": "2024-09-30"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-09-28",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000804328-25-000085",
+      "source_artifact_path": "filings/0000804328-25-000085/filing-artifact/qcom-20250928.htm",
+      "source_artifact_sha256": "da5ced9e61dfdd634360fda810c173c66c230e95fea9643979862b6564fbb814",
+      "source_concept_qname": "us-gaap:OperatingIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "QCOM"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000804328-25-000085",
+          "end": "2025-09-28",
+          "filed": "2025-11-05",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-30",
+          "val": 5541000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "a466da4777ec1202313896d695272832882fd9875e955bab974ce9185bf4a8e7"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 5541000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-11-05",
+      "filing_form": "10-K",
+      "metric": "net_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-09-28",
+        "start_date": "2024-09-30"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-09-28",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000804328-25-000085",
+      "source_artifact_path": "filings/0000804328-25-000085/filing-artifact/qcom-20250928.htm",
+      "source_artifact_sha256": "da5ced9e61dfdd634360fda810c173c66c230e95fea9643979862b6564fbb814",
+      "source_concept_qname": "us-gaap:NetIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "QCOM"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000804328-25-000085",
+          "end": "2025-09-28",
+          "filed": "2025-11-05",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 5520000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "a466da4777ec1202313896d695272832882fd9875e955bab974ce9185bf4a8e7"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 5520000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-11-05",
+      "filing_form": "10-K",
+      "metric": "cash_and_equivalents",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-09-28"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-09-28",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000804328-25-000085",
+      "source_artifact_path": "filings/0000804328-25-000085/filing-artifact/qcom-20250928.htm",
+      "source_artifact_sha256": "da5ced9e61dfdd634360fda810c173c66c230e95fea9643979862b6564fbb814",
+      "source_concept_qname": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+      "taxonomy": "us-gaap",
+      "ticker": "QCOM"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000804328-25-000085",
+          "end": "2025-09-28",
+          "filed": "2025-11-05",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025Q3I",
+          "fy": 2025,
+          "start": null,
+          "val": 14811000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "a466da4777ec1202313896d695272832882fd9875e955bab974ce9185bf4a8e7"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 14811000000,
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-11-05",
+      "filing_form": "10-K",
+      "metric": "total_debt",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-09-28"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-09-28",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000804328-25-000085",
+      "source_artifact_path": "filings/0000804328-25-000085/filing-artifact/qcom-20250928.htm",
+      "source_artifact_sha256": "da5ced9e61dfdd634360fda810c173c66c230e95fea9643979862b6564fbb814",
+      "source_concept_qname": "us-gaap:DebtLongtermAndShorttermCombinedAmount",
+      "taxonomy": "us-gaap",
+      "ticker": "QCOM"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000804328-25-000085",
+          "end": "2025-09-28",
+          "filed": "2025-11-05",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 50143000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "a466da4777ec1202313896d695272832882fd9875e955bab974ce9185bf4a8e7"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 50143000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-11-05",
+      "filing_form": "10-K",
+      "metric": "total_assets",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-09-28"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-09-28",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000804328-25-000085",
+      "source_artifact_path": "filings/0000804328-25-000085/filing-artifact/qcom-20250928.htm",
+      "source_artifact_sha256": "da5ced9e61dfdd634360fda810c173c66c230e95fea9643979862b6564fbb814",
+      "source_concept_qname": "us-gaap:Assets",
+      "taxonomy": "us-gaap",
+      "ticker": "QCOM"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000804328-25-000085",
+          "end": "2025-09-28",
+          "filed": "2025-11-05",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 28937000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "a466da4777ec1202313896d695272832882fd9875e955bab974ce9185bf4a8e7"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 28937000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-11-05",
+      "filing_form": "10-K",
+      "metric": "total_liabilities",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-09-28"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-09-28",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000804328-25-000085",
+      "source_artifact_path": "filings/0000804328-25-000085/filing-artifact/qcom-20250928.htm",
+      "source_artifact_sha256": "da5ced9e61dfdd634360fda810c173c66c230e95fea9643979862b6564fbb814",
+      "source_concept_qname": "us-gaap:Liabilities",
+      "taxonomy": "us-gaap",
+      "ticker": "QCOM"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000804328-25-000085",
+          "end": "2025-09-28",
+          "filed": "2025-11-05",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 21206000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "a466da4777ec1202313896d695272832882fd9875e955bab974ce9185bf4a8e7"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 21206000000,
+      "expected_resolution_method": "STANDARD_ALIAS",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-11-05",
+      "filing_form": "10-K",
+      "metric": "shareholders_equity",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-09-28"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-09-28",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000804328-25-000085",
+      "source_artifact_path": "filings/0000804328-25-000085/filing-artifact/qcom-20250928.htm",
+      "source_artifact_sha256": "da5ced9e61dfdd634360fda810c173c66c230e95fea9643979862b6564fbb814",
+      "source_concept_qname": "us-gaap:StockholdersEquityIncludingPortionAttributableToNoncontrollingInterest",
+      "taxonomy": "us-gaap",
+      "ticker": "QCOM"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000804328-25-000085",
+          "end": "2025-09-28",
+          "filed": "2025-11-05",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-30",
+          "val": 1105000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "a466da4777ec1202313896d695272832882fd9875e955bab974ce9185bf4a8e7"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 1105000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-11-05",
+      "filing_form": "10-K",
+      "metric": "diluted_shares",
+      "normalized_unit": "shares",
+      "period": {
+        "end_date": "2025-09-28",
+        "start_date": "2024-09-30"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-09-28",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000804328-25-000085",
+      "source_artifact_path": "filings/0000804328-25-000085/filing-artifact/qcom-20250928.htm",
+      "source_artifact_sha256": "da5ced9e61dfdd634360fda810c173c66c230e95fea9643979862b6564fbb814",
+      "source_concept_qname": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding",
+      "taxonomy": "us-gaap",
+      "ticker": "QCOM"
+    }
+  ],
+  "schema_version": "canonical-golden-v1",
+  "source_corpus_version": "sec-corpus-v2",
+  "source_issuer_manifest_sha256": "67dfa72ffe44e6e0d4d4a9dc17ef232d1e16261a3a7cc418fb3123a24520b3e9",
+  "target_fiscal_year": 2025,
+  "target_report_date": "2025-09-28",
+  "ticker": "QCOM"
+}

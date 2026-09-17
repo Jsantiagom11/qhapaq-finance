@@ -1,0 +1,34 @@
+#!/usr/bin/env python3
+"""Explicit one-time live SEC corpus build; never invoked by tests or analysis."""
+
+import argparse
+
+
+_TICKERS = ("AAPL", "QCOM", "NVDA", "COST", "AMZN", "VRTX")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Build an offline SEC corpus from live SEC responses."
+    )
+    parser.add_argument(
+        "tickers",
+        nargs="*",
+        type=str.upper,
+        metavar="TICKER",
+        help="issuer ticker(s) to acquire (default: legacy configured corpus)",
+    )
+    args = parser.parse_args()
+
+    # Delay SEC configuration and client construction until after argparse has
+    # handled --help and invalid command lines.
+    from qhapaq_finance.sec_client import SecClient
+    from qhapaq_finance.sec_config import SecConfig
+    from qhapaq_finance.sec_corpus import build_sec_corpus
+
+    build_sec_corpus(SecClient(SecConfig.from_env()), tickers=tuple(args.tickers) or _TICKERS)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

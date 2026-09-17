@@ -11,8 +11,10 @@ from .accounting import (
     TtmFactSpec,
     normalize_accounting_snapshot,
 )
+from .capital_cost import load_legacy_assumptions
 from .evidence import FinancialFact, load_facts
 from .market import load_market_snapshot
+from .market_inputs import canonical_market_input
 from .valuation import (
     CapitalCost,
     FcffInputs,
@@ -31,6 +33,8 @@ NVDA_ACCOUNTING_SPEC = AccountingEvidenceSpec(
     ebit=TtmFactSpec("ebit_fy26", "ebit_h1fy26", "ebit_h1fy27"),
     depreciation_amortization=TtmFactSpec("da_fy26", "da_h1fy26", "da_h1fy27"),
     capex=TtmFactSpec("capex_fy26", "capex_h1fy26", "capex_h1fy27"),
+    income_tax_expense=None,
+    pretax_income=None,
     capex_source_sign="negative_cash_outflow",
     operating_nwc_opening_assets=("ar_q2fy26", "inventory_q2fy26"),
     operating_nwc_opening_liabilities=("ap_q2fy26", "accruals_q2fy26"),
@@ -44,12 +48,17 @@ NVDA_ACCOUNTING_SPEC = AccountingEvidenceSpec(
     valuation_shares="shares_diluted_h1fy27",
     valuation_share_basis="diluted_weighted_average",
     require_ttm_endpoint_alignment=True,
+    legacy_invested_capital_adapter=True,
 )
 
 
 def _accounting_snapshot(facts: dict[str, FinancialFact]) -> AccountingSnapshot:
-    # Filing tax expense / pretax income is not asserted to be a durable operating-tax rate.
-    return normalize_accounting_snapshot(facts, spec=NVDA_ACCOUNTING_SPEC, tax_rate=0.18)
+    assumptions = load_legacy_assumptions(
+        Path(__file__).resolve().parents[2] / "data/research/nvda/capital-cost-legacy.json"
+    )
+    return normalize_accounting_snapshot(
+        facts, spec=NVDA_ACCOUNTING_SPEC, tax_rate=assumptions["tax_rate"]
+    )
 
 
 def _require_reconciled(facts: dict[str, FinancialFact]) -> None:
@@ -74,22 +83,24 @@ def load_nvda_case(repository_root: str | Path = ".") -> ResearchCase:
     assert snapshot.invested_capital is not None and snapshot.valuation_shares is not None
     assert snapshot.cash is not None and snapshot.marketable_securities is not None
     assert snapshot.debt is not None
-    frozen_market = load_market_snapshot(root / "data/research/nvda/market-2026-09-04.json")
-    if frozen_market.ticker != "NVDA":
-        raise ValueError("NVDA market snapshot ticker mismatch")
+    market_input = canonical_market_input(
+        root=root,
+        ticker="NVDA",
+        evaluation_as_of=NVDA_AS_OF,
+        valuation_shares=snapshot.valuation_shares,
+    )
+    if market_input is None:
+        raise ValueError("NVDA canonical market profile is unavailable")
     market = MarketSnapshot(
-        price=frozen_market.price,
+        price=market_input.price,
         shares_outstanding=snapshot.valuation_shares,
         cash_and_equivalents=snapshot.cash,
         marketable_securities=snapshot.marketable_securities,
         debt=snapshot.debt,
     )
+    assumptions = load_legacy_assumptions(root / "data/research/nvda/capital-cost-legacy.json")
     cost = CapitalCost.from_assumptions(
-        risk_free_rate=0.04,
-        equity_risk_premium=0.05,
-        beta=1.30,
-        pre_tax_cost_of_debt=0.045,
-        tax_rate=snapshot.tax_rate,
+        **assumptions,
         market_equity=market.equity_value,
         debt=market.debt,
     )
@@ -113,7 +124,7 @@ def load_nvda_case(repository_root: str | Path = ".") -> ResearchCase:
             ),
         ),
         cost,
-        snapshot.invested_capital,
+        snapshot.invested_capital.average,
         0.25,
         (
             ScenarioAssumptions("bear", 0.07, 0.02, 8),
@@ -129,6 +140,7 @@ def load_nvda_case(repository_root: str | Path = ".") -> ResearchCase:
             "it excludes goodwill, leases and financial investments as an explicit classification "
             "policy.",
         ),
+        market_input.provenance(NVDA_AS_OF),
     )
 
 
@@ -141,6 +153,7 @@ def _obsolete_pre_period_alignment_audit(repository_root: str | Path = ".") -> d
     _require_reconciled(facts)
     snapshot = _accounting_snapshot(facts)
     assert snapshot.valuation_shares is not None
+    assert snapshot.invested_capital is not None
     frozen_market = load_market_snapshot(
         Path(repository_root) / "data/research/nvda/market-2026-09-04.json"
     )
@@ -214,7 +227,7 @@ def _obsolete_pre_period_alignment_audit(repository_root: str | Path = ".") -> d
             "closing_net_operating_assets": closing_operating_assets,
             "opening_net_operating_capital": opening_trade_nwc + opening_operating_assets,
             "closing_net_operating_capital": closing_trade_nwc + closing_operating_assets,
-            "reported_average": snapshot.invested_capital,
+            "reported_average": snapshot.invested_capital.average,
             "average_treatment": "simple average of 2026-01-25 and 2026-07-26 balances",
             "excluded": (
                 "cash and cash equivalents",
@@ -352,7 +365,7 @@ def nvda_audit(repository_root: str | Path = ".") -> dict[str, object]:
             },
             "opening_net_operating_capital": opening_capital,
             "closing_net_operating_capital": closing_capital,
-            "reported_average": snapshot.invested_capital,
+            "reported_average": snapshot.invested_capital.average,
             "average_treatment": (
                 "simple average of 2025-07-27 and 2026-07-26 operating-capital endpoints"
             ),

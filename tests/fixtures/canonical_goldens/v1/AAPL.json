@@ -1,0 +1,371 @@
+{
+  "CIK": "0000320193",
+  "evidence_notes": [
+    "Frozen companyfacts and selected filing inline XBRL were reviewed; no dimensional observation is selected."
+  ],
+  "metrics": [
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000320193-25-000079",
+          "end": "2025-09-27",
+          "filed": "2025-10-31",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-29",
+          "val": 416161000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 416161000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-31",
+      "filing_form": "10-K",
+      "metric": "revenue",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-09-27",
+        "start_date": "2024-09-29"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-09-27",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000320193-25-000079",
+      "source_artifact_path": "filings/0000320193-25-000079/filing-artifact/aapl-20250927.htm",
+      "source_artifact_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_concept_qname": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "taxonomy": "us-gaap",
+      "ticker": "AAPL"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000320193-25-000079",
+          "end": "2025-09-27",
+          "filed": "2025-10-31",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-29",
+          "val": 133050000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 133050000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-31",
+      "filing_form": "10-K",
+      "metric": "operating_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-09-27",
+        "start_date": "2024-09-29"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-09-27",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000320193-25-000079",
+      "source_artifact_path": "filings/0000320193-25-000079/filing-artifact/aapl-20250927.htm",
+      "source_artifact_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_concept_qname": "us-gaap:OperatingIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "AAPL"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000320193-25-000079",
+          "end": "2025-09-27",
+          "filed": "2025-10-31",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-29",
+          "val": 112010000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 112010000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-31",
+      "filing_form": "10-K",
+      "metric": "net_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-09-27",
+        "start_date": "2024-09-29"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-09-27",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000320193-25-000079",
+      "source_artifact_path": "filings/0000320193-25-000079/filing-artifact/aapl-20250927.htm",
+      "source_artifact_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_concept_qname": "us-gaap:NetIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "AAPL"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000320193-25-000079",
+          "end": "2025-09-27",
+          "filed": "2025-10-31",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 35934000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 35934000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-31",
+      "filing_form": "10-K",
+      "metric": "cash_and_equivalents",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-09-27"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-09-27",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000320193-25-000079",
+      "source_artifact_path": "filings/0000320193-25-000079/filing-artifact/aapl-20250927.htm",
+      "source_artifact_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_concept_qname": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+      "taxonomy": "us-gaap",
+      "ticker": "AAPL"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": null,
+          "end": null,
+          "filed": null,
+          "form": null,
+          "fp": null,
+          "frame": null,
+          "fy": null,
+          "start": null,
+          "val": null
+        },
+        "path": "companyfacts.json",
+        "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43"
+      },
+      "derivation": {
+        "components": [
+          {
+            "source_concept_qname": "us-gaap:LongTermDebtCurrent",
+            "unit": "USD",
+            "value": 12350000000
+          },
+          {
+            "source_concept_qname": "us-gaap:LongTermDebtNoncurrent",
+            "unit": "USD",
+            "value": 78328000000
+          },
+          {
+            "source_concept_qname": "us-gaap:CommercialPaper",
+            "unit": "USD",
+            "value": 7979000000
+          }
+        ],
+        "operator": "sum"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 98657000000,
+      "expected_resolution_method": "DERIVED",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-31",
+      "filing_form": "10-K",
+      "metric": "total_debt",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-09-27"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-09-27",
+      "resolution_rationale": "LongTermDebtCurrent=12350000000 + LongTermDebtNoncurrent=78328000000 + CommercialPaper=7979000000",
+      "source_accession": "0000320193-25-000079",
+      "source_artifact_path": "filings/0000320193-25-000079/filing-artifact/aapl-20250927.htm",
+      "source_artifact_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_concept_qname": "us-gaap:DerivedLongTermDebtAndCommercialPaper",
+      "taxonomy": "us-gaap",
+      "ticker": "AAPL"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000320193-25-000079",
+          "end": "2025-09-27",
+          "filed": "2025-10-31",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 359241000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 359241000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-31",
+      "filing_form": "10-K",
+      "metric": "total_assets",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-09-27"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-09-27",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000320193-25-000079",
+      "source_artifact_path": "filings/0000320193-25-000079/filing-artifact/aapl-20250927.htm",
+      "source_artifact_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_concept_qname": "us-gaap:Assets",
+      "taxonomy": "us-gaap",
+      "ticker": "AAPL"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000320193-25-000079",
+          "end": "2025-09-27",
+          "filed": "2025-10-31",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 285508000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 285508000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-31",
+      "filing_form": "10-K",
+      "metric": "total_liabilities",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-09-27"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-09-27",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000320193-25-000079",
+      "source_artifact_path": "filings/0000320193-25-000079/filing-artifact/aapl-20250927.htm",
+      "source_artifact_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_concept_qname": "us-gaap:Liabilities",
+      "taxonomy": "us-gaap",
+      "ticker": "AAPL"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000320193-25-000079",
+          "end": "2025-09-27",
+          "filed": "2025-10-31",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 73733000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 73733000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-31",
+      "filing_form": "10-K",
+      "metric": "shareholders_equity",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-09-27"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-09-27",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000320193-25-000079",
+      "source_artifact_path": "filings/0000320193-25-000079/filing-artifact/aapl-20250927.htm",
+      "source_artifact_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_concept_qname": "us-gaap:StockholdersEquity",
+      "taxonomy": "us-gaap",
+      "ticker": "AAPL"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000320193-25-000079",
+          "end": "2025-09-27",
+          "filed": "2025-10-31",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-29",
+          "val": 15004697000
+        },
+        "path": "companyfacts.json",
+        "sha256": "73a86c6aedc31f77cac2ea4df5f80f0b3bd7e6eb58bb4e01444fbedf3afb9c43"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 15004697000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-31",
+      "filing_form": "10-K",
+      "metric": "diluted_shares",
+      "normalized_unit": "shares",
+      "period": {
+        "end_date": "2025-09-27",
+        "start_date": "2024-09-29"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-09-27",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000320193-25-000079",
+      "source_artifact_path": "filings/0000320193-25-000079/filing-artifact/aapl-20250927.htm",
+      "source_artifact_sha256": "548ae59778cf08ee0f2ee088e7ece20d947076c3c01f74d2d65db4c2777e436a",
+      "source_concept_qname": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding",
+      "taxonomy": "us-gaap",
+      "ticker": "AAPL"
+    }
+  ],
+  "schema_version": "canonical-golden-v1",
+  "source_corpus_version": "sec-corpus-v2",
+  "source_issuer_manifest_sha256": "88f37ef0092d8594d4b900bb4a4565423b22bd269ee5d2c734fe1d05c0ecdfdc",
+  "target_fiscal_year": 2025,
+  "target_report_date": "2025-09-27",
+  "ticker": "AAPL"
+}

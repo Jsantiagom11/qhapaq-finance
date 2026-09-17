@@ -1,0 +1,25 @@
+{
+  "schema_version": "sec-company-tickers-cache-v1",
+  "source": {
+    "source_url": "https://www.sec.gov/files/company_tickers.json",
+    "fetched_at": null,
+    "raw_sha256": null,
+    "raw_byte_size": null
+  },
+  "entries_sha256": "81d68f688ff59618cef83b2f4cb2fccc06ea4f5de78adae2e04325bc3fca173b",
+  "entries": [
+    {"ticker": "AAPL", "company_name": "Apple Inc.", "cik": "0000320193", "exchange": null},
+    {"ticker": "AMZN", "company_name": "Amazon.com, Inc.", "cik": "0001018724", "exchange": null},
+    {"ticker": "AVGO", "company_name": "Broadcom Inc.", "cik": "0001730168", "exchange": null},
+    {"ticker": "CSCO", "company_name": "Cisco Systems, Inc.", "cik": "0000858877", "exchange": null},
+    {"ticker": "GOOG", "company_name": "Alphabet Inc.", "cik": "0001652044", "exchange": null},
+    {"ticker": "GOOGL", "company_name": "Alphabet Inc.", "cik": "0001652044", "exchange": null},
+    {"ticker": "META", "company_name": "Meta Platforms, Inc.", "cik": "0001326801", "exchange": null},
+    {"ticker": "MSFT", "company_name": "Microsoft Corporation", "cik": "0000789019", "exchange": null},
+    {"ticker": "MU", "company_name": "Micron Technology, Inc.", "cik": "0000723125", "exchange": null},
+    {"ticker": "NVDA", "company_name": "NVIDIA Corporation", "cik": "0001045810", "exchange": null},
+    {"ticker": "QCOM", "company_name": "QUALCOMM Incorporated", "cik": "0000804328", "exchange": null},
+    {"ticker": "TSLA", "company_name": "Tesla, Inc.", "cik": "0001318605", "exchange": null},
+    {"ticker": "VRTX", "company_name": "Vertex Pharmaceuticals Incorporated", "cik": "0000875320", "exchange": null}
+  ]
+}

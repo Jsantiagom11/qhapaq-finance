@@ -1,0 +1,34 @@
+{
+  "schema_version": "financial-model-profile-v1",
+  "profile_id": "fcff-research",
+  "version": "1",
+  "market_requirements": [
+    {"id":"current_market_price","metric_id":"price","unit":"currency_per_share","currency":"USD","stage":"market_comparison","mandatory":true},
+    {"id":"reverse_valuation_price","metric_id":"price","unit":"currency_per_share","currency":"USD","stage":"reverse_valuation","mandatory":true}
+  ],
+  "capital_cost_requirement": {
+    "stage": "valuation",
+    "methodology_id": "capm_wacc_v1",
+    "risk_free_tenor": "10Y",
+    "erp_methodology": "implied_erp",
+    "beta_methodologies": ["deterministic_regression", "externally_reported"],
+    "debt_semantics": ["total_interest_bearing_debt"],
+    "tax_semantics": ["effective", "normalized"],
+    "max_age_days": 365
+  },
+  "requirements": [
+    {"id":"revenue_ttm","metric_id":"revenue","accepted_concepts":["Revenue"],"unit":"USD million","period_kind":"DURATION","period":"TTM","mandatory":true,"stage":"operating_model","allowed_derivations":["ttm_reconstruction"]},
+    {"id":"operating_income_ttm","metric_id":"operating_income","accepted_concepts":["OperatingIncomeLoss"],"unit":"USD million","period_kind":"DURATION","period":"TTM","mandatory":true,"stage":"nopat","allowed_derivations":["ttm_reconstruction"]},
+    {"id":"depreciation_amortization_ttm","metric_id":"depreciation_amortization","accepted_concepts":["DepreciationDepletionAndAmortization"],"unit":"USD million","period_kind":"DURATION","period":"TTM","mandatory":true,"stage":"fcff","allowed_derivations":["ttm_reconstruction"]},
+    {"id":"capital_expenditures_ttm","metric_id":"capital_expenditures","accepted_concepts":["PaymentsToAcquirePropertyPlantAndEquipment"],"unit":"USD million","period_kind":"DURATION","period":"TTM","mandatory":true,"stage":"fcff","allowed_derivations":["ttm_reconstruction"]},
+    {"id":"accounts_receivable","metric_id":"accounts_receivable","accepted_concepts":["AccountsReceivableNetCurrent"],"unit":"USD million","period_kind":"INSTANT","period":"LATEST_INSTANT","mandatory":true,"stage":"invested_capital","allowed_derivations":[]},
+    {"id":"inventory","metric_id":"inventory","accepted_concepts":["InventoryNet"],"unit":"USD million","period_kind":"INSTANT","period":"LATEST_INSTANT","mandatory":true,"stage":"invested_capital","allowed_derivations":[]},
+    {"id":"accounts_payable","metric_id":"accounts_payable","accepted_concepts":["AccountsPayableCurrent"],"unit":"USD million","period_kind":"INSTANT","period":"LATEST_INSTANT","mandatory":true,"stage":"invested_capital","allowed_derivations":[]},
+    {"id":"accrued_liabilities","metric_id":"accrued_liabilities","accepted_concepts":["AccruedLiabilitiesCurrent"],"unit":"USD million","period_kind":"INSTANT","period":"LATEST_INSTANT","mandatory":true,"stage":"invested_capital","allowed_derivations":[]},
+    {"id":"operating_assets","metric_id":"operating_assets","accepted_concepts":["PropertyPlantEquipmentAndOperatingIntangibles"],"unit":"USD million","period_kind":"INSTANT","period":"LATEST_INSTANT","mandatory":true,"stage":"invested_capital","allowed_derivations":[]},
+    {"id":"cash","metric_id":"cash","accepted_concepts":["CashAndCashEquivalentsAtCarryingValue"],"unit":"USD million","period_kind":"INSTANT","period":"LATEST_INSTANT","mandatory":true,"stage":"capital_structure","allowed_derivations":[]},
+    {"id":"short_term_debt","metric_id":"short_term_debt","accepted_concepts":["ShortTermBorrowings"],"unit":"USD million","period_kind":"INSTANT","period":"LATEST_INSTANT","mandatory":true,"stage":"capital_structure","allowed_derivations":[]},
+    {"id":"long_term_debt","metric_id":"long_term_debt","accepted_concepts":["LongTermDebtNoncurrent"],"unit":"USD million","period_kind":"INSTANT","period":"LATEST_INSTANT","mandatory":true,"stage":"capital_structure","allowed_derivations":[]},
+    {"id":"shares_outstanding","metric_id":"shares_outstanding","accepted_concepts":["EntityCommonStockSharesOutstanding"],"unit":"million shares","period_kind":"INSTANT","period":"LATEST_INSTANT","mandatory":false,"stage":"per_share","allowed_derivations":[]}
+  ]
+}

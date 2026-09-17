@@ -4,56 +4,14 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from ..evidence import EvidenceKind, load_facts
 from ..explainability import explainability_contract
+from ..research_result import build_canonical_research_result
 from ..sensitivity import sensitivity_matrices
-from ..valuation import (
-    ResearchResult,
-    analyze_case,
-    load_fixture_case,
-    price_value_classification,
-    valuation_cushion_prices,
-)
-
-COMPANY_NAMES = {
-    "QCOM": "QUALCOMM Incorporated",
-    "NVDA": "NVIDIA Corporation",
-    "VRTX": "Vertex Pharmaceuticals",
-    "CSCO": "Cisco Systems",
-}
-
-
-def _empirical_case_support(ticker: str) -> tuple[Path, object, object] | None:
-    """Return evidence routing metadata; mappings select facts, never calculations."""
-    if ticker == "QCOM":
-        from ..qcom_case import QCOM_AS_OF, qcom_audit
-
-        return Path("data/research/qcom/financial-evidence.json"), QCOM_AS_OF, qcom_audit
-    if ticker == "NVDA":
-        from ..nvda_case import NVDA_AS_OF, nvda_audit
-
-        return Path("data/research/nvda/financial-evidence.json"), NVDA_AS_OF, nvda_audit
-    return None
-
-
-def _scenario(result: ResearchResult, name: str) -> dict[str, Any]:
-    valuation = next(item for item in result.scenarios if item.name == name)
-    assumptions = next(item for item in result.case.scenarios if item.name == name)
-    return {
-        "name": name.upper(),
-        "intrinsic_value": valuation.intrinsic_value_per_share,
-        "margin_of_safety": valuation.margin_of_safety,
-        "explicit_growth": assumptions.explicit_growth,
-        "terminal_growth": assumptions.terminal_growth,
-        "wacc": result.case.capital_cost.wacc,
-        "terminal_value_share": valuation.terminal_value_share,
-        "terminal_spread": valuation.terminal_spread,
-        "pv_explicit_period": valuation.pv_explicit_period,
-        "pv_terminal_value": valuation.pv_terminal_value,
-        "warnings": list(valuation.warnings),
-    }
+from ..universe import DomainRegistry
+from ..valuation import load_fixture_case, price_value_classification, valuation_cushion_prices
 
 
 def _evidence_provenance(
@@ -83,21 +41,46 @@ def _evidence_provenance(
 
 
 def build_company_artifact(ticker: str, repository_root: str | Path = ".") -> dict[str, Any]:
-    """Serialize an already-valued ResearchResult without valuation recomputation."""
-    result = analyze_case(load_fixture_case(ticker, repository_root))
-    case, market, cost = result.case, result.case.market_snapshot, result.case.capital_cost
-    scenarios = {name.lower(): _scenario(result, name) for name in ("bear", "base", "bull")}
-    support = _empirical_case_support(case.ticker)
+    """Create the dashboard projection of the canonical research result.
+
+    Display-only bridges and sensitivity remain here, but identity, readiness,
+    provenance, and valuation truth are sourced from ``research-result-v1``.
+    """
+    canonical = build_canonical_research_result(ticker, repository_root)
+    registry = DomainRegistry(repository_root)
+    security = registry.security(ticker)
+    case = load_fixture_case(ticker, repository_root)
+    market, cost = case.market_snapshot, case.capital_cost
+    canonical_scenarios = cast(dict[str, dict[str, object]], canonical.valuation["scenarios"])
+    scenarios = {
+        name: {
+            "name": name.upper(),
+            "intrinsic_value": value["intrinsic_value_per_share"],
+            "margin_of_safety": value["margin_of_safety"],
+            "explicit_growth": value["explicit_growth"],
+            "terminal_growth": value["terminal_growth"],
+            "wacc": canonical.valuation["wacc"],
+            "terminal_value_share": value["terminal_value_share"],
+            "terminal_spread": value["terminal_spread"],
+            "pv_explicit_period": value["pv_explicit_period"],
+            "pv_terminal_value": value["pv_terminal_value"],
+            "warnings": value["warnings"],
+        }
+        for name, value in canonical_scenarios.items()
+    }
+    support = registry.audit(case.ticker)
     fixture = support is None
     audit: dict[str, Any] = support[2](repository_root) if support is not None else {}  # type: ignore[operator]
     base = scenarios["base"]
     liquid_assets = market.liquid_assets
-    cushion_prices = valuation_cushion_prices(base["intrinsic_value"])
+    fair_value = cast(float, base["intrinsic_value"])
+    cushion_prices = valuation_cushion_prices(fair_value)
     artifact: dict[str, Any] = {
         "schema_version": "dashboard-research-v1",
+        "canonical_result_identity": canonical.content_identity,
         "identity": {
             "ticker": case.ticker,
-            "company_name": COMPANY_NAMES[case.ticker],
+            "company_name": registry.issuer_for(security.ticker).display_name,
             "status": "RESEARCH" if not fixture else "FIXTURE",
             "classification": "fixture" if fixture else "evidence-backed",
             "research_as_of": case.as_of_date.isoformat(),
@@ -108,29 +91,35 @@ def build_company_artifact(ticker: str, repository_root: str | Path = ".") -> di
             "price": market.price,
             "market_equity": market.equity_value,
             "enterprise_value": market.enterprise_value,
+            "provenance": case.market_provenance.to_dict()
+            if case.market_provenance is not None
+            else {"source_mode": "fixture" if fixture else "legacy"},
         },
         "economics": {
             "revenue_ttm": audit.get("revenue"),
             "ebit_ttm": audit.get("ebit"),
-            "nopat": result.nopat,
-            "normalized_fcff": result.normalized_fcff,
+            "nopat": canonical.valuation["nopat"],
+            "normalized_fcff": canonical.valuation["normalized_fcff"],
             "invested_capital": case.invested_capital,
-            "roic": result.roic,
-            "wacc": cost.wacc,
-            "roic_minus_wacc": result.roic_minus_wacc,
-            "fcff_yield": result.fcff_yield,
+            "roic": canonical.valuation["roic"],
+            "wacc": canonical.valuation["wacc"],
+            "roic_minus_wacc": canonical.valuation["roic_minus_wacc"],
+            "fcff_yield": canonical.valuation["fcff_yield"],
         },
         "valuation": {
             "scenarios": scenarios,
-            "fcff_implied_discount_rate": result.fcff_implied_discount_rate,
-            "reverse_dcf_implied_growth": result.reverse_implied_growth,
+            "fcff_implied_discount_rate": canonical.market_comparison["fcff_implied_discount_rate"],
+            "reverse_dcf_implied_growth": canonical.reverse_valuation["implied_growth"],
             "expectations": {
-                "growth_difference_pp": result.expectation_growth_gap,
-                "discount_rate_difference_pp": result.fcff_implied_discount_rate - cost.wacc,
+                "growth_difference_pp": canonical.reverse_valuation["expectation_growth_gap"],
+                "discount_rate_difference_pp": cast(
+                    float, canonical.market_comparison["fcff_implied_discount_rate"]
+                )
+                - cost.wacc,
             },
         },
         "buy_zone": {
-            "fair_value": base["intrinsic_value"],
+            "fair_value": fair_value,
             "price_at_10_mos": cushion_prices["mos_10"],
             "price_at_20_mos": cushion_prices["mos_20"],
             "price_at_25_mos": cushion_prices["mos_25"],
@@ -138,9 +127,9 @@ def build_company_artifact(ticker: str, repository_root: str | Path = ".") -> di
         },
         "decision_zones": {
             "current_price": market.price,
-            "fair_value": base["intrinsic_value"],
+            "fair_value": fair_value,
             **cushion_prices,
-            "classification": price_value_classification(market.price, base["intrinsic_value"]),
+            "classification": price_value_classification(market.price, fair_value),
         },
         "decision": {
             "status": "RESEARCH" if not fixture else "FIXTURE",
@@ -167,15 +156,15 @@ def build_company_artifact(ticker: str, repository_root: str | Path = ".") -> di
             "fcff": {
                 "ebit": case.financial_inputs.ebit,
                 "tax_rate": case.financial_inputs.tax_rate,
-                "nopat": result.nopat,
+                "nopat": canonical.valuation["nopat"],
                 "da": case.financial_inputs.depreciation_amortization,
                 "capex": case.financial_inputs.capex,
                 "change_nwc": case.financial_inputs.change_in_nwc,
-                "reconstructed_fcff": result.reconstructed_fcff,
+                "reconstructed_fcff": canonical.valuation["reconstructed_fcff"],
                 "normalization_adjustments": sum(
                     item.amount for item in case.normalization_adjustments
                 ),
-                "normalized_fcff": result.normalized_fcff,
+                "normalized_fcff": canonical.valuation["normalized_fcff"],
             },
             "operating_nwc": None
             if fixture
@@ -207,6 +196,23 @@ def build_company_artifact(ticker: str, repository_root: str | Path = ".") -> di
     # The dashboard has one deterministic artifact.  Explainability is a
     # semantic projection of it, not a novice-only second dataset.
     artifact["explainability"] = explainability_contract(artifact)
+    # These values are deliberately projected, rather than independently
+    # serialized domain semantics by the dashboard.
+    artifact["identity"].update(
+        {
+            "ticker": canonical.security["ticker"],
+            "company_name": canonical.issuer["display_name"],
+            "research_as_of": canonical.research_as_of.isoformat(),
+        }
+    )
+    artifact["market"].update(
+        {
+            "price": canonical.market_comparison["price"],
+            "market_equity": canonical.market_comparison["market_equity"],
+            "enterprise_value": canonical.market_comparison["enterprise_value"],
+            "provenance": canonical.market_provenance.to_dict(),
+        }
+    )
     return artifact
 
 

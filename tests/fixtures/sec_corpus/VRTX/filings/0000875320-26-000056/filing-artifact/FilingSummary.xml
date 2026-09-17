@@ -1,0 +1,1307 @@
+<?xml version='1.0' encoding='utf-8'?>
+<FilingSummary>
+  <Version>3.25.4</Version>
+  <ProcessingTime/>
+  <ReportFormat>html</ReportFormat>
+  <ContextCount>392</ContextCount>
+  <ElementCount>600</ElementCount>
+  <EntityCount>1</EntityCount>
+  <FootnotesReported>false</FootnotesReported>
+  <SegmentCount>127</SegmentCount>
+  <ScenarioCount>0</ScenarioCount>
+  <TuplesReported>false</TuplesReported>
+  <UnitCount>12</UnitCount>
+  <MyReports>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R1.htm</HtmlFileName>
+      <LongName>0000001 - Document - Cover</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/Cover</Role>
+      <ShortName>Cover</ShortName>
+      <MenuCategory>Cover</MenuCategory>
+      <Position>1</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R2.htm</HtmlFileName>
+      <LongName>0000002 - Document - Audit Information</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AuditInformation</Role>
+      <ShortName>Audit Information</ShortName>
+      <MenuCategory>Cover</MenuCategory>
+      <Position>2</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R3.htm</HtmlFileName>
+      <LongName>9952151 - Statement - Consolidated Statements of Income (Loss)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/ConsolidatedStatementsofIncomeLoss</Role>
+      <ShortName>Consolidated Statements of Income (Loss)</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>3</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R4.htm</HtmlFileName>
+      <LongName>9952152 - Statement - Consolidated Statements of Comprehensive Income (Loss)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/ConsolidatedStatementsofComprehensiveIncomeLoss</Role>
+      <ShortName>Consolidated Statements of Comprehensive Income (Loss)</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>4</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R5.htm</HtmlFileName>
+      <LongName>9952153 - Statement - Consolidated Statements of Comprehensive Income (Loss) (Parenthetical)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/ConsolidatedStatementsofComprehensiveIncomeLossParenthetical</Role>
+      <ShortName>Consolidated Statements of Comprehensive Income (Loss) (Parenthetical)</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>5</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R6.htm</HtmlFileName>
+      <LongName>9952154 - Statement - Consolidated Balance Sheets</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/ConsolidatedBalanceSheets</Role>
+      <ShortName>Consolidated Balance Sheets</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>6</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R7.htm</HtmlFileName>
+      <LongName>9952155 - Statement - Consolidated Balance Sheets (Parenthetical)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/ConsolidatedBalanceSheetsParenthetical</Role>
+      <ShortName>Consolidated Balance Sheets (Parenthetical)</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>7</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R8.htm</HtmlFileName>
+      <LongName>9952156 - Statement - Consolidated Statements of Shareholders??? Equity</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/ConsolidatedStatementsofShareholdersEquity</Role>
+      <ShortName>Consolidated Statements of Shareholders??? Equity</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>8</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R9.htm</HtmlFileName>
+      <LongName>9952157 - Statement - Consolidated Statements of Cash Flows</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/ConsolidatedStatementsofCashFlows</Role>
+      <ShortName>Consolidated Statements of Cash Flows</ShortName>
+      <MenuCategory>Statements</MenuCategory>
+      <Position>9</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R10.htm</HtmlFileName>
+      <LongName>9952158 - Disclosure - Nature of Business and Accounting Policies</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/NatureofBusinessandAccountingPolicies</Role>
+      <ShortName>Nature of Business and Accounting Policies</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>10</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R11.htm</HtmlFileName>
+      <LongName>9952159 - Disclosure - Collaboration, License and Other Arrangements</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CollaborationLicenseandOtherArrangements</Role>
+      <ShortName>Collaboration, License and Other Arrangements</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>11</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R12.htm</HtmlFileName>
+      <LongName>9952160 - Disclosure - Earnings Per Share</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/EarningsPerShare</Role>
+      <ShortName>Earnings Per Share</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>12</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R13.htm</HtmlFileName>
+      <LongName>9952161 - Disclosure - Fair Value Measurements</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/FairValueMeasurements</Role>
+      <ShortName>Fair Value Measurements</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>13</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R14.htm</HtmlFileName>
+      <LongName>9952162 - Disclosure - Marketable Securities and Equity Investments</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestments</Role>
+      <ShortName>Marketable Securities and Equity Investments</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>14</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R15.htm</HtmlFileName>
+      <LongName>9952163 - Disclosure - Accumulated Other Comprehensive Income (Loss)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AccumulatedOtherComprehensiveIncomeLoss</Role>
+      <ShortName>Accumulated Other Comprehensive Income (Loss)</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>15</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R16.htm</HtmlFileName>
+      <LongName>9952164 - Disclosure - Hedging</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/Hedging</Role>
+      <ShortName>Hedging</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>16</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R17.htm</HtmlFileName>
+      <LongName>9952165 - Disclosure - Inventories</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/Inventories</Role>
+      <ShortName>Inventories</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>17</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R18.htm</HtmlFileName>
+      <LongName>9952166 - Disclosure - Property and Equipment</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/PropertyandEquipment</Role>
+      <ShortName>Property and Equipment</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>18</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R19.htm</HtmlFileName>
+      <LongName>9952167 - Disclosure - Goodwill and Other Intangible Assets</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/GoodwillandOtherIntangibleAssets</Role>
+      <ShortName>Goodwill and Other Intangible Assets</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>19</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R20.htm</HtmlFileName>
+      <LongName>9952168 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformation</Role>
+      <ShortName>Additional Balance Sheet &amp; Cash Flow Information</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>20</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R21.htm</HtmlFileName>
+      <LongName>9952169 - Disclosure - Leases</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/Leases</Role>
+      <ShortName>Leases</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>21</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R22.htm</HtmlFileName>
+      <LongName>9952170 - Disclosure - Common Stock, Preferred Stock and Equity Plans</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlans</Role>
+      <ShortName>Common Stock, Preferred Stock and Equity Plans</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>22</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R23.htm</HtmlFileName>
+      <LongName>9952171 - Disclosure - Stock-based Compensation Expense</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/StockbasedCompensationExpense</Role>
+      <ShortName>Stock-based Compensation Expense</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>23</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R24.htm</HtmlFileName>
+      <LongName>9952172 - Disclosure - Income Taxes</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/IncomeTaxes</Role>
+      <ShortName>Income Taxes</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>24</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R25.htm</HtmlFileName>
+      <LongName>9952173 - Disclosure - Commitments and Contingencies</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommitmentsandContingencies</Role>
+      <ShortName>Commitments and Contingencies</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>25</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R26.htm</HtmlFileName>
+      <LongName>9952174 - Disclosure - Segment Information</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/SegmentInformation</Role>
+      <ShortName>Segment Information</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>26</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R27.htm</HtmlFileName>
+      <LongName>995445 - Disclosure - Insider Trading Arrangements</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://xbrl.sec.gov/ecd/role/InsiderTradingArrangements</Role>
+      <ShortName>Insider Trading Arrangements</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>27</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R28.htm</HtmlFileName>
+      <LongName>995447 - Disclosure - Insider Trading Policies and Procedures</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://xbrl.sec.gov/ecd/role/InsiderTradingPoliciesProc</Role>
+      <ShortName>Insider Trading Policies and Procedures</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>28</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R29.htm</HtmlFileName>
+      <LongName>995550 - Disclosure - Cybersecurity Risk Management and Strategy Disclosure</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://xbrl.sec.gov/cyd/role/CybersecurityRiskManagementAndStrategyDisclosure</Role>
+      <ShortName>Cybersecurity Risk Management and Strategy Disclosure</ShortName>
+      <MenuCategory>Notes</MenuCategory>
+      <Position>29</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R30.htm</HtmlFileName>
+      <LongName>9955511 - Disclosure - Nature of Business and Accounting Policies (Policies)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesPolicies</Role>
+      <ShortName>Nature of Business and Accounting Policies (Policies)</ShortName>
+      <MenuCategory>Policies</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/NatureofBusinessandAccountingPolicies</ParentRole>
+      <Position>30</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R31.htm</HtmlFileName>
+      <LongName>9955512 - Disclosure - Nature of Business and Accounting Policies (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesTables</Role>
+      <ShortName>Nature of Business and Accounting Policies (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/NatureofBusinessandAccountingPolicies</ParentRole>
+      <Position>31</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R32.htm</HtmlFileName>
+      <LongName>9955513 - Disclosure - Collaboration, License and Other Arrangements (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CollaborationLicenseandOtherArrangementsTables</Role>
+      <ShortName>Collaboration, License and Other Arrangements (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/CollaborationLicenseandOtherArrangements</ParentRole>
+      <Position>32</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R33.htm</HtmlFileName>
+      <LongName>9955514 - Disclosure - Earnings Per Share (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/EarningsPerShareTables</Role>
+      <ShortName>Earnings Per Share (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/EarningsPerShare</ParentRole>
+      <Position>33</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R34.htm</HtmlFileName>
+      <LongName>9955515 - Disclosure - Fair Value Measurements (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/FairValueMeasurementsTables</Role>
+      <ShortName>Fair Value Measurements (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/FairValueMeasurements</ParentRole>
+      <Position>34</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R35.htm</HtmlFileName>
+      <LongName>9955516 - Disclosure - Marketable Securities and Equity Investments (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsTables</Role>
+      <ShortName>Marketable Securities and Equity Investments (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestments</ParentRole>
+      <Position>35</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R36.htm</HtmlFileName>
+      <LongName>9955517 - Disclosure - Accumulated Other Comprehensive Income (Loss) (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AccumulatedOtherComprehensiveIncomeLossTables</Role>
+      <ShortName>Accumulated Other Comprehensive Income (Loss) (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/AccumulatedOtherComprehensiveIncomeLoss</ParentRole>
+      <Position>36</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R37.htm</HtmlFileName>
+      <LongName>9955518 - Disclosure - Hedging (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/HedgingTables</Role>
+      <ShortName>Hedging (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/Hedging</ParentRole>
+      <Position>37</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R38.htm</HtmlFileName>
+      <LongName>9955519 - Disclosure - Inventories (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/InventoriesTables</Role>
+      <ShortName>Inventories (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/Inventories</ParentRole>
+      <Position>38</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R39.htm</HtmlFileName>
+      <LongName>9955520 - Disclosure - Property and Equipment (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/PropertyandEquipmentTables</Role>
+      <ShortName>Property and Equipment (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/PropertyandEquipment</ParentRole>
+      <Position>39</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R40.htm</HtmlFileName>
+      <LongName>9955521 - Disclosure - Goodwill and Other Intangible Assets (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/GoodwillandOtherIntangibleAssetsTables</Role>
+      <ShortName>Goodwill and Other Intangible Assets (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/GoodwillandOtherIntangibleAssets</ParentRole>
+      <Position>40</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R41.htm</HtmlFileName>
+      <LongName>9955522 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationTables</Role>
+      <ShortName>Additional Balance Sheet &amp; Cash Flow Information (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformation</ParentRole>
+      <Position>41</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R42.htm</HtmlFileName>
+      <LongName>9955523 - Disclosure - Leases (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/LeasesTables</Role>
+      <ShortName>Leases (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/Leases</ParentRole>
+      <Position>42</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R43.htm</HtmlFileName>
+      <LongName>9955524 - Disclosure - Common Stock, Preferred Stock and Equity Plans (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansTables</Role>
+      <ShortName>Common Stock, Preferred Stock and Equity Plans (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlans</ParentRole>
+      <Position>43</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R44.htm</HtmlFileName>
+      <LongName>9955525 - Disclosure - Stock-based Compensation Expense (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/StockbasedCompensationExpenseTables</Role>
+      <ShortName>Stock-based Compensation Expense (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/StockbasedCompensationExpense</ParentRole>
+      <Position>44</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R45.htm</HtmlFileName>
+      <LongName>9955526 - Disclosure - Income Taxes (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/IncomeTaxesTables</Role>
+      <ShortName>Income Taxes (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/IncomeTaxes</ParentRole>
+      <Position>45</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R46.htm</HtmlFileName>
+      <LongName>9955527 - Disclosure - Segment Information (Tables)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/SegmentInformationTables</Role>
+      <ShortName>Segment Information (Tables)</ShortName>
+      <MenuCategory>Tables</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/SegmentInformation</ParentRole>
+      <Position>46</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R47.htm</HtmlFileName>
+      <LongName>9955528 - Disclosure - Nature of Business and Accounting Policies - Revenue Recognition (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesRevenueRecognitionDetails</Role>
+      <ShortName>Nature of Business and Accounting Policies - Revenue Recognition (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>47</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R48.htm</HtmlFileName>
+      <LongName>9955529 - Disclosure - Nature of Business and Accounting Policies - Advertising Costs (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesAdvertisingCostsDetails</Role>
+      <ShortName>Nature of Business and Accounting Policies - Advertising Costs (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>48</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R49.htm</HtmlFileName>
+      <LongName>9955530 - Disclosure - Nature of Business and Accounting Policies - schedule of Property and Equipment (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesscheduleofPropertyandEquipmentDetails</Role>
+      <ShortName>Nature of Business and Accounting Policies - schedule of Property and Equipment (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>49</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R50.htm</HtmlFileName>
+      <LongName>9955531 - Disclosure - Nature of Business and Accounting Policies - Goodwill, Hedging Activities and Foreign Currency Gain (Loss) (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesGoodwillHedgingActivitiesandForeignCurrencyGainLossDetails</Role>
+      <ShortName>Nature of Business and Accounting Policies - Goodwill, Hedging Activities and Foreign Currency Gain (Loss) (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>50</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R51.htm</HtmlFileName>
+      <LongName>9955532 - Disclosure - Collaboration, License and Other Arrangements - Narrative (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CollaborationLicenseandOtherArrangementsNarrativeDetails</Role>
+      <ShortName>Collaboration, License and Other Arrangements - Narrative (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>51</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R52.htm</HtmlFileName>
+      <LongName>9955533 - Disclosure - Collaboration, License and Other Arrangements - Allocation of Consideration to the Assets and Liabilities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CollaborationLicenseandOtherArrangementsAllocationofConsiderationtotheAssetsandLiabilitiesDetails</Role>
+      <ShortName>Collaboration, License and Other Arrangements - Allocation of Consideration to the Assets and Liabilities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>52</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R53.htm</HtmlFileName>
+      <LongName>9955534 - Disclosure - Earnings Per Share - Schedule of Computation (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/EarningsPerShareScheduleofComputationDetails</Role>
+      <ShortName>Earnings Per Share - Schedule of Computation (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>53</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R54.htm</HtmlFileName>
+      <LongName>9955535 - Disclosure - Earnings Per Share - Schedule of Anti-dilutive Securities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/EarningsPerShareScheduleofAntidilutiveSecuritiesDetails</Role>
+      <ShortName>Earnings Per Share - Schedule of Anti-dilutive Securities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>54</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R55.htm</HtmlFileName>
+      <LongName>9955536 - Disclosure - Fair Value Measurements - Financial Assets and Liabilities Subject to Fair Value Measurements (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/FairValueMeasurementsFinancialAssetsandLiabilitiesSubjecttoFairValueMeasurementsDetails</Role>
+      <ShortName>Fair Value Measurements - Financial Assets and Liabilities Subject to Fair Value Measurements (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>55</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R56.htm</HtmlFileName>
+      <LongName>9955537 - Disclosure - Fair Value Measurements - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/FairValueMeasurementsAdditionalInformationDetails</Role>
+      <ShortName>Fair Value Measurements - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>56</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R57.htm</HtmlFileName>
+      <LongName>9955538 - Disclosure - Fair Value Measurements - Schedule of Fair Value of Contingent Consideration Liabilities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/FairValueMeasurementsScheduleofFairValueofContingentConsiderationLiabilitiesDetails</Role>
+      <ShortName>Fair Value Measurements - Schedule of Fair Value of Contingent Consideration Liabilities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>57</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R58.htm</HtmlFileName>
+      <LongName>9955539 - Disclosure - Marketable Securities and Equity Investments - Schedule of Cash Equivalents and Marketable Securities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsScheduleofCashEquivalentsandMarketableSecuritiesDetails</Role>
+      <ShortName>Marketable Securities and Equity Investments - Schedule of Cash Equivalents and Marketable Securities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>58</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R59.htm</HtmlFileName>
+      <LongName>9955540 - Disclosure - Marketable Securities and Equity Investments - Schedule of Available-for-Sale Debt Securities at Fair Value (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsScheduleofAvailableforSaleDebtSecuritiesatFairValueDetails</Role>
+      <ShortName>Marketable Securities and Equity Investments - Schedule of Available-for-Sale Debt Securities at Fair Value (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>59</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R60.htm</HtmlFileName>
+      <LongName>9955541 - Disclosure - Marketable Securities and Equity Investments - Available-for-Sale Debt Securities by Contractual Maturity (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsAvailableforSaleDebtSecuritiesbyContractualMaturityDetails</Role>
+      <ShortName>Marketable Securities and Equity Investments - Available-for-Sale Debt Securities by Contractual Maturity (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>60</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R61.htm</HtmlFileName>
+      <LongName>9955542 - Disclosure - Marketable Securities and Equity Investments - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsAdditionalInformationDetails</Role>
+      <ShortName>Marketable Securities and Equity Investments - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>61</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R62.htm</HtmlFileName>
+      <LongName>9955543 - Disclosure - Marketable Securities and Equity Investments - Net Unrealized Gains (Losses) (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsNetUnrealizedGainsLossesDetails</Role>
+      <ShortName>Marketable Securities and Equity Investments - Net Unrealized Gains (Losses) (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>62</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R63.htm</HtmlFileName>
+      <LongName>9955544 - Disclosure - Accumulated Other Comprehensive Income (Loss) (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AccumulatedOtherComprehensiveIncomeLossDetails</Role>
+      <ShortName>Accumulated Other Comprehensive Income (Loss) (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/AccumulatedOtherComprehensiveIncomeLossTables</ParentRole>
+      <Position>63</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R64.htm</HtmlFileName>
+      <LongName>9955545 - Disclosure - Hedging - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/HedgingAdditionalInformationDetails</Role>
+      <ShortName>Hedging - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>64</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R65.htm</HtmlFileName>
+      <LongName>9955546 - Disclosure - Hedging - Schedule of Notional Amount (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/HedgingScheduleofNotionalAmountDetails</Role>
+      <ShortName>Hedging - Schedule of Notional Amount (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>65</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R66.htm</HtmlFileName>
+      <LongName>9955547 - Disclosure - Hedging - Schedule of Cash Flow Hedging Instruments (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/HedgingScheduleofCashFlowHedgingInstrumentsDetails</Role>
+      <ShortName>Hedging - Schedule of Cash Flow Hedging Instruments (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>66</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R67.htm</HtmlFileName>
+      <LongName>9955548 - Disclosure - Hedging - Schedule of Derivative Fair Value (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/HedgingScheduleofDerivativeFairValueDetails</Role>
+      <ShortName>Hedging - Schedule of Derivative Fair Value (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>67</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R68.htm</HtmlFileName>
+      <LongName>9955549 - Disclosure - Hedging - Schedule of Offsetting Derivatives (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/HedgingScheduleofOffsettingDerivativesDetails</Role>
+      <ShortName>Hedging - Schedule of Offsetting Derivatives (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>68</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R69.htm</HtmlFileName>
+      <LongName>9955550 - Disclosure - Inventories (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/InventoriesDetails</Role>
+      <ShortName>Inventories (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/InventoriesTables</ParentRole>
+      <Position>69</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R70.htm</HtmlFileName>
+      <LongName>9955551 - Disclosure - Property and Equipment - Schedule of Property and Equipment, Net (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/PropertyandEquipmentScheduleofPropertyandEquipmentNetDetails</Role>
+      <ShortName>Property and Equipment - Schedule of Property and Equipment, Net (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>70</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R71.htm</HtmlFileName>
+      <LongName>9955552 - Disclosure - Property and Equipment - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/PropertyandEquipmentAdditionalInformationDetails</Role>
+      <ShortName>Property and Equipment - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>71</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R72.htm</HtmlFileName>
+      <LongName>9955553 - Disclosure - Goodwill and Other Intangible Assets - Schedule of Intangible Assets and Goodwill (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/GoodwillandOtherIntangibleAssetsScheduleofIntangibleAssetsandGoodwillDetails</Role>
+      <ShortName>Goodwill and Other Intangible Assets - Schedule of Intangible Assets and Goodwill (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>72</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R73.htm</HtmlFileName>
+      <LongName>9955554 - Disclosure - Goodwill and Other Intangible Assets - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/GoodwillandOtherIntangibleAssetsAdditionalInformationDetails</Role>
+      <ShortName>Goodwill and Other Intangible Assets - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>73</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R74.htm</HtmlFileName>
+      <LongName>9955555 - Disclosure - Goodwill and Other Intangible Assets - Schedule of Future Amortization Expense (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/GoodwillandOtherIntangibleAssetsScheduleofFutureAmortizationExpenseDetails</Role>
+      <ShortName>Goodwill and Other Intangible Assets - Schedule of Future Amortization Expense (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>74</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R75.htm</HtmlFileName>
+      <LongName>9955556 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Schedule of Cash, Cash Equivalents and Restricted Cash (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationScheduleofCashCashEquivalentsandRestrictedCashDetails</Role>
+      <ShortName>Additional Balance Sheet &amp; Cash Flow Information - Schedule of Cash, Cash Equivalents and Restricted Cash (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>75</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R76.htm</HtmlFileName>
+      <LongName>9955557 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Schedule of Prepaid Expenses and Other Current Assets (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationScheduleofPrepaidExpensesandOtherCurrentAssetsDetails</Role>
+      <ShortName>Additional Balance Sheet &amp; Cash Flow Information - Schedule of Prepaid Expenses and Other Current Assets (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>76</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R77.htm</HtmlFileName>
+      <LongName>9955558 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationAdditionalInformationDetails</Role>
+      <ShortName>Additional Balance Sheet &amp; Cash Flow Information - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>77</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R78.htm</HtmlFileName>
+      <LongName>9955559 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Schedule of Accrued Expenses (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationScheduleofAccruedExpensesDetails</Role>
+      <ShortName>Additional Balance Sheet &amp; Cash Flow Information - Schedule of Accrued Expenses (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>78</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R79.htm</HtmlFileName>
+      <LongName>9955560 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Schedule of Other Current Liabilities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationScheduleofOtherCurrentLiabilitiesDetails</Role>
+      <ShortName>Additional Balance Sheet &amp; Cash Flow Information - Schedule of Other Current Liabilities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>79</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R80.htm</HtmlFileName>
+      <LongName>9955561 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Schedule of Other Long Term Liabilities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationScheduleofOtherLongTermLiabilitiesDetails</Role>
+      <ShortName>Additional Balance Sheet &amp; Cash Flow Information - Schedule of Other Long Term Liabilities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>80</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R81.htm</HtmlFileName>
+      <LongName>9955562 - Disclosure - Leases - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/LeasesAdditionalInformationDetails</Role>
+      <ShortName>Leases - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>81</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R82.htm</HtmlFileName>
+      <LongName>9955563 - Disclosure - Leases - Schedule of Components of Lease Expense (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/LeasesScheduleofComponentsofLeaseExpenseDetails</Role>
+      <ShortName>Leases - Schedule of Components of Lease Expense (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>82</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R83.htm</HtmlFileName>
+      <LongName>9955564 - Disclosure - Leases - Schedule of Balance Sheet Classification of Lease Assets and Liabilities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/LeasesScheduleofBalanceSheetClassificationofLeaseAssetsandLiabilitiesDetails</Role>
+      <ShortName>Leases - Schedule of Balance Sheet Classification of Lease Assets and Liabilities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>83</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R84.htm</HtmlFileName>
+      <LongName>9955565 - Disclosure - Leases -Schedule of Maturities of Operating and Financing Lease Liabilities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/LeasesScheduleofMaturitiesofOperatingandFinancingLeaseLiabilitiesDetails</Role>
+      <ShortName>Leases -Schedule of Maturities of Operating and Financing Lease Liabilities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>84</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R85.htm</HtmlFileName>
+      <LongName>9955566 - Disclosure - Leases - Schedule of Weighted-Average Remaining Lease Terms and Discount Rates (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/LeasesScheduleofWeightedAverageRemainingLeaseTermsandDiscountRatesDetails</Role>
+      <ShortName>Leases - Schedule of Weighted-Average Remaining Lease Terms and Discount Rates (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>85</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R86.htm</HtmlFileName>
+      <LongName>9955567 - Disclosure - Leases - Schedule of Supplemental Cash Flow Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/LeasesScheduleofSupplementalCashFlowInformationDetails</Role>
+      <ShortName>Leases - Schedule of Supplemental Cash Flow Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>86</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R87.htm</HtmlFileName>
+      <LongName>9955568 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Common Stock and Preferred Stock (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansCommonStockandPreferredStockDetails</Role>
+      <ShortName>Common Stock, Preferred Stock and Equity Plans - Common Stock and Preferred Stock (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>87</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R88.htm</HtmlFileName>
+      <LongName>9955569 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Share Repurchase Program (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansShareRepurchaseProgramDetails</Role>
+      <ShortName>Common Stock, Preferred Stock and Equity Plans - Share Repurchase Program (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>88</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R89.htm</HtmlFileName>
+      <LongName>9955570 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Restricted Stock and Restricted Stock Units (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansRestrictedStockandRestrictedStockUnitsDetails</Role>
+      <ShortName>Common Stock, Preferred Stock and Equity Plans - Restricted Stock and Restricted Stock Units (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>89</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R90.htm</HtmlFileName>
+      <LongName>9955571 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Performance-based RSUs (PSUs) (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansPerformancebasedRSUsPSUsDetails</Role>
+      <ShortName>Common Stock, Preferred Stock and Equity Plans - Performance-based RSUs (PSUs) (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>90</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R91.htm</HtmlFileName>
+      <LongName>9955572 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Outstanding and Exercisable Options (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansOutstandingandExercisableOptionsDetails</Role>
+      <ShortName>Common Stock, Preferred Stock and Equity Plans - Outstanding and Exercisable Options (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>91</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R92.htm</HtmlFileName>
+      <LongName>9955573 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Stock Options Outstanding and Exercisable (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansStockOptionsOutstandingandExercisableDetails</Role>
+      <ShortName>Common Stock, Preferred Stock and Equity Plans - Stock Options Outstanding and Exercisable (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>92</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R93.htm</HtmlFileName>
+      <LongName>9955574 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Employee Stock Purchase Plan (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansEmployeeStockPurchasePlanDetails</Role>
+      <ShortName>Common Stock, Preferred Stock and Equity Plans - Employee Stock Purchase Plan (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>93</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R94.htm</HtmlFileName>
+      <LongName>9955575 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Employee Benefits (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansEmployeeBenefitsDetails</Role>
+      <ShortName>Common Stock, Preferred Stock and Equity Plans - Employee Benefits (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>94</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R95.htm</HtmlFileName>
+      <LongName>9955576 - Disclosure - Stock-based Compensation Expense - Schedule of Stock-based Compensation Expense by Line Item (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/StockbasedCompensationExpenseScheduleofStockbasedCompensationExpensebyLineItemDetails</Role>
+      <ShortName>Stock-based Compensation Expense - Schedule of Stock-based Compensation Expense by Line Item (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>95</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R96.htm</HtmlFileName>
+      <LongName>9955577 - Disclosure - Stock-based Compensation Expense - Schedule of Unrecognized Stock-Based Compensation Expense (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/StockbasedCompensationExpenseScheduleofUnrecognizedStockBasedCompensationExpenseDetails</Role>
+      <ShortName>Stock-based Compensation Expense - Schedule of Unrecognized Stock-Based Compensation Expense (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>96</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R97.htm</HtmlFileName>
+      <LongName>9955578 - Disclosure - Stock-based Compensation Expense - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/StockbasedCompensationExpenseAdditionalInformationDetails</Role>
+      <ShortName>Stock-based Compensation Expense - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>97</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R98.htm</HtmlFileName>
+      <LongName>9955579 - Disclosure - Stock-based Compensation Expense - Schedule of weighted-average Assumptions (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/StockbasedCompensationExpenseScheduleofweightedaverageAssumptionsDetails</Role>
+      <ShortName>Stock-based Compensation Expense - Schedule of weighted-average Assumptions (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>98</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R99.htm</HtmlFileName>
+      <LongName>9955580 - Disclosure - Income Taxes - Schedule of Components of Income and Provision for (Benefit from) Income Taxes (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/IncomeTaxesScheduleofComponentsofIncomeandProvisionforBenefitfromIncomeTaxesDetails</Role>
+      <ShortName>Income Taxes - Schedule of Components of Income and Provision for (Benefit from) Income Taxes (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>99</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R100.htm</HtmlFileName>
+      <LongName>9955581 - Disclosure - Income Taxes - Schedule of Effective Income Tax Reconciliation (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/IncomeTaxesScheduleofEffectiveIncomeTaxReconciliationDetails</Role>
+      <ShortName>Income Taxes - Schedule of Effective Income Tax Reconciliation (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>100</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R101.htm</HtmlFileName>
+      <LongName>9955582 - Disclosure - Income Taxes - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/IncomeTaxesAdditionalInformationDetails</Role>
+      <ShortName>Income Taxes - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>101</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R102.htm</HtmlFileName>
+      <LongName>9955583 - Disclosure - Income Taxes - Schedule of Deferred Tax Assets and Liabilities (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/IncomeTaxesScheduleofDeferredTaxAssetsandLiabilitiesDetails</Role>
+      <ShortName>Income Taxes - Schedule of Deferred Tax Assets and Liabilities (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>102</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R103.htm</HtmlFileName>
+      <LongName>9955584 - Disclosure - Income Taxes - Net Operating Losses, Capital Losses, And Tax Credit Carryforwards (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/IncomeTaxesNetOperatingLossesCapitalLossesAndTaxCreditCarryforwardsDetails</Role>
+      <ShortName>Income Taxes - Net Operating Losses, Capital Losses, And Tax Credit Carryforwards (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>103</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R104.htm</HtmlFileName>
+      <LongName>9955585 - Disclosure - Income Taxes - Cash Paid for Income Taxes (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/IncomeTaxesCashPaidforIncomeTaxesDetails</Role>
+      <ShortName>Income Taxes - Cash Paid for Income Taxes (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>104</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R105.htm</HtmlFileName>
+      <LongName>9955586 - Disclosure - Income Taxes - Unrecognized Tax Benefits (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/IncomeTaxesUnrecognizedTaxBenefitsDetails</Role>
+      <ShortName>Income Taxes - Unrecognized Tax Benefits (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>105</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R106.htm</HtmlFileName>
+      <LongName>9955587 - Disclosure - Commitments and Contingencies (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/CommitmentsandContingenciesDetails</Role>
+      <ShortName>Commitments and Contingencies (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <ParentRole>http://www.vrtx.com/role/CommitmentsandContingencies</ParentRole>
+      <Position>106</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R107.htm</HtmlFileName>
+      <LongName>9955588 - Disclosure - Segment Information - Additional Information (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/SegmentInformationAdditionalInformationDetails</Role>
+      <ShortName>Segment Information - Additional Information (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>107</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R108.htm</HtmlFileName>
+      <LongName>9955589 - Disclosure - Segment Information - Schedule of Revenues by Product (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/SegmentInformationScheduleofRevenuesbyProductDetails</Role>
+      <ShortName>Segment Information - Schedule of Revenues by Product (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>108</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R109.htm</HtmlFileName>
+      <LongName>9955590 - Disclosure - Segment Information - Schedule of Revenue by Geographic Location (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/SegmentInformationScheduleofRevenuebyGeographicLocationDetails</Role>
+      <ShortName>Segment Information - Schedule of Revenue by Geographic Location (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>109</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R110.htm</HtmlFileName>
+      <LongName>9955591 - Disclosure - Segment Information - Schedule of Significant Customers (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/SegmentInformationScheduleofSignificantCustomersDetails</Role>
+      <ShortName>Segment Information - Schedule of Significant Customers (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>110</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R111.htm</HtmlFileName>
+      <LongName>9955592 - Disclosure - Segment Information - Schedule of Significant Segment Expenses (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/SegmentInformationScheduleofSignificantSegmentExpensesDetails</Role>
+      <ShortName>Segment Information - Schedule of Significant Segment Expenses (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>111</Position>
+    </Report>
+    <Report instance="vrtx-20251231.htm">
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <HtmlFileName>R112.htm</HtmlFileName>
+      <LongName>9955593 - Disclosure - Segment Information - Schedule of Property and Equipment, Net by Location (Details)</LongName>
+      <ReportType>Sheet</ReportType>
+      <Role>http://www.vrtx.com/role/SegmentInformationScheduleofPropertyandEquipmentNetbyLocationDetails</Role>
+      <ShortName>Segment Information - Schedule of Property and Equipment, Net by Location (Details)</ShortName>
+      <MenuCategory>Details</MenuCategory>
+      <Position>112</Position>
+    </Report>
+    <Report>
+      <IsDefault>false</IsDefault>
+      <HasEmbeddedReports>false</HasEmbeddedReports>
+      <LongName>All Reports</LongName>
+      <ReportType>Book</ReportType>
+      <ShortName>All Reports</ShortName>
+    </Report>
+  </MyReports>
+  <InputFiles>
+    <File doctype="10-K" isDefinitelyFs="true" isUsgaap="true" original="vrtx-20251231.htm">vrtx-20251231.htm</File>
+    <File>vrtx-20251231.xsd</File>
+    <File>vrtx-20251231_cal.xml</File>
+    <File>vrtx-20251231_def.xml</File>
+    <File>vrtx-20251231_lab.xml</File>
+    <File>vrtx-20251231_pre.xml</File>
+  </InputFiles>
+  <SupplementalFiles>
+    <File>vrtx-20251231_g1.jpg</File>
+    <File>vrtx-20251231_g10.jpg</File>
+    <File>vrtx-20251231_g11.jpg</File>
+    <File>vrtx-20251231_g12.gif</File>
+    <File>vrtx-20251231_g13.gif</File>
+    <File>vrtx-20251231_g2.jpg</File>
+    <File>vrtx-20251231_g3.jpg</File>
+    <File>vrtx-20251231_g4.jpg</File>
+    <File>vrtx-20251231_g5.jpg</File>
+    <File>vrtx-20251231_g6.jpg</File>
+    <File>vrtx-20251231_g7.jpg</File>
+    <File>vrtx-20251231_g8.jpg</File>
+    <File>vrtx-20251231_g9.jpg</File>
+  </SupplementalFiles>
+  <BaseTaxonomies>
+    <BaseTaxonomy items="2">http://fasb.org/srt/2025</BaseTaxonomy>
+    <BaseTaxonomy items="1446">http://fasb.org/us-gaap/2025</BaseTaxonomy>
+    <BaseTaxonomy items="16">http://xbrl.sec.gov/cyd/2025</BaseTaxonomy>
+    <BaseTaxonomy items="38">http://xbrl.sec.gov/dei/2025</BaseTaxonomy>
+    <BaseTaxonomy items="33">http://xbrl.sec.gov/ecd/2025</BaseTaxonomy>
+  </BaseTaxonomies>
+  <HasPresentationLinkbase>true</HasPresentationLinkbase>
+  <HasCalculationLinkbase>true</HasCalculationLinkbase>
+</FilingSummary>

@@ -1,0 +1,350 @@
+{
+  "CIK": "0000909832",
+  "evidence_notes": [
+    "Frozen companyfacts and selected filing inline XBRL were reviewed; no dimensional observation is selected."
+  ],
+  "metrics": [
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000909832-25-000101",
+          "end": "2025-08-31",
+          "filed": "2025-10-08",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-02",
+          "val": 275235000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 275235000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-08",
+      "filing_form": "10-K",
+      "metric": "revenue",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-08-31",
+        "start_date": "2024-09-02"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-08-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000909832-25-000101",
+      "source_artifact_path": "filings/0000909832-25-000101/filing-artifact/cost-20250831.htm",
+      "source_artifact_sha256": "2cf71f4336c8f36b008a584403551d95ab3b7e4addc9179a99b62029810f7c9a",
+      "source_concept_qname": "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax",
+      "taxonomy": "us-gaap",
+      "ticker": "COST"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000909832-25-000101",
+          "end": "2025-08-31",
+          "filed": "2025-10-08",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-02",
+          "val": 10383000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 10383000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-08",
+      "filing_form": "10-K",
+      "metric": "operating_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-08-31",
+        "start_date": "2024-09-02"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-08-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000909832-25-000101",
+      "source_artifact_path": "filings/0000909832-25-000101/filing-artifact/cost-20250831.htm",
+      "source_artifact_sha256": "2cf71f4336c8f36b008a584403551d95ab3b7e4addc9179a99b62029810f7c9a",
+      "source_concept_qname": "us-gaap:OperatingIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "COST"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000909832-25-000101",
+          "end": "2025-08-31",
+          "filed": "2025-10-08",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-02",
+          "val": 8099000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 8099000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-08",
+      "filing_form": "10-K",
+      "metric": "net_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2025-08-31",
+        "start_date": "2024-09-02"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-08-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000909832-25-000101",
+      "source_artifact_path": "filings/0000909832-25-000101/filing-artifact/cost-20250831.htm",
+      "source_artifact_sha256": "2cf71f4336c8f36b008a584403551d95ab3b7e4addc9179a99b62029810f7c9a",
+      "source_concept_qname": "us-gaap:NetIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "COST"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000909832-25-000101",
+          "end": "2025-08-31",
+          "filed": "2025-10-08",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 14161000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 14161000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-08",
+      "filing_form": "10-K",
+      "metric": "cash_and_equivalents",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-08-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-08-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000909832-25-000101",
+      "source_artifact_path": "filings/0000909832-25-000101/filing-artifact/cost-20250831.htm",
+      "source_artifact_sha256": "2cf71f4336c8f36b008a584403551d95ab3b7e4addc9179a99b62029810f7c9a",
+      "source_concept_qname": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+      "taxonomy": "us-gaap",
+      "ticker": "COST"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000909832-25-000101",
+          "end": "2025-08-31",
+          "filed": "2025-10-08",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 5805000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 5805000000,
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-08",
+      "filing_form": "10-K",
+      "metric": "total_debt",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-08-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-08-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000909832-25-000101",
+      "source_artifact_path": "filings/0000909832-25-000101/filing-artifact/cost-20250831.htm",
+      "source_artifact_sha256": "2cf71f4336c8f36b008a584403551d95ab3b7e4addc9179a99b62029810f7c9a",
+      "source_concept_qname": "us-gaap:DebtInstrumentCarryingAmount",
+      "taxonomy": "us-gaap",
+      "ticker": "COST"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000909832-25-000101",
+          "end": "2025-08-31",
+          "filed": "2025-10-08",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 77099000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 77099000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-08",
+      "filing_form": "10-K",
+      "metric": "total_assets",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-08-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-08-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000909832-25-000101",
+      "source_artifact_path": "filings/0000909832-25-000101/filing-artifact/cost-20250831.htm",
+      "source_artifact_sha256": "2cf71f4336c8f36b008a584403551d95ab3b7e4addc9179a99b62029810f7c9a",
+      "source_concept_qname": "us-gaap:Assets",
+      "taxonomy": "us-gaap",
+      "ticker": "COST"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000909832-25-000101",
+          "end": "2025-08-31",
+          "filed": "2025-10-08",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 47935000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 47935000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-08",
+      "filing_form": "10-K",
+      "metric": "total_liabilities",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-08-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-08-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000909832-25-000101",
+      "source_artifact_path": "filings/0000909832-25-000101/filing-artifact/cost-20250831.htm",
+      "source_artifact_sha256": "2cf71f4336c8f36b008a584403551d95ab3b7e4addc9179a99b62029810f7c9a",
+      "source_concept_qname": "us-gaap:Liabilities",
+      "taxonomy": "us-gaap",
+      "ticker": "COST"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000909832-25-000101",
+          "end": "2025-08-31",
+          "filed": "2025-10-08",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2025,
+          "start": null,
+          "val": 29164000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 29164000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-08",
+      "filing_form": "10-K",
+      "metric": "shareholders_equity",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2025-08-31"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2025-08-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000909832-25-000101",
+      "source_artifact_path": "filings/0000909832-25-000101/filing-artifact/cost-20250831.htm",
+      "source_artifact_sha256": "2cf71f4336c8f36b008a584403551d95ab3b7e4addc9179a99b62029810f7c9a",
+      "source_concept_qname": "us-gaap:StockholdersEquity",
+      "taxonomy": "us-gaap",
+      "ticker": "COST"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0000909832-25-000101",
+          "end": "2025-08-31",
+          "filed": "2025-10-08",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2025,
+          "start": "2024-09-02",
+          "val": 444803000
+        },
+        "path": "companyfacts.json",
+        "sha256": "71a4fd99c86f27c3aa27b8f05b3a9705c16f0060b425395bb1a367ce239b7d1f"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 444803000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2025-10-08",
+      "filing_form": "10-K",
+      "metric": "diluted_shares",
+      "normalized_unit": "shares",
+      "period": {
+        "end_date": "2025-08-31",
+        "start_date": "2024-09-02"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2025-08-31",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0000909832-25-000101",
+      "source_artifact_path": "filings/0000909832-25-000101/filing-artifact/cost-20250831.htm",
+      "source_artifact_sha256": "2cf71f4336c8f36b008a584403551d95ab3b7e4addc9179a99b62029810f7c9a",
+      "source_concept_qname": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding",
+      "taxonomy": "us-gaap",
+      "ticker": "COST"
+    }
+  ],
+  "schema_version": "canonical-golden-v1",
+  "source_corpus_version": "sec-corpus-v2",
+  "source_issuer_manifest_sha256": "834d2a3f2ffb38bc3839cfb8bbed1ddfd180b6c9d9301056d50aea05c5770eaf",
+  "target_fiscal_year": 2025,
+  "target_report_date": "2025-08-31",
+  "ticker": "COST"
+}

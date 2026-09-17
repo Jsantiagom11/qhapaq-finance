@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Local daemon lifecycle only. Qhapaq owns provider preflight and model unload.
+set -euo pipefail
+
+service_bin="${QHAPAQ_SYSTEMCTL_BIN:-systemctl}"
+qhapaq_bin="${QHAPAQ_BIN:-qhapaq}"
+started=0
+
+cleanup() {
+  status=$?
+  if [ "$started" -eq 1 ]; then
+    if ! "$service_bin" stop ollama.service; then
+      printf '%s\n' 'warning: Ollama service teardown failed' >&2
+    fi
+  fi
+  exit "$status"
+}
+trap cleanup EXIT INT TERM
+
+if [ "$#" -lt 2 ] || [ "$1" != "investigate" ]; then
+  printf '%s\n' 'usage: qhapaq-local-agent investigate SECURITY [Qhapaq investigate options]' >&2
+  exit 64
+fi
+
+"$service_bin" start ollama.service
+started=1
+"$service_bin" is-active --quiet ollama.service
+"$qhapaq_bin" "$@" --local

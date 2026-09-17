@@ -1,0 +1,365 @@
+{
+  "CIK": "0001045810",
+  "evidence_notes": [
+    "Frozen companyfacts and selected filing inline XBRL were reviewed; no dimensional observation is selected."
+  ],
+  "metrics": [
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001045810-26-000021",
+          "end": "2026-01-25",
+          "filed": "2026-02-25",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2026,
+          "start": "2025-01-27",
+          "val": 215938000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 215938000000,
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-25",
+      "filing_form": "10-K",
+      "metric": "revenue",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2026-01-25",
+        "start_date": "2025-01-27"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2026-01-25",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001045810-26-000021",
+      "source_artifact_path": "filings/0001045810-26-000021/filing-artifact/nvda-20260125.htm",
+      "source_artifact_sha256": "73d81f5a111abcf72426c840871e76f5f5edc9631f436d495a86b6f87306d58b",
+      "source_concept_qname": "us-gaap:Revenues",
+      "taxonomy": "us-gaap",
+      "ticker": "NVDA"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001045810-26-000021",
+          "end": "2026-01-25",
+          "filed": "2026-02-25",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2026,
+          "start": "2025-01-27",
+          "val": 130387000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 130387000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-25",
+      "filing_form": "10-K",
+      "metric": "operating_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2026-01-25",
+        "start_date": "2025-01-27"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2026-01-25",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001045810-26-000021",
+      "source_artifact_path": "filings/0001045810-26-000021/filing-artifact/nvda-20260125.htm",
+      "source_artifact_sha256": "73d81f5a111abcf72426c840871e76f5f5edc9631f436d495a86b6f87306d58b",
+      "source_concept_qname": "us-gaap:OperatingIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "NVDA"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001045810-26-000021",
+          "end": "2026-01-25",
+          "filed": "2026-02-25",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2026,
+          "start": "2025-01-27",
+          "val": 120067000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 120067000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-25",
+      "filing_form": "10-K",
+      "metric": "net_income",
+      "normalized_unit": "USD",
+      "period": {
+        "end_date": "2026-01-25",
+        "start_date": "2025-01-27"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2026-01-25",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001045810-26-000021",
+      "source_artifact_path": "filings/0001045810-26-000021/filing-artifact/nvda-20260125.htm",
+      "source_artifact_sha256": "73d81f5a111abcf72426c840871e76f5f5edc9631f436d495a86b6f87306d58b",
+      "source_concept_qname": "us-gaap:NetIncomeLoss",
+      "taxonomy": "us-gaap",
+      "ticker": "NVDA"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001045810-26-000021",
+          "end": "2026-01-25",
+          "filed": "2026-02-25",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2026,
+          "start": null,
+          "val": 10605000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 10605000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-25",
+      "filing_form": "10-K",
+      "metric": "cash_and_equivalents",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2026-01-25"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2026-01-25",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001045810-26-000021",
+      "source_artifact_path": "filings/0001045810-26-000021/filing-artifact/nvda-20260125.htm",
+      "source_artifact_sha256": "73d81f5a111abcf72426c840871e76f5f5edc9631f436d495a86b6f87306d58b",
+      "source_concept_qname": "us-gaap:CashAndCashEquivalentsAtCarryingValue",
+      "taxonomy": "us-gaap",
+      "ticker": "NVDA"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": null,
+          "end": null,
+          "filed": null,
+          "form": null,
+          "fp": null,
+          "frame": null,
+          "fy": null,
+          "start": null,
+          "val": null
+        },
+        "path": "companyfacts.json",
+        "sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff"
+      },
+      "derivation": {
+        "components": [
+          {
+            "source_concept_qname": "us-gaap:LongTermDebtCurrent",
+            "unit": "USD",
+            "value": 999000000
+          },
+          {
+            "source_concept_qname": "us-gaap:LongTermDebtNoncurrent",
+            "unit": "USD",
+            "value": 7469000000
+          }
+        ],
+        "operator": "sum"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 8468000000,
+      "expected_resolution_method": "DERIVED",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-25",
+      "filing_form": "10-K",
+      "metric": "total_debt",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2026-01-25"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2026-01-25",
+      "resolution_rationale": "LongTermDebtCurrent=999000000 + LongTermDebtNoncurrent=7469000000",
+      "source_accession": "0001045810-26-000021",
+      "source_artifact_path": "filings/0001045810-26-000021/filing-artifact/nvda-20260125.htm",
+      "source_artifact_sha256": "73d81f5a111abcf72426c840871e76f5f5edc9631f436d495a86b6f87306d58b",
+      "source_concept_qname": "us-gaap:DerivedLongTermDebt",
+      "taxonomy": "us-gaap",
+      "ticker": "NVDA"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001045810-26-000021",
+          "end": "2026-01-25",
+          "filed": "2026-02-25",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2026,
+          "start": null,
+          "val": 206803000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 206803000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-25",
+      "filing_form": "10-K",
+      "metric": "total_assets",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2026-01-25"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2026-01-25",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001045810-26-000021",
+      "source_artifact_path": "filings/0001045810-26-000021/filing-artifact/nvda-20260125.htm",
+      "source_artifact_sha256": "73d81f5a111abcf72426c840871e76f5f5edc9631f436d495a86b6f87306d58b",
+      "source_concept_qname": "us-gaap:Assets",
+      "taxonomy": "us-gaap",
+      "ticker": "NVDA"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001045810-26-000021",
+          "end": "2026-01-25",
+          "filed": "2026-02-25",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2026,
+          "start": null,
+          "val": 49510000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 49510000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-25",
+      "filing_form": "10-K",
+      "metric": "total_liabilities",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2026-01-25"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2026-01-25",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001045810-26-000021",
+      "source_artifact_path": "filings/0001045810-26-000021/filing-artifact/nvda-20260125.htm",
+      "source_artifact_sha256": "73d81f5a111abcf72426c840871e76f5f5edc9631f436d495a86b6f87306d58b",
+      "source_concept_qname": "us-gaap:Liabilities",
+      "taxonomy": "us-gaap",
+      "ticker": "NVDA"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001045810-26-000021",
+          "end": "2026-01-25",
+          "filed": "2026-02-25",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": null,
+          "fy": 2026,
+          "start": null,
+          "val": 157293000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 157293000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-25",
+      "filing_form": "10-K",
+      "metric": "shareholders_equity",
+      "normalized_unit": "USD",
+      "period": {
+        "instant": "2026-01-25"
+      },
+      "period_kind": "INSTANT",
+      "report_date": "2026-01-25",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001045810-26-000021",
+      "source_artifact_path": "filings/0001045810-26-000021/filing-artifact/nvda-20260125.htm",
+      "source_artifact_sha256": "73d81f5a111abcf72426c840871e76f5f5edc9631f436d495a86b6f87306d58b",
+      "source_concept_qname": "us-gaap:StockholdersEquity",
+      "taxonomy": "us-gaap",
+      "ticker": "NVDA"
+    },
+    {
+      "companyfacts_corroboration": {
+        "fact_identity": {
+          "accn": "0001045810-26-000021",
+          "end": "2026-01-25",
+          "filed": "2026-02-25",
+          "form": "10-K",
+          "fp": "FY",
+          "frame": "CY2025",
+          "fy": 2026,
+          "start": "2025-01-27",
+          "val": 24514000000
+        },
+        "path": "companyfacts.json",
+        "sha256": "19ef503a5770f5660964b3c3aea6937579d9b359da344afe6a9adf59c63d26ff"
+      },
+      "dimensional_context": "consolidated entity-level; no dimensions used",
+      "expected_normalized_value": 24514000000,
+      "expected_resolution_method": "STANDARD_CONCEPT",
+      "expected_status": "RESOLVED",
+      "filed_date": "2026-02-25",
+      "filing_form": "10-K",
+      "metric": "diluted_shares",
+      "normalized_unit": "shares",
+      "period": {
+        "end_date": "2026-01-25",
+        "start_date": "2025-01-27"
+      },
+      "period_kind": "DURATION",
+      "report_date": "2026-01-25",
+      "resolution_rationale": "Selected consolidated observation corroborates companyfacts and filing inline XBRL.",
+      "source_accession": "0001045810-26-000021",
+      "source_artifact_path": "filings/0001045810-26-000021/filing-artifact/nvda-20260125.htm",
+      "source_artifact_sha256": "73d81f5a111abcf72426c840871e76f5f5edc9631f436d495a86b6f87306d58b",
+      "source_concept_qname": "us-gaap:WeightedAverageNumberOfDilutedSharesOutstanding",
+      "taxonomy": "us-gaap",
+      "ticker": "NVDA"
+    }
+  ],
+  "schema_version": "canonical-golden-v1",
+  "source_corpus_version": "sec-corpus-v2",
+  "source_issuer_manifest_sha256": "aa0b13043cbfbbb62cebe24efa39cd1a5748b4d56746126e2f439147b7411dd0",
+  "target_fiscal_year": 2026,
+  "target_report_date": "2026-01-25",
+  "ticker": "NVDA"
+}

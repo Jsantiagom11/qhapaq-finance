@@ -1,0 +1,857 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--XBRL Document Created with the Workiva Platform-->
+<!--Copyright 2026 Workiva-->
+<!--r:d2a6a468-fc2a-4ef7-9bff-3d3bd1ea728c,g:33077bb3-c262-4d31-ace6-96892e272ed5-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:vrtx="http://www.vrtx.com/20251231" xmlns:xbrli="http://www.xbrl.org/2003/instance" xmlns:dtr-types="http://www.xbrl.org/dtr/type/2024-01-31" xmlns:xbrldt="http://xbrl.org/2005/xbrldt" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.vrtx.com/20251231">
+  <xs:import namespace="http://fasb.org/srt/2025" schemaLocation="https://xbrl.fasb.org/srt/2025/elts/srt-2025.xsd"/>
+  <xs:import namespace="http://fasb.org/us-gaap/2025" schemaLocation="https://xbrl.fasb.org/us-gaap/2025/elts/us-gaap-2025.xsd"/>
+  <xs:import namespace="http://www.xbrl.org/2003/instance" schemaLocation="http://www.xbrl.org/2003/xbrl-instance-2003-12-31.xsd"/>
+  <xs:import namespace="http://www.xbrl.org/2003/linkbase" schemaLocation="http://www.xbrl.org/2003/xbrl-linkbase-2003-12-31.xsd"/>
+  <xs:import namespace="http://www.xbrl.org/dtr/type/2024-01-31" schemaLocation="https://www.xbrl.org/dtr/type/2024-01-31/types.xsd"/>
+  <xs:import namespace="http://xbrl.org/2005/xbrldt" schemaLocation="http://www.xbrl.org/2005/xbrldt-2005.xsd"/>
+  <xs:import namespace="http://xbrl.sec.gov/country/2025" schemaLocation="https://xbrl.sec.gov/country/2025/country-2025.xsd"/>
+  <xs:import namespace="http://xbrl.sec.gov/currency/2025" schemaLocation="https://xbrl.sec.gov/currency/2025/currency-2025.xsd"/>
+  <xs:import namespace="http://xbrl.sec.gov/cyd-af-sub/2025" schemaLocation="https://xbrl.sec.gov/cyd/2025/cyd-af-sub-2025.xsd"/>
+  <xs:import namespace="http://xbrl.sec.gov/dei/2025" schemaLocation="https://xbrl.sec.gov/dei/2025/dei-2025.xsd"/>
+  <xs:import namespace="http://xbrl.sec.gov/ecd/2025" schemaLocation="https://xbrl.sec.gov/ecd/2025/ecd-2025.xsd"/>
+  <xs:annotation>
+    <xs:appinfo>
+      <link:linkbaseRef xmlns:xlink="http://www.w3.org/1999/xlink" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="vrtx-20251231_pre.xml" xlink:role="http://www.xbrl.org/2003/role/presentationLinkbaseRef" xlink:type="simple"/>
+      <link:linkbaseRef xmlns:xlink="http://www.w3.org/1999/xlink" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="vrtx-20251231_def.xml" xlink:role="http://www.xbrl.org/2003/role/definitionLinkbaseRef" xlink:type="simple"/>
+      <link:linkbaseRef xmlns:xlink="http://www.w3.org/1999/xlink" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="vrtx-20251231_lab.xml" xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef" xlink:type="simple"/>
+      <link:linkbaseRef xmlns:xlink="http://www.w3.org/1999/xlink" xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="vrtx-20251231_cal.xml" xlink:role="http://www.xbrl.org/2003/role/calculationLinkbaseRef" xlink:type="simple"/>
+      <link:roleType id="Cover" roleURI="http://www.vrtx.com/role/Cover">
+        <link:definition>0000001 - Document - Cover</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AuditInformation" roleURI="http://www.vrtx.com/role/AuditInformation">
+        <link:definition>0000002 - Document - Audit Information</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="ConsolidatedStatementsofIncomeLoss" roleURI="http://www.vrtx.com/role/ConsolidatedStatementsofIncomeLoss">
+        <link:definition>9952151 - Statement - Consolidated Statements of Income (Loss)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="ConsolidatedStatementsofComprehensiveIncomeLoss" roleURI="http://www.vrtx.com/role/ConsolidatedStatementsofComprehensiveIncomeLoss">
+        <link:definition>9952152 - Statement - Consolidated Statements of Comprehensive Income (Loss)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="ConsolidatedStatementsofComprehensiveIncomeLossParenthetical" roleURI="http://www.vrtx.com/role/ConsolidatedStatementsofComprehensiveIncomeLossParenthetical">
+        <link:definition>9952153 - Statement - Consolidated Statements of Comprehensive Income (Loss) (Parenthetical)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="ConsolidatedBalanceSheets" roleURI="http://www.vrtx.com/role/ConsolidatedBalanceSheets">
+        <link:definition>9952154 - Statement - Consolidated Balance Sheets</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="ConsolidatedBalanceSheetsParenthetical" roleURI="http://www.vrtx.com/role/ConsolidatedBalanceSheetsParenthetical">
+        <link:definition>9952155 - Statement - Consolidated Balance Sheets (Parenthetical)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="ConsolidatedStatementsofShareholdersEquity" roleURI="http://www.vrtx.com/role/ConsolidatedStatementsofShareholdersEquity">
+        <link:definition>9952156 - Statement - Consolidated Statements of Shareholders&#8217; Equity</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="ConsolidatedStatementsofCashFlows" roleURI="http://www.vrtx.com/role/ConsolidatedStatementsofCashFlows">
+        <link:definition>9952157 - Statement - Consolidated Statements of Cash Flows</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="NatureofBusinessandAccountingPolicies" roleURI="http://www.vrtx.com/role/NatureofBusinessandAccountingPolicies">
+        <link:definition>9952158 - Disclosure - Nature of Business and Accounting Policies</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CollaborationLicenseandOtherArrangements" roleURI="http://www.vrtx.com/role/CollaborationLicenseandOtherArrangements">
+        <link:definition>9952159 - Disclosure - Collaboration, License and Other Arrangements</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="EarningsPerShare" roleURI="http://www.vrtx.com/role/EarningsPerShare">
+        <link:definition>9952160 - Disclosure - Earnings Per Share</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="FairValueMeasurements" roleURI="http://www.vrtx.com/role/FairValueMeasurements">
+        <link:definition>9952161 - Disclosure - Fair Value Measurements</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="MarketableSecuritiesandEquityInvestments" roleURI="http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestments">
+        <link:definition>9952162 - Disclosure - Marketable Securities and Equity Investments</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AccumulatedOtherComprehensiveIncomeLoss" roleURI="http://www.vrtx.com/role/AccumulatedOtherComprehensiveIncomeLoss">
+        <link:definition>9952163 - Disclosure - Accumulated Other Comprehensive Income (Loss)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="Hedging" roleURI="http://www.vrtx.com/role/Hedging">
+        <link:definition>9952164 - Disclosure - Hedging</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="Inventories" roleURI="http://www.vrtx.com/role/Inventories">
+        <link:definition>9952165 - Disclosure - Inventories</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="PropertyandEquipment" roleURI="http://www.vrtx.com/role/PropertyandEquipment">
+        <link:definition>9952166 - Disclosure - Property and Equipment</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="GoodwillandOtherIntangibleAssets" roleURI="http://www.vrtx.com/role/GoodwillandOtherIntangibleAssets">
+        <link:definition>9952167 - Disclosure - Goodwill and Other Intangible Assets</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AdditionalBalanceSheetCashFlowInformation" roleURI="http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformation">
+        <link:definition>9952168 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="Leases" roleURI="http://www.vrtx.com/role/Leases">
+        <link:definition>9952169 - Disclosure - Leases</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommonStockPreferredStockandEquityPlans" roleURI="http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlans">
+        <link:definition>9952170 - Disclosure - Common Stock, Preferred Stock and Equity Plans</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="StockbasedCompensationExpense" roleURI="http://www.vrtx.com/role/StockbasedCompensationExpense">
+        <link:definition>9952171 - Disclosure - Stock-based Compensation Expense</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxes" roleURI="http://www.vrtx.com/role/IncomeTaxes">
+        <link:definition>9952172 - Disclosure - Income Taxes</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommitmentsandContingencies" roleURI="http://www.vrtx.com/role/CommitmentsandContingencies">
+        <link:definition>9952173 - Disclosure - Commitments and Contingencies</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformation" roleURI="http://www.vrtx.com/role/SegmentInformation">
+        <link:definition>9952174 - Disclosure - Segment Information</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="NatureofBusinessandAccountingPoliciesPolicies" roleURI="http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesPolicies">
+        <link:definition>9955511 - Disclosure - Nature of Business and Accounting Policies (Policies)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="NatureofBusinessandAccountingPoliciesTables" roleURI="http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesTables">
+        <link:definition>9955512 - Disclosure - Nature of Business and Accounting Policies (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CollaborationLicenseandOtherArrangementsTables" roleURI="http://www.vrtx.com/role/CollaborationLicenseandOtherArrangementsTables">
+        <link:definition>9955513 - Disclosure - Collaboration, License and Other Arrangements (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="EarningsPerShareTables" roleURI="http://www.vrtx.com/role/EarningsPerShareTables">
+        <link:definition>9955514 - Disclosure - Earnings Per Share (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="FairValueMeasurementsTables" roleURI="http://www.vrtx.com/role/FairValueMeasurementsTables">
+        <link:definition>9955515 - Disclosure - Fair Value Measurements (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="MarketableSecuritiesandEquityInvestmentsTables" roleURI="http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsTables">
+        <link:definition>9955516 - Disclosure - Marketable Securities and Equity Investments (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AccumulatedOtherComprehensiveIncomeLossTables" roleURI="http://www.vrtx.com/role/AccumulatedOtherComprehensiveIncomeLossTables">
+        <link:definition>9955517 - Disclosure - Accumulated Other Comprehensive Income (Loss) (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="HedgingTables" roleURI="http://www.vrtx.com/role/HedgingTables">
+        <link:definition>9955518 - Disclosure - Hedging (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="InventoriesTables" roleURI="http://www.vrtx.com/role/InventoriesTables">
+        <link:definition>9955519 - Disclosure - Inventories (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="PropertyandEquipmentTables" roleURI="http://www.vrtx.com/role/PropertyandEquipmentTables">
+        <link:definition>9955520 - Disclosure - Property and Equipment (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="GoodwillandOtherIntangibleAssetsTables" roleURI="http://www.vrtx.com/role/GoodwillandOtherIntangibleAssetsTables">
+        <link:definition>9955521 - Disclosure - Goodwill and Other Intangible Assets (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AdditionalBalanceSheetCashFlowInformationTables" roleURI="http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationTables">
+        <link:definition>9955522 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="LeasesTables" roleURI="http://www.vrtx.com/role/LeasesTables">
+        <link:definition>9955523 - Disclosure - Leases (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommonStockPreferredStockandEquityPlansTables" roleURI="http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansTables">
+        <link:definition>9955524 - Disclosure - Common Stock, Preferred Stock and Equity Plans (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="StockbasedCompensationExpenseTables" roleURI="http://www.vrtx.com/role/StockbasedCompensationExpenseTables">
+        <link:definition>9955525 - Disclosure - Stock-based Compensation Expense (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxesTables" roleURI="http://www.vrtx.com/role/IncomeTaxesTables">
+        <link:definition>9955526 - Disclosure - Income Taxes (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformationTables" roleURI="http://www.vrtx.com/role/SegmentInformationTables">
+        <link:definition>9955527 - Disclosure - Segment Information (Tables)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="NatureofBusinessandAccountingPoliciesRevenueRecognitionDetails" roleURI="http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesRevenueRecognitionDetails">
+        <link:definition>9955528 - Disclosure - Nature of Business and Accounting Policies - Revenue Recognition (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="NatureofBusinessandAccountingPoliciesAdvertisingCostsDetails" roleURI="http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesAdvertisingCostsDetails">
+        <link:definition>9955529 - Disclosure - Nature of Business and Accounting Policies - Advertising Costs (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="NatureofBusinessandAccountingPoliciesscheduleofPropertyandEquipmentDetails" roleURI="http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesscheduleofPropertyandEquipmentDetails">
+        <link:definition>9955530 - Disclosure - Nature of Business and Accounting Policies - schedule of Property and Equipment (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="NatureofBusinessandAccountingPoliciesGoodwillHedgingActivitiesandForeignCurrencyGainLossDetails" roleURI="http://www.vrtx.com/role/NatureofBusinessandAccountingPoliciesGoodwillHedgingActivitiesandForeignCurrencyGainLossDetails">
+        <link:definition>9955531 - Disclosure - Nature of Business and Accounting Policies - Goodwill, Hedging Activities and Foreign Currency Gain (Loss) (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CollaborationLicenseandOtherArrangementsNarrativeDetails" roleURI="http://www.vrtx.com/role/CollaborationLicenseandOtherArrangementsNarrativeDetails">
+        <link:definition>9955532 - Disclosure - Collaboration, License and Other Arrangements - Narrative (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CollaborationLicenseandOtherArrangementsAllocationofConsiderationtotheAssetsandLiabilitiesDetails" roleURI="http://www.vrtx.com/role/CollaborationLicenseandOtherArrangementsAllocationofConsiderationtotheAssetsandLiabilitiesDetails">
+        <link:definition>9955533 - Disclosure - Collaboration, License and Other Arrangements - Allocation of Consideration to the Assets and Liabilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="EarningsPerShareScheduleofComputationDetails" roleURI="http://www.vrtx.com/role/EarningsPerShareScheduleofComputationDetails">
+        <link:definition>9955534 - Disclosure - Earnings Per Share - Schedule of Computation (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="EarningsPerShareScheduleofAntidilutiveSecuritiesDetails" roleURI="http://www.vrtx.com/role/EarningsPerShareScheduleofAntidilutiveSecuritiesDetails">
+        <link:definition>9955535 - Disclosure - Earnings Per Share - Schedule of Anti-dilutive Securities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="FairValueMeasurementsFinancialAssetsandLiabilitiesSubjecttoFairValueMeasurementsDetails" roleURI="http://www.vrtx.com/role/FairValueMeasurementsFinancialAssetsandLiabilitiesSubjecttoFairValueMeasurementsDetails">
+        <link:definition>9955536 - Disclosure - Fair Value Measurements - Financial Assets and Liabilities Subject to Fair Value Measurements (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="FairValueMeasurementsAdditionalInformationDetails" roleURI="http://www.vrtx.com/role/FairValueMeasurementsAdditionalInformationDetails">
+        <link:definition>9955537 - Disclosure - Fair Value Measurements - Additional Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="FairValueMeasurementsScheduleofFairValueofContingentConsiderationLiabilitiesDetails" roleURI="http://www.vrtx.com/role/FairValueMeasurementsScheduleofFairValueofContingentConsiderationLiabilitiesDetails">
+        <link:definition>9955538 - Disclosure - Fair Value Measurements - Schedule of Fair Value of Contingent Consideration Liabilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="MarketableSecuritiesandEquityInvestmentsScheduleofCashEquivalentsandMarketableSecuritiesDetails" roleURI="http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsScheduleofCashEquivalentsandMarketableSecuritiesDetails">
+        <link:definition>9955539 - Disclosure - Marketable Securities and Equity Investments - Schedule of Cash Equivalents and Marketable Securities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="MarketableSecuritiesandEquityInvestmentsScheduleofCashEquivalentsandMarketableSecuritiesDetails_1" roleURI="http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsScheduleofCashEquivalentsandMarketableSecuritiesDetails_1">
+        <link:definition>9955539 - Disclosure - Marketable Securities and Equity Investments - Schedule of Cash Equivalents and Marketable Securities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="MarketableSecuritiesandEquityInvestmentsScheduleofAvailableforSaleDebtSecuritiesatFairValueDetails" roleURI="http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsScheduleofAvailableforSaleDebtSecuritiesatFairValueDetails">
+        <link:definition>9955540 - Disclosure - Marketable Securities and Equity Investments - Schedule of Available-for-Sale Debt Securities at Fair Value (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="MarketableSecuritiesandEquityInvestmentsAvailableforSaleDebtSecuritiesbyContractualMaturityDetails" roleURI="http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsAvailableforSaleDebtSecuritiesbyContractualMaturityDetails">
+        <link:definition>9955541 - Disclosure - Marketable Securities and Equity Investments - Available-for-Sale Debt Securities by Contractual Maturity (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="MarketableSecuritiesandEquityInvestmentsAdditionalInformationDetails" roleURI="http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsAdditionalInformationDetails">
+        <link:definition>9955542 - Disclosure - Marketable Securities and Equity Investments - Additional Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="MarketableSecuritiesandEquityInvestmentsNetUnrealizedGainsLossesDetails" roleURI="http://www.vrtx.com/role/MarketableSecuritiesandEquityInvestmentsNetUnrealizedGainsLossesDetails">
+        <link:definition>9955543 - Disclosure - Marketable Securities and Equity Investments - Net Unrealized Gains (Losses) (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AccumulatedOtherComprehensiveIncomeLossDetails" roleURI="http://www.vrtx.com/role/AccumulatedOtherComprehensiveIncomeLossDetails">
+        <link:definition>9955544 - Disclosure - Accumulated Other Comprehensive Income (Loss) (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="HedgingAdditionalInformationDetails" roleURI="http://www.vrtx.com/role/HedgingAdditionalInformationDetails">
+        <link:definition>9955545 - Disclosure - Hedging - Additional Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="HedgingScheduleofNotionalAmountDetails" roleURI="http://www.vrtx.com/role/HedgingScheduleofNotionalAmountDetails">
+        <link:definition>9955546 - Disclosure - Hedging - Schedule of Notional Amount (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="HedgingScheduleofCashFlowHedgingInstrumentsDetails" roleURI="http://www.vrtx.com/role/HedgingScheduleofCashFlowHedgingInstrumentsDetails">
+        <link:definition>9955547 - Disclosure - Hedging - Schedule of Cash Flow Hedging Instruments (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="HedgingScheduleofDerivativeFairValueDetails" roleURI="http://www.vrtx.com/role/HedgingScheduleofDerivativeFairValueDetails">
+        <link:definition>9955548 - Disclosure - Hedging - Schedule of Derivative Fair Value (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="HedgingScheduleofOffsettingDerivativesDetails" roleURI="http://www.vrtx.com/role/HedgingScheduleofOffsettingDerivativesDetails">
+        <link:definition>9955549 - Disclosure - Hedging - Schedule of Offsetting Derivatives (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="InventoriesDetails" roleURI="http://www.vrtx.com/role/InventoriesDetails">
+        <link:definition>9955550 - Disclosure - Inventories (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="PropertyandEquipmentScheduleofPropertyandEquipmentNetDetails" roleURI="http://www.vrtx.com/role/PropertyandEquipmentScheduleofPropertyandEquipmentNetDetails">
+        <link:definition>9955551 - Disclosure - Property and Equipment - Schedule of Property and Equipment, Net (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="PropertyandEquipmentAdditionalInformationDetails" roleURI="http://www.vrtx.com/role/PropertyandEquipmentAdditionalInformationDetails">
+        <link:definition>9955552 - Disclosure - Property and Equipment - Additional Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="GoodwillandOtherIntangibleAssetsScheduleofIntangibleAssetsandGoodwillDetails" roleURI="http://www.vrtx.com/role/GoodwillandOtherIntangibleAssetsScheduleofIntangibleAssetsandGoodwillDetails">
+        <link:definition>9955553 - Disclosure - Goodwill and Other Intangible Assets - Schedule of Intangible Assets and Goodwill (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="GoodwillandOtherIntangibleAssetsScheduleofIntangibleAssetsandGoodwillDetails_1" roleURI="http://www.vrtx.com/role/GoodwillandOtherIntangibleAssetsScheduleofIntangibleAssetsandGoodwillDetails_1">
+        <link:definition>9955553 - Disclosure - Goodwill and Other Intangible Assets - Schedule of Intangible Assets and Goodwill (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="GoodwillandOtherIntangibleAssetsAdditionalInformationDetails" roleURI="http://www.vrtx.com/role/GoodwillandOtherIntangibleAssetsAdditionalInformationDetails">
+        <link:definition>9955554 - Disclosure - Goodwill and Other Intangible Assets - Additional Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="GoodwillandOtherIntangibleAssetsScheduleofFutureAmortizationExpenseDetails" roleURI="http://www.vrtx.com/role/GoodwillandOtherIntangibleAssetsScheduleofFutureAmortizationExpenseDetails">
+        <link:definition>9955555 - Disclosure - Goodwill and Other Intangible Assets - Schedule of Future Amortization Expense (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AdditionalBalanceSheetCashFlowInformationScheduleofCashCashEquivalentsandRestrictedCashDetails" roleURI="http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationScheduleofCashCashEquivalentsandRestrictedCashDetails">
+        <link:definition>9955556 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Schedule of Cash, Cash Equivalents and Restricted Cash (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AdditionalBalanceSheetCashFlowInformationScheduleofPrepaidExpensesandOtherCurrentAssetsDetails" roleURI="http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationScheduleofPrepaidExpensesandOtherCurrentAssetsDetails">
+        <link:definition>9955557 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Schedule of Prepaid Expenses and Other Current Assets (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AdditionalBalanceSheetCashFlowInformationAdditionalInformationDetails" roleURI="http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationAdditionalInformationDetails">
+        <link:definition>9955558 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Additional Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AdditionalBalanceSheetCashFlowInformationScheduleofAccruedExpensesDetails" roleURI="http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationScheduleofAccruedExpensesDetails">
+        <link:definition>9955559 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Schedule of Accrued Expenses (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AdditionalBalanceSheetCashFlowInformationScheduleofOtherCurrentLiabilitiesDetails" roleURI="http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationScheduleofOtherCurrentLiabilitiesDetails">
+        <link:definition>9955560 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Schedule of Other Current Liabilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="AdditionalBalanceSheetCashFlowInformationScheduleofOtherLongTermLiabilitiesDetails" roleURI="http://www.vrtx.com/role/AdditionalBalanceSheetCashFlowInformationScheduleofOtherLongTermLiabilitiesDetails">
+        <link:definition>9955561 - Disclosure - Additional Balance Sheet &amp; Cash Flow Information - Schedule of Other Long Term Liabilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="LeasesAdditionalInformationDetails" roleURI="http://www.vrtx.com/role/LeasesAdditionalInformationDetails">
+        <link:definition>9955562 - Disclosure - Leases - Additional Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="LeasesScheduleofComponentsofLeaseExpenseDetails" roleURI="http://www.vrtx.com/role/LeasesScheduleofComponentsofLeaseExpenseDetails">
+        <link:definition>9955563 - Disclosure - Leases - Schedule of Components of Lease Expense (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="LeasesScheduleofBalanceSheetClassificationofLeaseAssetsandLiabilitiesDetails" roleURI="http://www.vrtx.com/role/LeasesScheduleofBalanceSheetClassificationofLeaseAssetsandLiabilitiesDetails">
+        <link:definition>9955564 - Disclosure - Leases - Schedule of Balance Sheet Classification of Lease Assets and Liabilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="LeasesScheduleofMaturitiesofOperatingandFinancingLeaseLiabilitiesDetails" roleURI="http://www.vrtx.com/role/LeasesScheduleofMaturitiesofOperatingandFinancingLeaseLiabilitiesDetails">
+        <link:definition>9955565 - Disclosure - Leases -Schedule of Maturities of Operating and Financing Lease Liabilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="LeasesScheduleofMaturitiesofOperatingandFinancingLeaseLiabilitiesDetails_1" roleURI="http://www.vrtx.com/role/LeasesScheduleofMaturitiesofOperatingandFinancingLeaseLiabilitiesDetails_1">
+        <link:definition>9955565 - Disclosure - Leases -Schedule of Maturities of Operating and Financing Lease Liabilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="LeasesScheduleofMaturitiesofOperatingandFinancingLeaseLiabilitiesDetails_2" roleURI="http://www.vrtx.com/role/LeasesScheduleofMaturitiesofOperatingandFinancingLeaseLiabilitiesDetails_2">
+        <link:definition>9955565 - Disclosure - Leases -Schedule of Maturities of Operating and Financing Lease Liabilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="LeasesScheduleofWeightedAverageRemainingLeaseTermsandDiscountRatesDetails" roleURI="http://www.vrtx.com/role/LeasesScheduleofWeightedAverageRemainingLeaseTermsandDiscountRatesDetails">
+        <link:definition>9955566 - Disclosure - Leases - Schedule of Weighted-Average Remaining Lease Terms and Discount Rates (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="LeasesScheduleofSupplementalCashFlowInformationDetails" roleURI="http://www.vrtx.com/role/LeasesScheduleofSupplementalCashFlowInformationDetails">
+        <link:definition>9955567 - Disclosure - Leases - Schedule of Supplemental Cash Flow Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommonStockPreferredStockandEquityPlansCommonStockandPreferredStockDetails" roleURI="http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansCommonStockandPreferredStockDetails">
+        <link:definition>9955568 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Common Stock and Preferred Stock (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommonStockPreferredStockandEquityPlansShareRepurchaseProgramDetails" roleURI="http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansShareRepurchaseProgramDetails">
+        <link:definition>9955569 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Share Repurchase Program (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommonStockPreferredStockandEquityPlansRestrictedStockandRestrictedStockUnitsDetails" roleURI="http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansRestrictedStockandRestrictedStockUnitsDetails">
+        <link:definition>9955570 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Restricted Stock and Restricted Stock Units (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommonStockPreferredStockandEquityPlansPerformancebasedRSUsPSUsDetails" roleURI="http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansPerformancebasedRSUsPSUsDetails">
+        <link:definition>9955571 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Performance-based RSUs (PSUs) (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommonStockPreferredStockandEquityPlansOutstandingandExercisableOptionsDetails" roleURI="http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansOutstandingandExercisableOptionsDetails">
+        <link:definition>9955572 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Outstanding and Exercisable Options (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommonStockPreferredStockandEquityPlansStockOptionsOutstandingandExercisableDetails" roleURI="http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansStockOptionsOutstandingandExercisableDetails">
+        <link:definition>9955573 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Stock Options Outstanding and Exercisable (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommonStockPreferredStockandEquityPlansEmployeeStockPurchasePlanDetails" roleURI="http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansEmployeeStockPurchasePlanDetails">
+        <link:definition>9955574 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Employee Stock Purchase Plan (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommonStockPreferredStockandEquityPlansEmployeeBenefitsDetails" roleURI="http://www.vrtx.com/role/CommonStockPreferredStockandEquityPlansEmployeeBenefitsDetails">
+        <link:definition>9955575 - Disclosure - Common Stock, Preferred Stock and Equity Plans - Employee Benefits (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="StockbasedCompensationExpenseScheduleofStockbasedCompensationExpensebyLineItemDetails" roleURI="http://www.vrtx.com/role/StockbasedCompensationExpenseScheduleofStockbasedCompensationExpensebyLineItemDetails">
+        <link:definition>9955576 - Disclosure - Stock-based Compensation Expense - Schedule of Stock-based Compensation Expense by Line Item (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="StockbasedCompensationExpenseScheduleofUnrecognizedStockBasedCompensationExpenseDetails" roleURI="http://www.vrtx.com/role/StockbasedCompensationExpenseScheduleofUnrecognizedStockBasedCompensationExpenseDetails">
+        <link:definition>9955577 - Disclosure - Stock-based Compensation Expense - Schedule of Unrecognized Stock-Based Compensation Expense (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="StockbasedCompensationExpenseAdditionalInformationDetails" roleURI="http://www.vrtx.com/role/StockbasedCompensationExpenseAdditionalInformationDetails">
+        <link:definition>9955578 - Disclosure - Stock-based Compensation Expense - Additional Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="StockbasedCompensationExpenseScheduleofweightedaverageAssumptionsDetails" roleURI="http://www.vrtx.com/role/StockbasedCompensationExpenseScheduleofweightedaverageAssumptionsDetails">
+        <link:definition>9955579 - Disclosure - Stock-based Compensation Expense - Schedule of weighted-average Assumptions (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxesScheduleofComponentsofIncomeandProvisionforBenefitfromIncomeTaxesDetails" roleURI="http://www.vrtx.com/role/IncomeTaxesScheduleofComponentsofIncomeandProvisionforBenefitfromIncomeTaxesDetails">
+        <link:definition>9955580 - Disclosure - Income Taxes - Schedule of Components of Income and Provision for (Benefit from) Income Taxes (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxesScheduleofEffectiveIncomeTaxReconciliationDetails" roleURI="http://www.vrtx.com/role/IncomeTaxesScheduleofEffectiveIncomeTaxReconciliationDetails">
+        <link:definition>9955581 - Disclosure - Income Taxes - Schedule of Effective Income Tax Reconciliation (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxesAdditionalInformationDetails" roleURI="http://www.vrtx.com/role/IncomeTaxesAdditionalInformationDetails">
+        <link:definition>9955582 - Disclosure - Income Taxes - Additional Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxesScheduleofDeferredTaxAssetsandLiabilitiesDetails" roleURI="http://www.vrtx.com/role/IncomeTaxesScheduleofDeferredTaxAssetsandLiabilitiesDetails">
+        <link:definition>9955583 - Disclosure - Income Taxes - Schedule of Deferred Tax Assets and Liabilities (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxesNetOperatingLossesCapitalLossesAndTaxCreditCarryforwardsDetails" roleURI="http://www.vrtx.com/role/IncomeTaxesNetOperatingLossesCapitalLossesAndTaxCreditCarryforwardsDetails">
+        <link:definition>9955584 - Disclosure - Income Taxes - Net Operating Losses, Capital Losses, And Tax Credit Carryforwards (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxesCashPaidforIncomeTaxesDetails" roleURI="http://www.vrtx.com/role/IncomeTaxesCashPaidforIncomeTaxesDetails">
+        <link:definition>9955585 - Disclosure - Income Taxes - Cash Paid for Income Taxes (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="IncomeTaxesUnrecognizedTaxBenefitsDetails" roleURI="http://www.vrtx.com/role/IncomeTaxesUnrecognizedTaxBenefitsDetails">
+        <link:definition>9955586 - Disclosure - Income Taxes - Unrecognized Tax Benefits (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="CommitmentsandContingenciesDetails" roleURI="http://www.vrtx.com/role/CommitmentsandContingenciesDetails">
+        <link:definition>9955587 - Disclosure - Commitments and Contingencies (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformationAdditionalInformationDetails" roleURI="http://www.vrtx.com/role/SegmentInformationAdditionalInformationDetails">
+        <link:definition>9955588 - Disclosure - Segment Information - Additional Information (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformationScheduleofRevenuesbyProductDetails" roleURI="http://www.vrtx.com/role/SegmentInformationScheduleofRevenuesbyProductDetails">
+        <link:definition>9955589 - Disclosure - Segment Information - Schedule of Revenues by Product (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformationScheduleofRevenuebyGeographicLocationDetails" roleURI="http://www.vrtx.com/role/SegmentInformationScheduleofRevenuebyGeographicLocationDetails">
+        <link:definition>9955590 - Disclosure - Segment Information - Schedule of Revenue by Geographic Location (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformationScheduleofSignificantCustomersDetails" roleURI="http://www.vrtx.com/role/SegmentInformationScheduleofSignificantCustomersDetails">
+        <link:definition>9955591 - Disclosure - Segment Information - Schedule of Significant Customers (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformationScheduleofSignificantSegmentExpensesDetails" roleURI="http://www.vrtx.com/role/SegmentInformationScheduleofSignificantSegmentExpensesDetails">
+        <link:definition>9955592 - Disclosure - Segment Information - Schedule of Significant Segment Expenses (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+      <link:roleType id="SegmentInformationScheduleofPropertyandEquipmentNetbyLocationDetails" roleURI="http://www.vrtx.com/role/SegmentInformationScheduleofPropertyandEquipmentNetbyLocationDetails">
+        <link:definition>9955593 - Disclosure - Segment Information - Schedule of Property and Equipment, Net by Location (Details)</link:definition>
+        <link:usedOn>link:presentationLink</link:usedOn>
+        <link:usedOn>link:calculationLink</link:usedOn>
+        <link:usedOn>link:definitionLink</link:usedOn>
+      </link:roleType>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:element id="vrtx_AuditInformationAbstract" abstract="true" name="AuditInformationAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_CollaborativeandRoyaltyMember" abstract="true" name="CollaborativeandRoyaltyMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ProceedsFromPaymentsForFiniteLivedIntangibleAssets" abstract="false" name="ProceedsFromPaymentsForFiniteLivedIntangibleAssets" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_PaymentsToAcquireDebtSecuritiesAvailableForSaleAssetAcquisition" abstract="false" name="PaymentsToAcquireDebtSecuritiesAvailableForSaleAssetAcquisition" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_NoncashFinancingOrInvestingActivitiesCollaborativeArrangementMilestonePaymentsDue" abstract="false" name="NoncashFinancingOrInvestingActivitiesCollaborativeArrangementMilestonePaymentsDue" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CommonStockPreferredStockAndEquityPlansDisclosureTextBlock" abstract="false" name="CommonStockPreferredStockAndEquityPlansDisclosureTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="vrtx_InProcessResearchAndDevelopmentAssetsAndContingentPaymentsPolicyTextBlock" abstract="false" name="InProcessResearchAndDevelopmentAssetsAndContingentPaymentsPolicyTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="vrtx_CloudComputingServiceContractsPolicyTextBlock" abstract="false" name="CloudComputingServiceContractsPolicyTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="vrtx_AssetsAndLiabilitiesLesseeTableTextBlock" abstract="false" name="AssetsAndLiabilitiesLesseeTableTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="vrtx_ScheduleOfWeightedAverageRemainingLeaseTermsAndDiscountRatesRelatedToLeasesTableTextBlock" abstract="false" name="ScheduleOfWeightedAverageRemainingLeaseTermsAndDiscountRatesRelatedToLeasesTableTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="vrtx_LeaseSupplementalCashFlowInformationTableTextBlock" abstract="false" name="LeaseSupplementalCashFlowInformationTableTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="vrtx_ScheduleOfStockAndStockOptionEquityPlansTableTextBlock" abstract="false" name="ScheduleOfStockAndStockOptionEquityPlansTableTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="vrtx_ScheduleOfUnrecognizedShareBasedCompensationExpenseTableTextBlock" abstract="false" name="ScheduleOfUnrecognizedShareBasedCompensationExpenseTableTextBlock" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:textBlockItemType"/>
+  <xs:element id="vrtx_CollaborativeArrangementsByAgreementAxis" abstract="true" name="CollaborativeArrangementsByAgreementAxis" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrldt:dimensionItem" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_CollaborativeArrangementsByAgreementDomain" abstract="true" name="CollaborativeArrangementsByAgreementDomain" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_OnoPharmaceuticalsCo.Ltd.Member" abstract="true" name="OnoPharmaceuticalsCo.Ltd.Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ZaiLabLimitedMember" abstract="true" name="ZaiLabLimitedMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ProceedsFromUpfrontPayment" abstract="false" name="ProceedsFromUpfrontPayment" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_LaboratoryEquipmentOtherEquipmentAndFurnitureMember" abstract="true" name="LaboratoryEquipmentOtherEquipmentAndFurnitureMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_NumberOfReportableSegmentsNotDisclosedFlag" abstract="false" name="NumberOfReportableSegmentsNotDisclosedFlag" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_AlphineImmuneSciencesIncMember" abstract="true" name="AlphineImmuneSciencesIncMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_UnvestedEquityAwardsMember" abstract="true" name="UnvestedEquityAwardsMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_CRISPRTherapeuticsAGMember" abstract="true" name="CRISPRTherapeuticsAGMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_CRISPRJDCAMember" abstract="true" name="CRISPRJDCAMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_CRISPRT1DMember" abstract="true" name="CRISPRT1DMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_EntradaTherapeuticsMember" abstract="true" name="EntradaTherapeuticsMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ModernaAgreementMember" abstract="true" name="ModernaAgreementMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_AdditionalInLicenseAgreementsAndOtherArrangementsMember" abstract="true" name="AdditionalInLicenseAgreementsAndOtherArrangementsMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_CRISPRMember" abstract="true" name="CRISPRMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_PaymentsForAssetAcquisitions" abstract="false" name="PaymentsForAssetAcquisitions" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CollaborativeArrangementRightToLicenseNumberOfTargets" abstract="false" name="CollaborativeArrangementRightToLicenseNumberOfTargets" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:integerItemType"/>
+  <xs:element id="vrtx_CollaborativeArrangementDevelopmentAndRegulatoryPotentialMilestonePaymentsMaximum" abstract="false" name="CollaborativeArrangementDevelopmentAndRegulatoryPotentialMilestonePaymentsMaximum" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CollaborativeArrangementMilestonePayment" abstract="false" name="CollaborativeArrangementMilestonePayment" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CollaborativeArrangementAllocationOfResearchAndDevelopmentExpensesPercent" abstract="false" name="CollaborativeArrangementAllocationOfResearchAndDevelopmentExpensesPercent" nillable="true" xbrli:periodType="instant" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="vrtx_CollaborativeArrangementAllocationOfNetProfitsAndLossesPercent" abstract="false" name="CollaborativeArrangementAllocationOfNetProfitsAndLossesPercent" nillable="true" xbrli:periodType="instant" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="vrtx_CollaborativeArrangementUpFrontLicenseFee" abstract="false" name="CollaborativeArrangementUpFrontLicenseFee" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_PaymentToAcquireCommonStock" abstract="false" name="PaymentToAcquireCommonStock" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CollaborativeArrangementMilestoneAndUpfrontPayment" abstract="false" name="CollaborativeArrangementMilestoneAndUpfrontPayment" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_VestedAndUnvestedEquityAwardsMember" abstract="true" name="VestedAndUnvestedEquityAwardsMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_AssetAcquisitionExpenseRelatedToUnvestedEquityAwards" abstract="false" name="AssetAcquisitionExpenseRelatedToUnvestedEquityAwards" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_AssetAcquisitionCashAndEquivalents" abstract="false" name="AssetAcquisitionCashAndEquivalents" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_AssetAcquisitionMarketableSecuritiesCurrent" abstract="false" name="AssetAcquisitionMarketableSecuritiesCurrent" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_AssetAcquisitionMarketableSecuritiesNoncurrent" abstract="false" name="AssetAcquisitionMarketableSecuritiesNoncurrent" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_AssetAcquisitionDeferredTaxAsset" abstract="false" name="AssetAcquisitionDeferredTaxAsset" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_AssetAcquisitionOtherAssets" abstract="false" name="AssetAcquisitionOtherAssets" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_AssetAcquisitionLiabilities" abstract="false" name="AssetAcquisitionLiabilities" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_AssetAcquisitionAssetsAcquiredAndLiabilitiesAssumedNet" abstract="false" name="AssetAcquisitionAssetsAcquiredAndLiabilitiesAssumedNet" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_BusinessCombinationRemainingMilestonePayment" abstract="false" name="BusinessCombinationRemainingMilestonePayment" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_ScheduleOfCashCashEquivalentsAndAvailableForSaleSecuritiesTable" abstract="true" name="ScheduleOfCashCashEquivalentsAndAvailableForSaleSecuritiesTable" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrldt:hypercubeItem" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_MarketableSecuritiesAndOtherNoncurrentAssetsMember" abstract="true" name="MarketableSecuritiesAndOtherNoncurrentAssetsMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ScheduleOfCashCashEquivalentsAndAvailableForSaleSecuritiesLineItems" abstract="true" name="ScheduleOfCashCashEquivalentsAndAvailableForSaleSecuritiesLineItems" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_CashEquivalentsAndDebtSecuritiesAvailableForSale" abstract="false" name="CashEquivalentsAndDebtSecuritiesAvailableForSale" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CashEquivalentsAndDebtSecuritiesAvailableForSaleFairValueDisclosure" abstract="false" name="CashEquivalentsAndDebtSecuritiesAvailableForSaleFairValueDisclosure" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_DebtAndEquitySecuritiesCost" abstract="false" name="DebtAndEquitySecuritiesCost" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_DebtAndEquitySecuritiesUnrealizedGain" abstract="false" name="DebtAndEquitySecuritiesUnrealizedGain" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_DebtAndEquitySecuritiesUnrealizedLoss" abstract="false" name="DebtAndEquitySecuritiesUnrealizedLoss" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_DebtAndEquitySecuritiesFairValue" abstract="false" name="DebtAndEquitySecuritiesFairValue" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CashEquivalentsDebtAndEquitySecuritiesCost" abstract="false" name="CashEquivalentsDebtAndEquitySecuritiesCost" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CashEquivalentsDebtAndEquitySecuritiesUnrealizedGain" abstract="false" name="CashEquivalentsDebtAndEquitySecuritiesUnrealizedGain" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CashEquivalentsDebtAndEquitySecuritiesUnrealizedLoss" abstract="false" name="CashEquivalentsDebtAndEquitySecuritiesUnrealizedLoss" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CashEquivalentsDebtAndEquitySecuritiesFairValue" abstract="false" name="CashEquivalentsDebtAndEquitySecuritiesFairValue" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_MarketableSecuritiesMember" abstract="true" name="MarketableSecuritiesMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_MarketableSecuritiesNoncurrentMember" abstract="true" name="MarketableSecuritiesNoncurrentMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_PubliclyTradedCompaniesSaleMember" abstract="true" name="PubliclyTradedCompaniesSaleMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_TaxRelatedPrepaidAndReceivables" abstract="false" name="TaxRelatedPrepaidAndReceivables" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_ProductSalesAccruedLiabilities" abstract="false" name="ProductSalesAccruedLiabilities" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_AccruedResearchDevelopmentAndCommercialContractCosts" abstract="false" name="AccruedResearchDevelopmentAndCommercialContractCosts" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CapitalRelatedAccruals" abstract="false" name="CapitalRelatedAccruals" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_OtherContractLiabilitiesCurrent" abstract="false" name="OtherContractLiabilitiesCurrent" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_UpfrontAndMilestonesPayableCurrent" abstract="false" name="UpfrontAndMilestonesPayableCurrent" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_TaxRelatedLiabilitiesNoncurrent" abstract="false" name="TaxRelatedLiabilitiesNoncurrent" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FanPierLeasesMember" abstract="true" name="FanPierLeasesMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_JeffreyLeidenCenterForBiologicsCellAndGeneticTherapiesCampusMember" abstract="true" name="JeffreyLeidenCenterForBiologicsCellAndGeneticTherapiesCampusMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_LonzaPortsmouthMember" abstract="true" name="LonzaPortsmouthMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_LeaseAgreementNumberOfLeases" abstract="false" name="LeaseAgreementNumberOfLeases" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:integerItemType"/>
+  <xs:element id="vrtx_LeaseAgreementNumberOfBuildings" abstract="false" name="LeaseAgreementNumberOfBuildings" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:integerItemType"/>
+  <xs:element id="vrtx_LesseeOperatingLeaseNumberOfRenewalOptions" abstract="false" name="LesseeOperatingLeaseNumberOfRenewalOptions" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:integerItemType"/>
+  <xs:element id="vrtx_ReductionToFinanceLeases" abstract="false" name="ReductionToFinanceLeases" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FinanceLeaseRightOfUseAssetGross" abstract="false" name="FinanceLeaseRightOfUseAssetGross" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_LesseeOperatingLeaseLiabilityTenantAllowance" abstract="false" name="LesseeOperatingLeaseLiabilityTenantAllowance" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FinanceLeasandOperatingLeaseLiabilitiesPaymentsDueAbstract" abstract="true" name="FinanceLeasandOperatingLeaseLiabilitiesPaymentsDueAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_FinanceLeaseAndOperatingLeaseLiabilityPaymentDueNextTwelveMonths" abstract="false" name="FinanceLeaseAndOperatingLeaseLiabilityPaymentDueNextTwelveMonths" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FinanceLeaseAndOperatingLeaseLiabilityPaymentDueYearTwo" abstract="false" name="FinanceLeaseAndOperatingLeaseLiabilityPaymentDueYearTwo" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FinanceLeaseAndOperatingLeaseLiabilityPaymentDueYearThree" abstract="false" name="FinanceLeaseAndOperatingLeaseLiabilityPaymentDueYearThree" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FinanceLeaseAndOperatingLeaseLiabilityPaymentsDueYearFour" abstract="false" name="FinanceLeaseAndOperatingLeaseLiabilityPaymentsDueYearFour" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FinanceLeaseAndOperatingLeaseLiabilityPaymentsDueYearFive" abstract="false" name="FinanceLeaseAndOperatingLeaseLiabilityPaymentsDueYearFive" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FinanceLeaseAndOperatingLeaseLiabilityPaymentsDueAfterYearFive" abstract="false" name="FinanceLeaseAndOperatingLeaseLiabilityPaymentsDueAfterYearFive" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FinanceLeaseAndOperatingLeaseLiabilityPaymentsDue" abstract="false" name="FinanceLeaseAndOperatingLeaseLiabilityPaymentsDue" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FinanceLeaseAndOperatingLeaseLiabilityUndiscountedExcessAmount" abstract="false" name="FinanceLeaseAndOperatingLeaseLiabilityUndiscountedExcessAmount" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_FinanceLeaseAndOperatingLeaseLiability" abstract="false" name="FinanceLeaseAndOperatingLeaseLiability" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_WeightedAverageRemainingLeaseAbstract" abstract="true" name="WeightedAverageRemainingLeaseAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_WeightedAverageDiscountRateAbstract" abstract="true" name="WeightedAverageDiscountRateAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_RightOfUseAssetObtainedInExchangeForLeaseLiabilityAbstract" abstract="true" name="RightOfUseAssetObtainedInExchangeForLeaseLiabilityAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_CommonStockVotesPerEachShare" abstract="false" name="CommonStockVotesPerEachShare" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:integerItemType"/>
+  <xs:element id="vrtx_StockandOptionPlan2013Member" abstract="true" name="StockandOptionPlan2013Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ShareRepurchaseProgram2023Member" abstract="true" name="ShareRepurchaseProgram2023Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_May2025ShareRepurchaseProgramMember" abstract="true" name="May2025ShareRepurchaseProgramMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ShareBasedCompensationArrangementByShareBasedPaymentAwardEquityInstrumentsOutstandingNumber" abstract="false" name="ShareBasedCompensationArrangementByShareBasedPaymentAwardEquityInstrumentsOutstandingNumber" nillable="true" xbrli:periodType="instant" substitutionGroup="xbrli:item" type="xbrli:sharesItemType"/>
+  <xs:element id="vrtx_FinancialPerformanceSharesMember" abstract="true" name="FinancialPerformanceSharesMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ShareBasedCompensationByShareBasedPaymentAwardPercentOfAwardsInTranche" abstract="false" name="ShareBasedCompensationByShareBasedPaymentAwardPercentOfAwardsInTranche" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="vrtx_ShareBasedCompensationByShareBasedPaymentAwardPerformancePeriod" abstract="false" name="ShareBasedCompensationByShareBasedPaymentAwardPerformancePeriod" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:durationItemType"/>
+  <xs:element id="vrtx_ShareBasedCompensationByShareBasedPaymentAwardAwardPercentageOfTargetMinimum" abstract="false" name="ShareBasedCompensationByShareBasedPaymentAwardAwardPercentageOfTargetMinimum" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="vrtx_ShareBasedCompensationByShareBasedPaymentAwardAwardPercentageOfTargetMaximum" abstract="false" name="ShareBasedCompensationByShareBasedPaymentAwardAwardPercentageOfTargetMaximum" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="vrtx_WeightedAverageRemainingContractualLifeAbstract" abstract="true" name="WeightedAverageRemainingContractualLifeAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_AggregateIntrinsicValueAbstract" abstract="true" name="AggregateIntrinsicValueAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_ExercisePriceRangeFromDollars86.52ToDollars100.00Member" abstract="true" name="ExercisePriceRangeFromDollars86.52ToDollars100.00Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ExercisePriceRangeFromDollars10001ToDollars15000Member" abstract="true" name="ExercisePriceRangeFromDollars10001ToDollars15000Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ExercisePriceRangeFromDollars15001ToDollars20000Member" abstract="true" name="ExercisePriceRangeFromDollars15001ToDollars20000Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ExercisePriceRangeFromDollars200.01ToDollars502.97Member" abstract="true" name="ExercisePriceRangeFromDollars200.01ToDollars502.97Member" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_SharebasedCompensationArrangementbySharebasedPaymentAwardOfferingPeriod" abstract="false" name="SharebasedCompensationArrangementbySharebasedPaymentAwardOfferingPeriod" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:durationItemType"/>
+  <xs:element id="vrtx_ShareBasedCompensationArrangementByShareBasedPaymentAwardNumberOfPurchasePeriods" abstract="false" name="ShareBasedCompensationArrangementByShareBasedPaymentAwardNumberOfPurchasePeriods" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:integerItemType"/>
+  <xs:element id="vrtx_ShareBasedCompensationArrangementByShareBasedPaymentAwardDurationOfPurchasePeriod" abstract="false" name="ShareBasedCompensationArrangementByShareBasedPaymentAwardDurationOfPurchasePeriod" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:durationItemType"/>
+  <xs:element id="vrtx_ShareBasedCompensationAllocationAbstract" abstract="true" name="ShareBasedCompensationAllocationAbstract" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_NonFinancialPerformanceSharesMember" abstract="true" name="NonFinancialPerformanceSharesMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_NonemployeeStockOptionMember" abstract="true" name="NonemployeeStockOptionMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodFairValue" abstract="false" name="ShareBasedCompensationArrangementByShareBasedPaymentAwardOptionsGrantsInPeriodFairValue" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_EffectiveIncomeTaxRateReconciliationDeferredChargesRelatedToIntraEntityTransfersAmount" abstract="false" name="EffectiveIncomeTaxRateReconciliationDeferredChargesRelatedToIntraEntityTransfersAmount" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_EffectiveIncomeTaxRateReconciliationCrossBorderSubpartFIncomeNetOfCreditsAmount" abstract="false" name="EffectiveIncomeTaxRateReconciliationCrossBorderSubpartFIncomeNetOfCreditsAmount" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_EffectiveIncomeTaxRateReconciliationDeferredChargesRelatedToIntraEntityTransfersPercent" abstract="false" name="EffectiveIncomeTaxRateReconciliationDeferredChargesRelatedToIntraEntityTransfersPercent" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="vrtx_EffectiveIncomeTaxRateReconciliationCrossBorderSubpartFIncomeNetOfCreditsPercent" abstract="false" name="EffectiveIncomeTaxRateReconciliationCrossBorderSubpartFIncomeNetOfCreditsPercent" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="vrtx_EffectiveIncomeTaxRateReconciliationRepatriationOfForeignEarningsNetPercent" abstract="false" name="EffectiveIncomeTaxRateReconciliationRepatriationOfForeignEarningsNetPercent" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="vrtx_OperatingLossAndTaxCreditCarryforwardsTable" abstract="true" name="OperatingLossAndTaxCreditCarryforwardsTable" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrldt:hypercubeItem" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_DeferredTaxAssetsMember" abstract="true" name="DeferredTaxAssetsMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_TaxCarryforwardsLineItems" abstract="true" name="TaxCarryforwardsLineItems" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:stringItemType"/>
+  <xs:element id="vrtx_OperatingLossCarryforwardsNotSubjectToExpiration" abstract="false" name="OperatingLossCarryforwardsNotSubjectToExpiration" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_TaxCreditCarryforwardNotSubjectToExpirationAmount" abstract="false" name="TaxCreditCarryforwardNotSubjectToExpirationAmount" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_UnrecognizedTaxBenefitsIncreaseDecreaseInDeferredTaxAssetsGross" abstract="false" name="UnrecognizedTaxBenefitsIncreaseDecreaseInDeferredTaxAssetsGross" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_UnrecognizedTaxBenefitsDeferredTaxLiabilitiesGross" abstract="false" name="UnrecognizedTaxBenefitsDeferredTaxLiabilitiesGross" nillable="true" xbrli:periodType="duration" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_DeferredTaxAssetsIntangibles" abstract="false" name="DeferredTaxAssetsIntangibles" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_DeferredTaxAssetsOperatingLeaseAssets" abstract="false" name="DeferredTaxAssetsOperatingLeaseAssets" nillable="true" xbrli:periodType="instant" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_ALYFTREKMember" abstract="true" name="ALYFTREKMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_LineOfCreditFacilityAdditionalBorrowingCapacity" abstract="false" name="LineOfCreditFacilityAdditionalBorrowingCapacity" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_DebtCovenantConsolidatedLeverageRatio" abstract="false" name="DebtCovenantConsolidatedLeverageRatio" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:pureItemType"/>
+  <xs:element id="vrtx_DebtCovenantIncreaseInConsolidatedLeverageRatio" abstract="false" name="DebtCovenantIncreaseInConsolidatedLeverageRatio" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="xbrli:pureItemType"/>
+  <xs:element id="vrtx_IndemnificationClaims" abstract="false" name="IndemnificationClaims" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_RoyaltyBurdenPercentage" abstract="false" name="RoyaltyBurdenPercentage" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:percentItemType"/>
+  <xs:element id="vrtx_ContingentLiabilities" abstract="false" name="ContingentLiabilities" nillable="true" xbrli:periodType="instant" xbrli:balance="credit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_CASGEVYMember" abstract="true" name="CASGEVYMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_JOURNAVXMember" abstract="true" name="JOURNAVXMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_TRIKAFTAKAFTRIOMember" abstract="true" name="TRIKAFTAKAFTRIOMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_OtherCountriesOutsideoftheUnitedStatesandEuropeMember" abstract="true" name="OtherCountriesOutsideoftheUnitedStatesandEuropeMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_OutsidetheUnitedStatesMember" abstract="true" name="OutsidetheUnitedStatesMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_McKessonCorporationMember" abstract="true" name="McKessonCorporationMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_AccredoHealthGroupIncMember" abstract="true" name="AccredoHealthGroupIncMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_LloydsPharmacyMember" abstract="true" name="LloydsPharmacyMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_PharmaceuticalsMember" abstract="true" name="PharmaceuticalsMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ResearchExpenses" abstract="false" name="ResearchExpenses" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_DevelopmentExpenses" abstract="false" name="DevelopmentExpenses" nillable="true" xbrli:periodType="duration" xbrli:balance="debit" substitutionGroup="xbrli:item" type="xbrli:monetaryItemType"/>
+  <xs:element id="vrtx_OtherCountriesOutsideoftheUnitedStatesandtheUnitedKingdomMember" abstract="true" name="OtherCountriesOutsideoftheUnitedStatesandtheUnitedKingdomMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_ReshmaKewalramaniMember" abstract="true" name="ReshmaKewalramaniMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_AmitSachdevMember" abstract="true" name="AmitSachdevMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_CarmenBozicMember" abstract="true" name="CarmenBozicMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+  <xs:element id="vrtx_DuncanMcKechnieMember" abstract="true" name="DuncanMcKechnieMember" nillable="true" xbrli:periodType="duration" substitutionGroup="xbrli:item" type="dtr-types:domainItemType"/>
+</xs:schema>

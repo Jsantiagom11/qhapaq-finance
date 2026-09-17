@@ -1,0 +1,9 @@
+{
+  "schema_version": "universe-snapshot-v1",
+  "universe_id": "sp500-top10",
+  "as_of": "2026-08-31",
+  "provenance": "operator-supplied externally supplied S&P 500 Top-10 snapshot; no index weights, market capitalizations, or source URL are asserted",
+  "constituents": [
+    {"rank": 1, "ticker": "NVDA", "issuer_id": "nvidia-corporation"}, {"rank": 2, "ticker": "AAPL", "issuer_id": "apple-inc"}, {"rank": 3, "ticker": "MSFT", "issuer_id": "microsoft-corporation"}, {"rank": 4, "ticker": "AMZN", "issuer_id": "amazon-com-inc"}, {"rank": 5, "ticker": "GOOGL", "issuer_id": "alphabet-inc"}, {"rank": 6, "ticker": "AVGO", "issuer_id": "broadcom-inc"}, {"rank": 7, "ticker": "GOOG", "issuer_id": "alphabet-inc"}, {"rank": 8, "ticker": "META", "issuer_id": "meta-platforms-inc"}, {"rank": 9, "ticker": "MU", "issuer_id": "micron-technology-inc"}, {"rank": 10, "ticker": "TSLA", "issuer_id": "tesla-inc"}
+  ]
+}
