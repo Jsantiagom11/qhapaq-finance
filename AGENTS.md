@@ -24,6 +24,10 @@ Leave the repository understandable and deliverable whether the result is PASS o
 
 Follow `docs/engineering/agent-execution-protocol.md` for the full preflight, development loop, debugging, compatibility, verification, diff-review, stop-condition, delivery, and reporting procedure.
 
+## Project contracts
+
+When a task touches generic company resolution or `qhapaq analyze TICKER`, treat `docs/engineering/qhapaq-analysis-resolution-contract.md` as authoritative unless the task explicitly approves a contract change.
+
 ## Task-specific intent
 
 The current task prompt owns the changing engineering intent: mission, current context, invariants, acceptance criteria, non-goals, and any additional verification or delivery requirements.
