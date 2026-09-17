@@ -10,7 +10,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 
 from .sec_client import SecClient
 
@@ -55,6 +55,13 @@ class SymbolResolver(Protocol):
     """Offline symbol-to-company identity boundary used by analysis orchestration."""
 
     def resolve(self, ticker: str) -> ResolvedCompany | None: ...
+
+
+@runtime_checkable
+class RefreshableSymbolResolver(SymbolResolver, Protocol):
+    """Resolver boundary used when analysis may request one explicit refresh."""
+
+    def refresh(self, client: SecClient) -> int: ...
 
 
 class CompanyResolver:

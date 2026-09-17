@@ -205,7 +205,7 @@ def test_generic_accounting_snapshot_consumes_temporary_canonical_market_evidenc
     issuers = json.loads(issuers_path.read_text(encoding="utf-8"))
     next(item for item in issuers["issuers"] if item["id"] == "apple-inc")["research"] = {
         "as_of": "2026-06-28",
-        "market_quality_profile": profile.relative_to(tmp_path).as_posix()
+        "market_quality_profile": profile.relative_to(tmp_path).as_posix(),
     }
     issuers_path.write_text(json.dumps(issuers), encoding="utf-8")
 
@@ -235,12 +235,11 @@ def test_generic_accounting_snapshot_consumes_temporary_canonical_market_evidenc
     assert result.plan.market_input.provenance(date(2026, 6, 27)).source_mode == "canonical"
 
 
-def test_unregistered_ticker_is_an_explicit_structured_outcome() -> None:
-    result = AnalysisOrchestrator(ROOT).analyze("nope")
+def test_local_cache_miss_is_blocked_during_offline_planning() -> None:
+    plan = AnalysisOrchestrator(ROOT).plan("nope")
 
-    assert result.status is AnalysisStatus.UNSUPPORTED_TICKER
-    assert result.canonical_result is None
-    assert result.plan.identity.to_dict() == {
+    assert plan.status is AnalysisStatus.BLOCKED
+    assert plan.identity.to_dict() == {
         "ticker": "NOPE",
         "security_id": None,
         "issuer_id": None,
