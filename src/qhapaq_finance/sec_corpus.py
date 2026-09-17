@@ -116,8 +116,7 @@ def build_sec_corpus(
         resolved = active_resolver.resolve(requested_ticker)
         if resolved is None:
             raise ValueError(
-                "ticker cannot be resolved from cached SEC company reference: "
-                f"{requested_ticker}"
+                f"ticker cannot be resolved from cached SEC company reference: {requested_ticker}"
             )
 
         ticker = resolved.ticker
@@ -184,10 +183,7 @@ def build_sec_corpus(
             for issuer in issuers
         ],
     }
-    is_full_fixed_corpus = (
-        len(tickers) == len(_ISSUER_CIKS)
-        and set(tickers) == set(_ISSUER_CIKS)
-    )
+    is_full_fixed_corpus = len(tickers) == len(_ISSUER_CIKS) and set(tickers) == set(_ISSUER_CIKS)
     root_manifest_path = root / "manifest.json"
 
     if is_full_fixed_corpus or not root_manifest_path.exists():
@@ -520,9 +516,10 @@ def _validate_legacy_root_for_upgrade(
         if not isinstance(issuer, dict) or issuer.get("ticker") not in current:
             raise ImmutableArtifactConflictError("existing root corpus issuer is invalid")
         target = current[issuer["ticker"]]
-        if issuer.get("cik") != target["cik"] or issuer.get("manifest") != target[
-            "issuer_manifest_path"
-        ]:
+        if (
+            issuer.get("cik") != target["cik"]
+            or issuer.get("manifest") != target["issuer_manifest_path"]
+        ):
             raise ImmutableArtifactConflictError(
                 "existing root corpus issuer conflicts with frozen corpus"
             )

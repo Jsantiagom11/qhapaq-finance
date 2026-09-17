@@ -83,9 +83,7 @@ class LocalSecCorpus:
             companyfacts,
             submissions,
             selected,
-            hashlib.sha256(
-                (issuer_root / companyfacts_path).read_bytes()
-            ).hexdigest(),
+            hashlib.sha256((issuer_root / companyfacts_path).read_bytes()).hexdigest(),
         )
 
     def canonicalize(

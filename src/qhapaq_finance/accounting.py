@@ -214,9 +214,7 @@ def accounting_evidence_spec_from_promoted_facts(
 
     missing = required_ids - set(facts)
     if missing:
-        raise AccountingError(
-            f"missing promoted accounting metric: {sorted(missing)[0]}"
-        )
+        raise AccountingError(f"missing promoted accounting metric: {sorted(missing)[0]}")
 
     present_noa = noa_ids & set(facts)
     if present_noa and present_noa != noa_ids:
@@ -245,12 +243,8 @@ def accounting_evidence_spec_from_promoted_facts(
         operating_nwc_opening_liabilities=("operating_current_liabilities_opening",),
         operating_nwc_closing_assets=("operating_current_assets_closing",),
         operating_nwc_closing_liabilities=("operating_current_liabilities_closing",),
-        net_operating_assets_opening=(
-            ("net_operating_assets_opening",) if has_noa else ()
-        ),
-        net_operating_assets_closing=(
-            ("net_operating_assets_closing",) if has_noa else ()
-        ),
+        net_operating_assets_opening=(("net_operating_assets_opening",) if has_noa else ()),
+        net_operating_assets_closing=(("net_operating_assets_closing",) if has_noa else ()),
         cash=("cash",),
         marketable_securities=("marketable_securities",),
         debt=("total_debt",),
@@ -285,11 +279,7 @@ def promote_local_sec_accounting_evidence(
     # Revenue defines the actual TTM accounting window.
     bootstrap_policies = accounting_evidence_policies()
     revenue_policy = next(
-        (
-            policy
-            for policy in bootstrap_policies
-            if policy.metric_id == "revenue"
-        ),
+        (policy for policy in bootstrap_policies if policy.metric_id == "revenue"),
         None,
     )
     if revenue_policy is None:
@@ -323,11 +313,7 @@ def promote_local_sec_accounting_evidence(
 
     # Invested capital is an optional analytical extension, but only as a
     # temporally homogeneous opening/closing pair.
-    noa_policies = {
-        policy.metric_id: policy
-        for policy in policies
-        if policy.metric_id in noa_ids
-    }
+    noa_policies = {policy.metric_id: policy for policy in policies if policy.metric_id in noa_ids}
     if set(noa_policies) != noa_ids:
         raise AccountingError("invested-capital promotion policies are incomplete")
 
@@ -641,9 +627,7 @@ def reconcile_invested_capital(
     else:
         gap_pct = abs(gap) / abs(top_down.value)
         status = (
-            ReconciliationStatus.ALIGNED
-            if gap_pct <= 0.05
-            else ReconciliationStatus.MATERIAL_GAP
+            ReconciliationStatus.ALIGNED if gap_pct <= 0.05 else ReconciliationStatus.MATERIAL_GAP
         )
     return ICReconciliation(
         as_of=as_of,
@@ -886,9 +870,7 @@ def _legacy_reconciliation(
         as_of=as_of,
         method=ICMethod.BOTTOM_UP,
         components={
-            "legacy_bottom_up_invested_capital": component_from_source(
-                value, provenance=provenance
-            )
+            "legacy_bottom_up_invested_capital": component_from_source(value, provenance=provenance)
         },
         state=_node_state(value),
         provenance=provenance,
@@ -898,9 +880,7 @@ def _legacy_reconciliation(
         as_of=as_of,
         method=ICMethod.FINANCING_IDENTITY,
         components={
-            "legacy_compatibility_capital": component_from_source(
-                value, provenance=provenance
-            )
+            "legacy_compatibility_capital": component_from_source(value, provenance=provenance)
         },
         state=_node_state(value),
         provenance=provenance,
@@ -1020,9 +1000,7 @@ def normalize_accounting_snapshot(
     has_opening_noa = bool(spec.net_operating_assets_opening)
     has_closing_noa = bool(spec.net_operating_assets_closing)
     if has_opening_noa != has_closing_noa:
-        raise AccountingError(
-            "invested capital requires both opening and closing operating assets"
-        )
+        raise AccountingError("invested capital requires both opening and closing operating assets")
 
     invested_capital: InvestedCapitalPair | None = None
     noa_units: set[str] = set()

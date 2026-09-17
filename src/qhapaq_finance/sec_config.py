@@ -34,9 +34,7 @@ class SecConfig:
             raise RuntimeError("Missing required environment variable: SEC_ORGANIZATION")
 
         if not contact_email or "@" not in contact_email:
-            raise RuntimeError(
-                "Missing or invalid environment variable: SEC_CONTACT_EMAIL"
-            )
+            raise RuntimeError("Missing or invalid environment variable: SEC_CONTACT_EMAIL")
 
         try:
             max_rps = float(os.getenv("SEC_MAX_RPS", "8"))

@@ -25,8 +25,6 @@ def test_ttm_window_exposes_period_end_as_closing_balance_date() -> None:
         (date(2026, 6, 28), date(2026, 6, 27)),
     ),
 )
-def test_ttm_window_rejects_empty_or_reversed_period(
-    period_start: date, period_end: date
-) -> None:
+def test_ttm_window_rejects_empty_or_reversed_period(period_start: date, period_end: date) -> None:
     with pytest.raises(FinancialTemporalError, match="TTM_WINDOW_INVALID"):
         TTMWindow(period_start=period_start, period_end=period_end)

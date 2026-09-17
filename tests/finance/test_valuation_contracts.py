@@ -9,9 +9,7 @@ from qhapaq_finance.accounting import InvestedCapitalPair
 
 
 def _contract():
-    if not hasattr(valuation, "ValuationInput") or not hasattr(
-        valuation, "run_valuation"
-    ):
+    if not hasattr(valuation, "ValuationInput") or not hasattr(valuation, "run_valuation"):
         pytest.fail("ValuationInput/run_valuation contract missing")
     return valuation.ValuationInput, valuation.run_valuation
 

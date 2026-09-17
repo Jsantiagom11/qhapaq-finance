@@ -56,11 +56,13 @@ class EvidenceRef:
     identifier: str
     content_identity: str | None
 
+
 @dataclass(frozen=True)
 class MetricTrace:
     metric: str
     evidence: tuple[EvidenceRef, ...]
     derivation: str | None = None
+
 
 @dataclass(frozen=True)
 class Lineage:
@@ -82,6 +84,7 @@ class InvestedCapitalPair:
     closing_date: date
 
     def average(self) -> float: ...
+
 
 @dataclass(frozen=True)
 class AccountingSnapshot:
@@ -116,6 +119,7 @@ class ValuationInputs:
     capital_cost: CapitalCostResult
     market: MarketInput
     assumptions: ValuationAssumptions
+
 
 @dataclass(frozen=True)
 class ValuationOutcome:
@@ -178,19 +182,23 @@ Use Railway Oriented Programming with small local types, not an external monad l
 ```python
 T = TypeVar("T")
 
+
 @dataclass(frozen=True)
 class BlockReason:
     code: str
     message: str
     evidence_ids: tuple[str, ...] = ()
 
+
 @dataclass(frozen=True)
 class StepSuccess(Generic[T]):
     value: T
 
+
 @dataclass(frozen=True)
 class StepBlocked:
     reason: BlockReason
+
 
 StepResult = StepSuccess[T] | StepBlocked
 ```

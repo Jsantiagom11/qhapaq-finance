@@ -46,8 +46,12 @@ def _sources():
 
 
 def _research_with(
-    research, *, margin_of_safety: float | None = 0.30, roic_minus_wacc: float | None = 0.06,
-    expectation_growth_gap: float | None = -0.01, ready: bool = True,
+    research,
+    *,
+    margin_of_safety: float | None = 0.30,
+    roic_minus_wacc: float | None = 0.06,
+    expectation_growth_gap: float | None = -0.01,
+    ready: bool = True,
 ):
     base = dict(research.valuation["scenarios"]["base"])
     base["margin_of_safety"] = margin_of_safety
@@ -100,9 +104,7 @@ def test_high_score_after_passing_gates_is_eligible() -> None:
     module = _decision_module()
     valuation, research = _sources()
 
-    result = module.evaluate_decision(
-        module.DecisionInput(valuation, _research_with(research))
-    )
+    result = module.evaluate_decision(module.DecisionInput(valuation, _research_with(research)))
 
     assert result.status is module.DecisionStatus.ELIGIBLE
     assert result.total_score == 1.0
@@ -191,9 +193,7 @@ def test_decision_consumes_supplied_evidence_without_recalculating_finance(monke
         lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("ROIC recalculated")),
     )
 
-    result = module.evaluate_decision(
-        module.DecisionInput(valuation, _research_with(research))
-    )
+    result = module.evaluate_decision(module.DecisionInput(valuation, _research_with(research)))
 
     assert result.status is module.DecisionStatus.ELIGIBLE
 

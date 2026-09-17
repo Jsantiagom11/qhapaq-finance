@@ -85,7 +85,10 @@ def test_repeated_corpus_export_keeps_manifests_stable(
         "tickers": ["AAPL"],
         "filings": {
             "recent": {
-                "accessionNumber": [], "form": [], "filingDate": [], "reportDate": [],
+                "accessionNumber": [],
+                "form": [],
+                "filingDate": [],
+                "reportDate": [],
                 "primaryDocument": [],
             }
         },
@@ -189,7 +192,6 @@ def test_reconciliation_has_deterministic_configured_order(tmp_path: Path) -> No
     )
 
     assert [entry["ticker"] for entry in manifest["issuers"]] == list(_CORPUS_TICKERS)
-
 
 
 def test_live_sec_corpus_builder_accepts_resolved_ticker_outside_legacy_allowlist(
