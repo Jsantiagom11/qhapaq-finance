@@ -4,17 +4,17 @@
 
 Status: `AUTOMATED_RELEASE_VALIDATION_COMPLETE` as of 2026-09-03.
 
-Implemented the bounded QCOM research workflow authorized by the handoff: a task-supplied one-symbol
-universe, three frozen Qualcomm/SEC primary documents, typed facts and calculations, reviewed Spanish
-narrative, thesis/counterthesis/invalidation, and a deterministic self-contained HTML report. This is
-research only; it is not a holding, recommendation, allocation, target price, or suitability result.
+Implemented the bounded QCOM research workflow: a one-symbol universe, three frozen Qualcomm/SEC
+primary documents, typed facts and calculations, reviewed Spanish narrative,
+thesis/counterthesis/invalidation, and a deterministic self-contained HTML report. This is research
+only; it is not a holding, recommendation, allocation, target price, or suitability result.
 
 ## Identity and acquisition
 
-- Root: `/home/propane/workspace/qhapaq-finance`; branch `feat/frozen-ecb-fx-snapshot`; starting HEAD
+- Root: `<repo-root>`; branch `feat/frozen-ecb-fx-snapshot`; starting HEAD
   `92381c9c18edb2d0f965a9b162a94929e19dfbfa`.
-- The seven pre-existing documentation changes were copied with hashes and baseline diff to
-  `/tmp/qhapaq-qcom-baseline-Mbld79` before edits.
+- Pre-existing documentation changes were copied with hashes and a baseline diff to an external
+  temporary workspace before edits.
 - Cutoff: `2026-09-01`; retrieval: `2026-09-02T15:02:17-05:00`.
 - SEC returned HTTP 403 to the bounded archive download; no bypass was attempted. Issuer-hosted
   copies discovered from Qualcomm IR were used, with SEC filing-index metadata for filing identity
