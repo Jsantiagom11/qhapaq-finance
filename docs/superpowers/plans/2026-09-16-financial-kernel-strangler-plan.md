@@ -53,7 +53,6 @@ def test_ttm_window_exposes_balance_endpoints() -> None:
     assert window.opening_balance_date == date(2025, 6, 28)
     assert window.closing_balance_date == date(2026, 6, 27)
 
-
 def test_ttm_window_rejects_empty_or_reversed_period() -> None:
     with pytest.raises(FinancialKernelError, match="TTM_WINDOW_INVALID"):
         TTMWindow(date(2026, 6, 27), date(2026, 6, 27))
@@ -124,7 +123,6 @@ def test_generic_valuation_runs_reverse_dcf_without_invested_capital() -> None:
     outcome = value(ValuationInputs(accounting_without_noa, canonical_wacc, market, assumptions))
     assert outcome.fcff == accounting_without_noa.fcff
     assert outcome.roic is None
-
 
 def test_generic_valuation_rejects_missing_debt_even_when_fcff_exists() -> None: ...
 ```
