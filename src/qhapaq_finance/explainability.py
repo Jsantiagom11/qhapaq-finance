@@ -8,18 +8,19 @@ not calculate a value, and it does not ask a model to decide what is a fact.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from enum import StrEnum
 from typing import Any
 
+from .string_enum import StringEnum
 
-class FactStatus(StrEnum):
+
+class FactStatus(StringEnum):
     FACT = "FACT"
     DERIVED_FACT = "DERIVED_FACT"
     INFERENCE = "INFERENCE"
     UNCERTAINTY = "UNCERTAINTY"
 
 
-class ArgumentCategory(StrEnum):
+class ArgumentCategory(StringEnum):
     VALUATION = "VALUATION"
     ECONOMIC_QUALITY = "ECONOMIC_QUALITY"
     EXPECTATIONS = "EXPECTATIONS"
