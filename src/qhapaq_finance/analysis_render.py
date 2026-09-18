@@ -50,11 +50,17 @@ def _render_header(result: AnalysisResult, options: AnalysisRenderOptions, width
     canonical = result.canonical_result
     canonical_name = canonical.issuer.get("display_name") if canonical is not None else None
     display_name = _sanitize_company_name(
-        canonical_name if isinstance(canonical_name, str) and canonical_name.strip() else identity.display_name
+        canonical_name
+        if isinstance(canonical_name, str) and canonical_name.strip()
+        else identity.display_name
     )
     separator_glyph = "-" if options.plain else "─"
     title_separator = " - " if options.plain else " — "
-    title = f"QHAPAQ{title_separator}{display_name} ({identity.ticker})" if display_name else f"QHAPAQ{title_separator}{identity.ticker}"
+    title = (
+        f"QHAPAQ{title_separator}{display_name} ({identity.ticker})"
+        if display_name
+        else f"QHAPAQ{title_separator}{identity.ticker}"
+    )
     return [title, separator_glyph * min(width, len(title)), ""]
 
 
