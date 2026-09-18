@@ -261,7 +261,8 @@ def test_analyze_cli_defaults_to_human_view(capsys: pytest.CaptureFixture[str]) 
 
     assert "QHAPAQ" in output
     assert "COMPLETED" in output
-    assert "FINANCIAL SNAPSHOT" in output
+    assert "MARKET EXPECTATIONS" in output
+    assert "BUSINESS ECONOMICS" in output
     assert '"schema_version"' not in output
 
 
@@ -272,7 +273,7 @@ def test_analyze_cli_detail_adds_analyst_sections(
     output = capsys.readouterr().out
 
     assert "ANALYSIS STAGES" in output
-    assert "VALUATION SCENARIOS" in output
+    assert "DCF SCENARIOS" in output
     assert "MARKET PROVENANCE" in output
     assert "AUDIT" in output
 
