@@ -92,6 +92,14 @@ def _rendered_value(text: str, label: str) -> str:
     return line[len(label) :].strip()
 
 
+def _rendered_values(text: str, label: str) -> list[str]:
+    return [
+        line[len(label) :].strip()
+        for line in text.splitlines()
+        if line.startswith(label) and line != label
+    ]
+
+
 def test_evidence_required_executive_view_is_human_and_omits_empty_valuation() -> None:
     result = _result(
         AnalysisStatus.EVIDENCE_REQUIRED,
@@ -114,7 +122,7 @@ def test_evidence_required_executive_view_is_human_and_omits_empty_valuation() -
     assert not text.endswith("\n\n")
 
 
-def test_evidence_required_detail_adds_stages_and_full_evidence_plan() -> None:
+def test_evidence_required_detail_adds_compact_evidence_quality() -> None:
     result = _result(
         AnalysisStatus.EVIDENCE_REQUIRED,
         "checksum-verified canonical evidence is not available",
@@ -123,12 +131,15 @@ def test_evidence_required_detail_adds_stages_and_full_evidence_plan() -> None:
     executive = render_analysis(result, AnalysisRenderOptions(plain=True))
     detail = render_analysis(result, AnalysisRenderOptions(detail=True, plain=True))
 
-    assert "ANALYSIS STAGES" not in executive
-    assert "EVIDENCE DETAIL" not in executive
-    assert "ANALYSIS STAGES" in detail
-    assert "EVIDENCE DETAIL" in detail
-    assert "company-facts" in detail
-    assert "no local artifact" in detail
+    assert "ANALYST DETAIL" not in executive
+    assert "EVIDENCE QUALITY" not in executive
+    assert "ANALYST DETAIL" in detail
+    assert "EVIDENCE QUALITY" in detail
+    assert "COMPANY FACTS" in detail
+    assert "MISSING - no local artifact" in detail
+    assert "IDENTIFIER" not in detail
+    assert "PROVIDER" not in detail
+    assert "ARTIFACT" not in detail
     assert len(detail) > len(executive)
 
 
@@ -281,7 +292,7 @@ def test_completed_header_prefers_canonical_identity_and_sec_fallback_is_sanitiz
     assert "Acme Inc" not in fallback_text
 
 
-def test_detail_adds_scenarios_provenance_readiness_and_content_identity() -> None:
+def test_detail_preserves_executive_view_and_adds_approved_analyst_hierarchy() -> None:
     result = AnalysisOrchestrator(ROOT).analyze("QCOM")
     canonical = result.canonical_result
     assert canonical is not None
@@ -289,19 +300,176 @@ def test_detail_adds_scenarios_provenance_readiness_and_content_identity() -> No
     executive = render_analysis(result, AnalysisRenderOptions(plain=True))
     detail = render_analysis(result, AnalysisRenderOptions(detail=True, plain=True))
 
-    assert "ANALYSIS STAGES" not in executive
-    assert "EVIDENCE DETAIL" not in executive
-    assert "DCF SCENARIOS" not in executive
-    assert "READINESS" not in executive
-    assert "MARKET PROVENANCE" not in executive
-    assert "ANALYSIS STAGES" in detail
-    assert "EVIDENCE DETAIL" in detail
-    assert "DCF SCENARIOS" in detail
-    assert "READINESS" in detail
-    assert "MARKET PROVENANCE" in detail
-    assert "AUDIT" in detail
-    assert "canonical-financial-evidence" in detail
+    headings = (
+        "ANALYST DETAIL",
+        "FINANCIAL DETAIL",
+        "DCF SCENARIOS",
+        "EVIDENCE QUALITY",
+        "READINESS",
+        "PROVENANCE",
+        "AUDIT",
+    )
+
+    assert detail.startswith(executive.rstrip() + "\n\nANALYST DETAIL\n")
+    assert all(heading not in executive for heading in headings)
+    lines = detail.splitlines()
+    assert [lines.index(heading) for heading in headings] == sorted(
+        lines.index(heading) for heading in headings
+    )
     assert canonical.content_identity in detail
+
+
+def test_detail_projects_compact_evidence_quality_without_flattened_internals() -> None:
+    result = AnalysisOrchestrator(ROOT).analyze("QCOM")
+
+    detail = render_analysis(result, AnalysisRenderOptions(detail=True, plain=True))
+
+    for label in (
+        "CANONICAL FACTS",
+        "EVIDENCE SET",
+        "PROVENANCE",
+        "SOURCE INTEGRITY",
+        "EFFECTIVE SOURCE SELECTION",
+        "NORMALIZATION",
+        "PERIOD SEMANTICS",
+        "UNIT SEMANTICS",
+        "TTM COMPATIBILITY",
+        "GOLDEN FACTS",
+        "CRITICAL FACT COMPLETENESS",
+        "REPRODUCIBILITY",
+    ):
+        assert label in detail
+    for internal_prefix in (
+        "quality.gates[",
+        "financial_evidence_quality.",
+        "model_requirements.",
+        "model_stage_readiness.",
+    ):
+        assert internal_prefix not in detail
+    assert "qcom-fy25-10k" not in detail
+    assert "REASON                Unavailable" not in detail
+    assert "DIAGNOSTICS           None" not in detail
+
+
+def test_detail_preserves_failed_evidence_gate_and_reason() -> None:
+    result = AnalysisOrchestrator(ROOT).analyze("QCOM")
+    canonical = result.canonical_result
+    assert canonical is not None
+    quality = canonical.financial_evidence["quality"]
+    assert isinstance(quality, dict)
+    gates = [dict(gate) for gate in quality["gates"]]
+    gates[0] = {
+        **gates[0],
+        "status": "FAIL",
+        "failures": ["source lineage is incomplete"],
+        "references": ["internal-source-reference"],
+    }
+    failed_quality = {**quality, "gates": gates, "blocking_failures": ["provenance"]}
+    canonical = replace(
+        canonical,
+        financial_evidence={**canonical.financial_evidence, "quality": failed_quality},
+    )
+
+    detail = render_analysis(
+        replace(result, canonical_result=canonical),
+        AnalysisRenderOptions(detail=True, plain=True),
+    )
+
+    assert _rendered_value(detail, "PROVENANCE") == "FAIL"
+    assert _rendered_value(detail, "PROVENANCE FAILURE") == "source lineage is incomplete"
+    assert "internal-source-reference" not in detail
+
+
+def test_detail_readiness_uses_unambiguous_human_labels() -> None:
+    result = AnalysisOrchestrator(ROOT).analyze("QCOM")
+
+    detail = render_analysis(result, AnalysisRenderOptions(detail=True, plain=True))
+    readiness = detail.split("\nREADINESS\n", maxsplit=1)[1].split("\n\nPROVENANCE\n", maxsplit=1)[
+        0
+    ]
+
+    for label in (
+        "RESEARCH",
+        "MODEL",
+        "CAPITAL STRUCTURE",
+        "FCFF",
+        "INVESTED CAPITAL",
+        "NOPAT",
+        "OPERATING MODEL",
+        "PER SHARE",
+    ):
+        assert _rendered_value(readiness, label) == "READY"
+    assert "CAPITAL COST READY" not in detail
+    assert "VALUATION READY" not in detail
+    assert "capital_cost_ready" not in detail
+    assert "valuation_ready" not in detail
+
+
+def test_detail_does_not_convert_false_readiness_to_success() -> None:
+    result = AnalysisOrchestrator(ROOT).analyze("QCOM")
+    canonical = result.canonical_result
+    assert canonical is not None
+    model_requirements = canonical.readiness["model_requirements"]
+    stage_readiness = canonical.readiness["model_stage_readiness"]
+    assert isinstance(model_requirements, dict)
+    assert isinstance(stage_readiness, dict)
+    readiness = {
+        **canonical.readiness,
+        "deterministic_research_ready": False,
+        "model_requirements": {**model_requirements, "model_ready": False},
+        "model_stage_readiness": {
+            **stage_readiness,
+            "fcff": {**stage_readiness["fcff"], "ready": False},
+        },
+    }
+
+    detail = render_analysis(
+        replace(result, canonical_result=replace(canonical, readiness=readiness)),
+        AnalysisRenderOptions(detail=True, plain=True),
+    )
+    readiness_section = detail.split("\nREADINESS\n", maxsplit=1)[1].split(
+        "\n\nPROVENANCE\n", maxsplit=1
+    )[0]
+
+    assert _rendered_value(readiness_section, "RESEARCH") == "NOT READY"
+    assert _rendered_value(readiness_section, "MODEL") == "NOT READY"
+    assert _rendered_value(readiness_section, "FCFF") == "NOT READY"
+
+
+def test_detail_provenance_omits_unavailable_internal_fields() -> None:
+    result = AnalysisOrchestrator(ROOT).analyze("QCOM")
+
+    detail = render_analysis(result, AnalysisRenderOptions(detail=True, plain=True))
+
+    assert _rendered_values(detail, "MARKET SOURCE")[-1] == "Legacy"
+    assert _rendered_value(detail, "CURRENCY") == "USD"
+    assert _rendered_value(detail, "RESEARCH AS OF") == "2026-09-08"
+    assert "canonical_observation_identity" not in detail
+    assert "market_quality_identity" not in detail
+    assert "price_fact_identity" not in detail
+
+
+def test_detail_only_shows_scenario_diagnostics_when_present() -> None:
+    result = AnalysisOrchestrator(ROOT).analyze("QCOM")
+    canonical = result.canonical_result
+    assert canonical is not None
+    without_diagnostics = render_analysis(
+        result,
+        AnalysisRenderOptions(detail=True, plain=True),
+    )
+    with_diagnostics = render_analysis(
+        replace(
+            result,
+            canonical_result=replace(
+                canonical,
+                valuation={**canonical.valuation, "diagnostics": ["terminal share is elevated"]},
+            ),
+        ),
+        AnalysisRenderOptions(detail=True, plain=True),
+    )
+
+    assert "DIAGNOSTICS" not in without_diagnostics
+    assert _rendered_value(with_diagnostics, "DIAGNOSTICS") == "terminal share is elevated"
 
 
 def test_rendering_is_deterministic_for_explicit_options() -> None:
@@ -332,7 +500,7 @@ def test_renderer_does_not_invoke_financial_engines(monkeypatch: pytest.MonkeyPa
     monkeypatch.setattr("qhapaq_finance.valuation.analyze_case", forbidden)
     monkeypatch.setattr("qhapaq_finance.research_result.build_canonical_research_result", forbidden)
 
-    text = render_analysis(result, AnalysisRenderOptions(plain=True))
+    text = render_analysis(result, AnalysisRenderOptions(detail=True, plain=True))
 
     assert "COMPLETED" in text
 

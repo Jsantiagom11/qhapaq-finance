@@ -272,10 +272,25 @@ def test_analyze_cli_detail_adds_analyst_sections(
     cli.main(["analyze", "QCOM", "--repository-root", str(ROOT), "--detail", "--plain"])
     output = capsys.readouterr().out
 
-    assert "ANALYSIS STAGES" in output
-    assert "DCF SCENARIOS" in output
-    assert "MARKET PROVENANCE" in output
-    assert "AUDIT" in output
+    headings = (
+        "ANALYST DETAIL",
+        "FINANCIAL DETAIL",
+        "DCF SCENARIOS",
+        "EVIDENCE QUALITY",
+        "READINESS",
+        "PROVENANCE",
+        "AUDIT",
+    )
+
+    assert all(heading in output for heading in headings)
+    lines = output.splitlines()
+    assert [lines.index(heading) for heading in headings] == sorted(
+        lines.index(heading) for heading in headings
+    )
+    assert "quality.gates[" not in output
+    assert "financial_evidence_quality." not in output
+    assert "model_requirements." not in output
+    assert "model_stage_readiness." not in output
 
 
 def test_analyze_cli_plain_is_ascii_without_ansi(capsys: pytest.CaptureFixture[str]) -> None:

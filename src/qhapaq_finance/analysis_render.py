@@ -341,7 +341,7 @@ def _scalar(value: object) -> str:
 
 def _scenario_summary(value: object, width: int) -> list[str]:
     if not isinstance(value, Mapping):
-        return _field("SCENARIOS", "Unavailable", width)
+        return _detail_field("SCENARIOS", "N/A", width)
     lines: list[str] = []
     names = [name for name in ("bear", "base", "bull") if name in value]
     names.extend(sorted(str(name) for name in value if name not in names))
@@ -362,51 +362,21 @@ def _scenario_summary(value: object, width: int) -> list[str]:
         warnings = scenario.get("warnings")
         if warnings:
             fields.append((f"{name.upper()} WARNINGS", warnings))
-        lines.extend(_fields(tuple(fields), width))
-    return lines or _field("SCENARIOS", "Unavailable", width)
+        lines.extend(_detail_fields(tuple(fields), width))
+    return lines or _detail_field("SCENARIOS", "N/A", width)
 
 
 def _render_detail(result: AnalysisResult, width: int) -> list[str]:
     canonical = result.canonical_result
-    lines = ["", "ANALYSIS STAGES"]
-    stages = (
-        ("acquisition", result.plan.acquisition),
-        ("evidence", result.plan.evidence),
-        ("research", result.plan.research),
-        ("valuation", result.plan.valuation),
-        ("publishing", result.plan.publishing),
-    )
-    for name, stage in stages:
-        value = stage.state.value
-        if stage.reason:
-            value = f"{value} - {stage.reason}"
-        lines.extend(_field(name.upper(), value, width))
-
-    lines.extend(["", "EVIDENCE DETAIL"])
-    evidence_plan = result.plan.evidence_plan
-    if evidence_plan is None:
-        lines.extend(_field("EVIDENCE", "Unavailable", width))
-    else:
-        for item in evidence_plan.items:
-            lines.extend(
-                _fields(
-                    (
-                        ("IDENTIFIER", item.requirement.identifier),
-                        ("PROVIDER", item.requirement.provider),
-                        ("ARTIFACT", item.requirement.artifact_kind),
-                        ("STATE", item.state.value),
-                        ("REASON", item.reason),
-                    ),
-                    width,
-                )
-            )
-
+    lines = ["", "ANALYST DETAIL"]
     if canonical is None:
+        lines.extend(["", "EVIDENCE QUALITY"])
+        lines.extend(_evidence_plan_fields(result, width))
         return lines
 
     lines.extend(["", "FINANCIAL DETAIL"])
     lines.extend(
-        _fields(
+        _detail_fields(
             (
                 ("RECONSTRUCTED FCFF", _number(canonical.valuation.get("reconstructed_fcff"))),
                 ("NOPAT", _number(canonical.valuation.get("nopat"))),
@@ -419,20 +389,22 @@ def _render_detail(result: AnalysisResult, width: int) -> list[str]:
             width,
         )
     )
-    lines.extend(["", "FINANCIAL EVIDENCE"])
-    lines.extend(_nested_fields(canonical.financial_evidence, width))
     lines.extend(["", "DCF SCENARIOS"])
     scenarios = canonical.valuation.get("scenarios")
     lines.extend(_scenario_summary(scenarios, width))
     diagnostics = canonical.valuation.get("diagnostics")
-    lines.extend(_field("DIAGNOSTICS", diagnostics, width))
+    if _is_meaningful(diagnostics):
+        lines.extend(_detail_field("DIAGNOSTICS", diagnostics, width))
+    lines.extend(["", "EVIDENCE QUALITY"])
+    lines.extend(_evidence_plan_fields(result, width))
+    lines.extend(_quality_fields(canonical.financial_evidence.get("quality"), width))
     lines.extend(["", "READINESS"])
-    lines.extend(_nested_fields(canonical.readiness, width))
-    lines.extend(["", "MARKET PROVENANCE"])
-    lines.extend(_nested_fields(canonical.market_provenance.to_dict(), width))
+    lines.extend(_readiness_fields(canonical.readiness, width))
+    lines.extend(["", "PROVENANCE"])
+    lines.extend(_provenance_fields(canonical, width))
     lines.extend(["", "AUDIT"])
     lines.extend(
-        _fields(
+        _detail_fields(
             (
                 ("RESEARCH IDENTITY", canonical.research_identity),
                 ("CONTENT IDENTITY", canonical.content_identity),
@@ -444,26 +416,155 @@ def _render_detail(result: AnalysisResult, width: int) -> list[str]:
     return lines
 
 
-def _nested_fields(value: object, width: int, prefix: str = "") -> list[str]:
-    if isinstance(value, Mapping):
-        lines: list[str] = []
-        for key in sorted(value, key=str):
-            name = f"{prefix}.{key}" if prefix else str(key)
-            lines.extend(_nested_fields(value[key], width, name))
-        return lines or _field(prefix or "VALUE", "None", width)
-    if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
-        if not value:
-            return _field(prefix or "VALUE", "None", width)
-        if all(
-            not isinstance(item, (Mapping, Sequence)) or isinstance(item, str) for item in value
-        ):
-            return _field(prefix or "VALUE", value, width)
-        lines = []
-        for index, item in enumerate(value):
-            name = f"{prefix}[{index}]" if prefix else f"[{index}]"
-            lines.extend(_nested_fields(item, width, name))
-        return lines
-    return _field(prefix or "VALUE", value, width)
+def _detail_fields(items: Sequence[tuple[str, object]], width: int) -> list[str]:
+    label_width = min(max(len(label) for label, _ in items) + 2, width - 12)
+    lines: list[str] = []
+    for label, value in items:
+        lines.extend(_detail_field(label, value, width, label_width=label_width))
+    return lines
+
+
+def _detail_field(
+    label: str, value: object, width: int, *, label_width: int | None = None
+) -> list[str]:
+    effective_label_width = label_width or min(len(label) + 2, width - 12)
+    prefix = f"{label:<{effective_label_width}}"
+    available = max(12, width - len(prefix))
+    parts = wrap(
+        _scalar(value),
+        width=available,
+        break_long_words=False,
+        break_on_hyphens=False,
+    ) or [""]
+    return [prefix + parts[0], *(" " * len(prefix) + part for part in parts[1:])]
+
+
+def _evidence_plan_fields(result: AnalysisResult, width: int) -> list[str]:
+    plan = result.plan.evidence_plan
+    if plan is None or not plan.items:
+        return []
+    fields: list[tuple[str, object]] = []
+    successful = {EvidenceState.AVAILABLE, EvidenceState.VERIFIED}
+    for item in plan.items:
+        value = item.state.value
+        reason = item.reason.strip() if isinstance(item.reason, str) else ""
+        if reason and not (item.state in successful and reason.lower() == "unavailable"):
+            value = f"{value} - {reason}"
+        fields.append((_evidence_label(item).upper(), value))
+    return _detail_fields(tuple(fields), width)
+
+
+_QUALITY_GATE_LABELS = (
+    ("provenance", "PROVENANCE"),
+    ("source_integrity", "SOURCE INTEGRITY"),
+    ("effective_source_selection", "EFFECTIVE SOURCE SELECTION"),
+    ("normalization", "NORMALIZATION"),
+    ("period_semantics", "PERIOD SEMANTICS"),
+    ("unit_semantics", "UNIT SEMANTICS"),
+    ("ttm_compatibility", "TTM COMPATIBILITY"),
+    ("golden_facts", "GOLDEN FACTS"),
+    ("critical_fact_completeness", "CRITICAL FACT COMPLETENESS"),
+    ("reproducibility", "REPRODUCIBILITY"),
+)
+
+
+def _quality_fields(value: object, width: int) -> list[str]:
+    if not isinstance(value, Mapping):
+        return _detail_field("QUALITY REPORT", "N/A", width)
+    fields: list[tuple[str, object]] = [
+        ("CANONICAL FACTS", value.get("canonical_fact_count")),
+        ("EVIDENCE SET", value.get("evidence_set_id")),
+    ]
+    raw_gates = value.get("gates")
+    gates = (
+        {
+            str(gate.get("id")): gate
+            for gate in raw_gates
+            if isinstance(gate, Mapping) and gate.get("id")
+        }
+        if isinstance(raw_gates, Sequence) and not isinstance(raw_gates, (str, bytes))
+        else {}
+    )
+    rendered_gate_ids: set[str] = set()
+    for identifier, label in _QUALITY_GATE_LABELS:
+        gate = gates.get(identifier)
+        if gate is None:
+            continue
+        rendered_gate_ids.add(identifier)
+        _append_quality_gate(fields, label, gate)
+    for identifier, gate in gates.items():
+        if identifier in rendered_gate_ids or str(gate.get("status")) != "FAIL":
+            continue
+        _append_quality_gate(fields, identifier.replace("_", " ").upper(), gate)
+    missing = value.get("missing_required_facts")
+    if _is_meaningful(missing):
+        fields.append(("MISSING REQUIRED FACTS", missing))
+    return _detail_fields(tuple(fields), width)
+
+
+def _append_quality_gate(
+    fields: list[tuple[str, object]], label: str, gate: Mapping[object, object]
+) -> None:
+    status = str(gate.get("status", "N/A")).replace("NOT_APPLICABLE", "N/A")
+    fields.append((label, status))
+    failures = gate.get("failures")
+    if status == "FAIL" and _is_meaningful(failures):
+        fields.append((f"{label} FAILURE", failures))
+
+
+def _readiness_fields(value: object, width: int) -> list[str]:
+    readiness = value if isinstance(value, Mapping) else {}
+    model = readiness.get("model_requirements")
+    model_mapping = model if isinstance(model, Mapping) else {}
+    stages = readiness.get("model_stage_readiness")
+    stage_mapping = stages if isinstance(stages, Mapping) else {}
+    fields = (
+        ("RESEARCH", _readiness_label(readiness.get("deterministic_research_ready"))),
+        ("MODEL", _readiness_label(model_mapping.get("model_ready"))),
+        ("CAPITAL STRUCTURE", _stage_readiness_label(stage_mapping, "capital_structure")),
+        ("FCFF", _stage_readiness_label(stage_mapping, "fcff")),
+        ("INVESTED CAPITAL", _stage_readiness_label(stage_mapping, "invested_capital")),
+        ("NOPAT", _stage_readiness_label(stage_mapping, "nopat")),
+        ("OPERATING MODEL", _stage_readiness_label(stage_mapping, "operating_model")),
+        ("PER SHARE", _stage_readiness_label(stage_mapping, "per_share")),
+    )
+    return _detail_fields(fields, width)
+
+
+def _stage_readiness_label(stages: Mapping[object, object], stage: str) -> str:
+    value = stages.get(stage)
+    return _readiness_label(value.get("ready") if isinstance(value, Mapping) else None)
+
+
+def _readiness_label(value: object) -> str:
+    if value is True:
+        return "READY"
+    if value is False:
+        return "NOT READY"
+    return "N/A"
+
+
+def _provenance_fields(canonical: CanonicalResearchResult, width: int) -> list[str]:
+    provenance = canonical.market_provenance
+    candidates = (
+        ("MARKET SOURCE", provenance.source_mode.replace("_", " ").title()),
+        ("CURRENCY", provenance.currency),
+        ("RESEARCH AS OF", provenance.research_as_of.isoformat()),
+        ("ISSUER IDENTITY", provenance.issuer_id),
+        ("SECURITY IDENTITY", provenance.security_id),
+    )
+    fields = tuple((label, value) for label, value in candidates if _is_meaningful(value))
+    return _detail_fields(fields, width) if fields else []
+
+
+def _is_meaningful(value: object) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return bool(value.strip())
+    if isinstance(value, (Mapping, Sequence)):
+        return bool(value)
+    return True
 
 
 def _unready_critical_evidence(result: AnalysisResult) -> tuple[EvidenceItem, ...]:
