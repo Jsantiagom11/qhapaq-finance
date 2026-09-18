@@ -7,6 +7,7 @@ import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from textwrap import wrap
+from typing import TypeGuard
 
 from .analysis import AnalysisResult, AnalysisStage, AnalysisStageState, AnalysisStatus
 from .evidence_orchestration import EvidenceItem, EvidenceState
@@ -296,7 +297,7 @@ def _paragraph(text: str, width: int) -> list[str]:
     return wrap(text, width=width, break_long_words=False, break_on_hyphens=False) or [""]
 
 
-def _is_finite_number(value: object) -> bool:
+def _is_finite_number(value: object) -> TypeGuard[int | float]:
     return (
         isinstance(value, (int, float))
         and not isinstance(value, bool)
