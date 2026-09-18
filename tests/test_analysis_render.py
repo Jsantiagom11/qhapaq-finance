@@ -231,10 +231,11 @@ def test_completed_bottom_line_uses_canonical_spread_and_handles_negative_growth
         replace(result, canonical_result=canonical),
         AnalysisRenderOptions(plain=True, width=88),
     )
+    normalized = " ".join(text.split())
 
     assert _rendered_value(text, "IMPLIED FCF GROWTH") == "-5.20%"
-    assert "3.00 percentage points below WACC" in text
-    assert "49.00 percentage points above WACC" not in text
+    assert "3.00 percentage points below WACC" in normalized
+    assert "49.00 percentage points above WACC" not in normalized
 
 
 def test_completed_non_finite_reverse_dcf_values_render_as_unavailable() -> None:
