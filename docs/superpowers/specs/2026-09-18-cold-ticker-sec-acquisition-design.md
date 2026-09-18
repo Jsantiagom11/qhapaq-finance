@@ -147,11 +147,14 @@ Typed reason codes should include, as needed by the existing canonicalization co
 - `MISSING_STANDARD_CONCEPT`
 - `AMBIGUOUS_CONTEXT`
 - `PERIOD_COVERAGE_GAP`
-- `CUSTOM_TAG_REQUIRED`
+- `STANDARD_CONCEPT_COVERAGE_GAP`
 - `REQUIRED_COMPONENT_MISSING`
+- `EXTENSION_DISCOVERY_REQUIRED`
 - `FILING_CONTEXT_REQUIRED`
 
-The exact internal enum may be narrower if the codebase can deterministically map multiple low-level causes to one stable public reason. Reason codes must be semantic and must not expose raw exception text as a contract.
+`EXTENSION_DISCOVERY_REQUIRED` means the standardized aggregate surface is insufficient and filing-level inspection is needed. It does not assert that the issuer actually uses a custom XBRL extension; that conclusion may only be made after filing-native evidence is inspected.
+
+The exact internal enum may be narrower if the codebase can deterministically map multiple low-level causes to one stable semantic reason. Reason codes are internal typed orchestration semantics, not additions to the public `AnalysisResult` schema. They must not expose raw exception text as a contract.
 
 A GAP may trigger the filing-native fallback exactly once.
 
