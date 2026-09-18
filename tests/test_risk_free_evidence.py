@@ -131,10 +131,7 @@ def test_official_treasury_csv_is_parsed_into_canonical_observations() -> None:
 def test_invalid_official_treasury_csv_fails_closed() -> None:
     import qhapaq_finance.risk_free_evidence as risk_free
 
-    raw = (
-        b"Date,2 Yr,5 Yr\n"
-        b"09/15/2026,4.14,4.16\n"
-    )
+    raw = b"Date,2 Yr,5 Yr\n09/15/2026,4.14,4.16\n"
 
     with pytest.raises(RiskFreeEvidenceError, match="RISK_FREE_SOURCE_INVALID"):
         risk_free.parse_official_treasury_daily_par_yield(

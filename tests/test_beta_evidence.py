@@ -19,9 +19,7 @@ def _period(index: int) -> date:
     return date(2020 + index // 12, index % 12 + 1, 1)
 
 
-def _series(
-    security_id: str, returns: list[float], *, offset: int = 0
-) -> CachedPriceSeries:
+def _series(security_id: str, returns: list[float], *, offset: int = 0) -> CachedPriceSeries:
     price = 100.0
     observations = [PriceObservation(_period(offset), price)]
     for index, periodic_return in enumerate(returns, start=1):

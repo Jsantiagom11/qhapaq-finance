@@ -202,8 +202,7 @@ def _canonical_evidence(research: CanonicalResearchResult | None) -> HardGateRes
     if readiness.get("valuation_ready") is not True:
         missing.append("valuation_ready")
     if quality and (
-        quality.get("research_ready") is not True
-        or bool(quality.get("blocking_failures"))
+        quality.get("research_ready") is not True or bool(quality.get("blocking_failures"))
     ):
         missing.append("financial_evidence_quality")
     passed = not missing
@@ -368,9 +367,7 @@ def evaluate_decision(
         )
     total = _total_score(scores, policy)
     status = (
-        DecisionStatus.ELIGIBLE
-        if total >= policy.eligibility_threshold
-        else DecisionStatus.WATCH
+        DecisionStatus.ELIGIBLE if total >= policy.eligibility_threshold else DecisionStatus.WATCH
     )
     reason = (
         "all hard gates passed and eligibility threshold was met"

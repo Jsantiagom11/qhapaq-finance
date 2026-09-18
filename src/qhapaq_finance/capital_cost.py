@@ -413,9 +413,7 @@ def derive_wacc(
                 and (research_as_of - item.observed_at).days <= requirements.max_age_days
                 for item in temporal_inputs
             ),
-            *(
-                item.identity for item in temporal_inputs
-            ),
+            *(item.identity for item in temporal_inputs),
         ),
     )
     if any(gate.status is GateStatus.FAIL for gate in gates):
@@ -452,7 +450,7 @@ def derive_wacc(
             | TaxRateEvidence
             | IssuerValueEvidence,
         ],
-        ...
+        ...,
     ] = (
         ("risk_free", risk_free),
         ("equity_risk_premium", equity_risk_premium),
@@ -473,9 +471,7 @@ def derive_wacc(
                 ("interest_expense", interest_expense),
                 ("average_debt", average_debt),
             )
-    inputs = tuple(
-        (name, item.identity) for name, item in input_items
-    )
+    inputs = tuple((name, item.identity) for name, item in input_items)
     payload = {
         "research_as_of": research_as_of.isoformat(),
         "methodology": requirements.methodology_id,

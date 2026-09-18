@@ -151,6 +151,10 @@ def test_qcom_and_nvda_run_through_generic_completed_orchestration() -> None:
         assert result.plan.evidence_plan.items[0].state.value == "AVAILABLE"
 
 
+@pytest.mark.skipif(
+    not (ROOT / "data/cache/sec_corpus_live/AAPL/manifest.json").is_file(),
+    reason="requires the validated local AAPL evidence corpus",
+)
 def test_registered_aapl_runs_end_to_end_from_canonical_evidence() -> None:
     result = AnalysisOrchestrator(ROOT).analyze("AAPL")
 
@@ -205,7 +209,7 @@ def test_generic_accounting_snapshot_consumes_temporary_canonical_market_evidenc
     issuers = json.loads(issuers_path.read_text(encoding="utf-8"))
     next(item for item in issuers["issuers"] if item["id"] == "apple-inc")["research"] = {
         "as_of": "2026-06-28",
-        "market_quality_profile": profile.relative_to(tmp_path).as_posix()
+        "market_quality_profile": profile.relative_to(tmp_path).as_posix(),
     }
     issuers_path.write_text(json.dumps(issuers), encoding="utf-8")
 

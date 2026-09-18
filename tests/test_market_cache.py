@@ -73,15 +73,18 @@ def test_registered_frozen_yfinance_observation_promotes_to_canonical_market_inp
     assert market.price_fact_identity
     assert market.canonical_observation_identity
     assert market.source_manifest_identity
-    assert cached_canonical_market_input(
-        root=root,
-        ticker="AAPL",
-        profile=profile,
-        evaluation_as_of=date(2026, 9, 15),
-        evaluation_at=NOW,
-        valuation_shares=10.0,
-        expected_currency="USD",
-    ) == market
+    assert (
+        cached_canonical_market_input(
+            root=root,
+            ticker="AAPL",
+            profile=profile,
+            evaluation_as_of=date(2026, 9, 15),
+            evaluation_at=NOW,
+            valuation_shares=10.0,
+            expected_currency="USD",
+        )
+        == market
+    )
 
 
 @pytest.mark.parametrize(

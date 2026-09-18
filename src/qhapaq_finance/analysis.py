@@ -300,10 +300,7 @@ class AnalysisOrchestrator:
         if plan.status is not AnalysisStatus.READY:
             return AnalysisResult("analysis-result-v1", plan.status, plan, None)
         try:
-            if (
-                plan.market_input is not None
-                and plan.market_research_as_of is not None
-            ):
+            if plan.market_input is not None and plan.market_research_as_of is not None:
                 canonical = self._generic_canonical_result(plan)
             else:
                 canonical = build_canonical_research_result(
@@ -391,10 +388,7 @@ class AnalysisOrchestrator:
             security_prices = load_cached_price_series(
                 root=self.root,
                 manifest_path=(
-                    self.root
-                    / "data/cache/market/yfinance"
-                    / cache_key
-                    / "history-manifest.json"
+                    self.root / "data/cache/market/yfinance" / cache_key / "history-manifest.json"
                 ),
             )
             benchmark_prices = load_cached_price_series(
@@ -415,10 +409,7 @@ class AnalysisOrchestrator:
             risk_free = canonical_risk_free_evidence(
                 cache=load_cached_treasury_observations(
                     root=self.root,
-                    manifest_path=(
-                        self.root
-                        / "data/cache/treasury/daily-par-yield/manifest.json"
-                    ),
+                    manifest_path=(self.root / "data/cache/treasury/daily-par-yield/manifest.json"),
                 ),
                 evaluation_as_of=research_as_of,
             ).as_capital_cost_evidence()
@@ -426,31 +417,21 @@ class AnalysisOrchestrator:
             erp = canonical_equity_risk_premium(
                 cache=load_cached_stern_erp_observations(
                     root=self.root,
-                    manifest_path=(
-                        self.root
-                        / "data/cache/erp/nyu-stern/manifest.json"
-                    ),
+                    manifest_path=(self.root / "data/cache/erp/nyu-stern/manifest.json"),
                 ),
                 evaluation_as_of=research_as_of,
             ).as_capital_cost_evidence()
 
-            debt_directory = (
-                self.root
-                / "data/cache/debt/market"
-                / cache_key
-            )
+            debt_directory = self.root / "data/cache/debt/market" / cache_key
             debt_artifacts = tuple(sorted(debt_directory.glob("*.json")))
 
             if len(debt_artifacts) != 1:
                 return None
 
-            debt_payload = json.loads(
-                debt_artifacts[0].read_text(encoding="utf-8")
-            )
+            debt_payload = json.loads(debt_artifacts[0].read_text(encoding="utf-8"))
 
             if (
-                debt_payload.get("schema_version")
-                != "market-debt-observation-v1"
+                debt_payload.get("schema_version") != "market-debt-observation-v1"
                 or debt_payload.get("issuer_id") != identity.issuer_id
                 or debt_payload.get("security_id") != identity.security_id
             ):
@@ -510,9 +491,8 @@ class AnalysisOrchestrator:
             )
 
             market_provenance = market_input.provenance(research_as_of)
-            market_quality = (
-                market_provenance.market_quality_identity
-                or content_identity(market_provenance.to_dict())
+            market_quality = market_provenance.market_quality_identity or content_identity(
+                market_provenance.to_dict()
             )
 
             requirements = CapitalCostRequirements(
@@ -655,17 +635,10 @@ class AnalysisOrchestrator:
         marketable_securities = marketable_securities / million
         debt = debt_value / million
 
-        enterprise_value = (
-            market_equity
-            - cash
-            - marketable_securities
-            + debt
-        )
+        enterprise_value = market_equity - cash - marketable_securities + debt
 
         if enterprise_value <= 0 or fcff <= 0:
-            raise ResearchResultError(
-                "GENERIC_REVERSE_DCF_INPUT_INVALID"
-            )
+            raise ResearchResultError("GENERIC_REVERSE_DCF_INPUT_INVALID")
 
         # These are sensitivity coordinates, not a forecast/base case.
         years = 10
@@ -731,9 +704,7 @@ class AnalysisOrchestrator:
                 "quality": None,
                 "capital_cost": {
                     "source_mode": "canonical",
-                    "provenance_identity": (
-                        capital.provenance.content_identity
-                    ),
+                    "provenance_identity": (capital.provenance.content_identity),
                 },
             },
             model,
@@ -741,9 +712,7 @@ class AnalysisOrchestrator:
             {
                 "financial_evidence_quality": None,
                 "model_requirements": None,
-                "market_quality_identity": (
-                    market_provenance.market_quality_identity
-                ),
+                "market_quality_identity": (market_provenance.market_quality_identity),
                 "market_source_mode": market_provenance.source_mode,
                 "model_stage_readiness": {},
                 "deterministic_research_ready": True,
@@ -762,10 +731,7 @@ class AnalysisOrchestrator:
                 "fcff_yield": fcff / enterprise_value,
                 "scenarios": {},
                 "diagnostics": [
-                    (
-                        "generic valuation is reverse-DCF-first; "
-                        "no analyst forward scenarios"
-                    )
+                    ("generic valuation is reverse-DCF-first; no analyst forward scenarios")
                 ],
             },
             {
@@ -785,9 +751,7 @@ class AnalysisOrchestrator:
         return CanonicalResearchResult(
             **{
                 **draft.__dict__,
-                "content_identity": content_identity(
-                    draft.payload(include_identity=False)
-                ),
+                "content_identity": content_identity(draft.payload(include_identity=False)),
             }
         )
 
