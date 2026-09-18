@@ -5,14 +5,14 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping
 from dataclasses import asdict, dataclass
-from enum import StrEnum
 from typing import TypeGuard
 
 from .research_result import CanonicalResearchResult
+from .string_enum import StringEnum
 from .valuation_result import ValuationResult
 
 
-class DecisionStatus(StrEnum):
+class DecisionStatus(StringEnum):
     """A review status, never an investment instruction."""
 
     ELIGIBLE = "ELIGIBLE"

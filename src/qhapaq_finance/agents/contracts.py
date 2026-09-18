@@ -5,22 +5,23 @@ from __future__ import annotations
 import math
 import re
 from dataclasses import asdict, dataclass
-from enum import StrEnum
 from typing import Any
 
+from ..string_enum import StringEnum
 
-class Confidence(StrEnum):
+
+class Confidence(StringEnum):
     LOW = "LOW"
     MEDIUM = "MEDIUM"
     HIGH = "HIGH"
 
 
-class EvidenceKind(StrEnum):
+class EvidenceKind(StringEnum):
     DETERMINISTIC_ARTIFACT = "DETERMINISTIC_ARTIFACT"
     INTERPRETATION_SIGNAL = "INTERPRETATION_SIGNAL"
 
 
-class NumericUnit(StrEnum):
+class NumericUnit(StringEnum):
     USD_PER_SHARE = "USD_PER_SHARE"
     RATIO = "RATIO"
     PERCENTAGE_POINT = "PERCENTAGE_POINT"
