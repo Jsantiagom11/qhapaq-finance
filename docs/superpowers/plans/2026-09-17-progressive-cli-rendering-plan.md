@@ -46,8 +46,7 @@ class AnalysisRenderOptions:
     width: int = 88
 
 
-def render_analysis(result: AnalysisResult, options: AnalysisRenderOptions) -> str:
-    ...
+def render_analysis(result: AnalysisResult, options: AnalysisRenderOptions) -> str: ...
 ```
 
 The returned string must end with exactly one newline.
@@ -395,11 +394,7 @@ Import `shutil` and renderer symbols. Build options after the analysis completes
 
 ```python
 width = shutil.get_terminal_size(fallback=(88, 24)).columns
-color = (
-    not args.plain
-    and sys.stdout.isatty()
-    and "NO_COLOR" not in os.environ
-)
+color = not args.plain and sys.stdout.isatty() and "NO_COLOR" not in os.environ
 options = AnalysisRenderOptions(
     detail=args.detail,
     plain=args.plain,

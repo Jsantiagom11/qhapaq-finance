@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
+import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -253,12 +255,106 @@ def test_local_cache_miss_is_blocked_during_offline_planning() -> None:
     }
 
 
-def test_analyze_cli_is_a_thin_structured_orchestration_entrypoint(
-    capsys: object,
-) -> None:
+def test_analyze_cli_defaults_to_human_view(capsys: pytest.CaptureFixture[str]) -> None:
     cli.main(["analyze", "QCOM", "--repository-root", str(ROOT)])
-    payload = json.loads(capsys.readouterr().out)  # type: ignore[attr-defined]
+    output = capsys.readouterr().out
 
+    assert "QHAPAQ" in output
+    assert "COMPLETED" in output
+    assert "FINANCIAL SNAPSHOT" in output
+    assert '"schema_version"' not in output
+
+
+def test_analyze_cli_detail_adds_analyst_sections(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    cli.main(["analyze", "QCOM", "--repository-root", str(ROOT), "--detail", "--plain"])
+    output = capsys.readouterr().out
+
+    assert "ANALYSIS STAGES" in output
+    assert "VALUATION SCENARIOS" in output
+    assert "MARKET PROVENANCE" in output
+    assert "AUDIT" in output
+
+
+def test_analyze_cli_plain_is_ascii_without_ansi(capsys: pytest.CaptureFixture[str]) -> None:
+    cli.main(["analyze", "QCOM", "--repository-root", str(ROOT), "--plain"])
+    output = capsys.readouterr().out
+
+    assert output.isascii()
+    assert "\x1b[" not in output
+
+
+def test_analyze_cli_json_preserves_canonical_machine_artifact(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    cli.main(["analyze", "QCOM", "--repository-root", str(ROOT), "--json"])
+    output = capsys.readouterr().out
+    payload = json.loads(output)
+
+    assert payload["schema_version"] == "analysis-result-v1"
     assert payload["status"] == "COMPLETED"
     assert payload["plan"]["identity"]["ticker"] == "QCOM"
     assert payload["canonical_result"]["security"]["ticker"] == "QCOM"
+    expected = AnalysisOrchestrator(ROOT).analyze("QCOM")
+    assert output == cli.canonical_json(expected.to_dict())
+
+
+@pytest.mark.parametrize(
+    ("human_flag", "message"),
+    [
+        ("--detail", "not allowed with argument --json"),
+        ("--plain", "--json cannot be combined with --plain"),
+    ],
+)
+def test_analyze_cli_rejects_json_with_human_flags(
+    human_flag: str, message: str, capsys: pytest.CaptureFixture[str]
+) -> None:
+    with pytest.raises(SystemExit):
+        cli.main(["analyze", "QCOM", "--json", human_flag])
+    assert message in capsys.readouterr().err
+
+
+def test_analyze_cli_non_tty_disables_color(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: False)
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    monkeypatch.setattr(
+        shutil, "get_terminal_size", lambda fallback=None: os.terminal_size((72, 24))
+    )
+
+    cli.main(["analyze", "QCOM", "--repository-root", str(ROOT)])
+
+    output = capsys.readouterr().out
+    assert "QHAPAQ" in output
+    assert "\x1b[" not in output
+
+
+def test_analyze_cli_no_color_environment_disables_color(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
+    monkeypatch.setenv("NO_COLOR", "1")
+    monkeypatch.setattr(
+        shutil, "get_terminal_size", lambda fallback=None: os.terminal_size((72, 24))
+    )
+
+    cli.main(["analyze", "QCOM", "--repository-root", str(ROOT)])
+
+    output = capsys.readouterr().out
+    assert "QHAPAQ" in output
+    assert "\x1b[" not in output
+
+
+def test_analyze_cli_tty_enables_semantic_color(
+    capsys: pytest.CaptureFixture[str], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(sys.stdout, "isatty", lambda: True)
+    monkeypatch.delenv("NO_COLOR", raising=False)
+
+    cli.main(["analyze", "QCOM", "--repository-root", str(ROOT)])
+
+    output = capsys.readouterr().out
+    assert "QHAPAQ" in output
+    assert "\x1b[" in output

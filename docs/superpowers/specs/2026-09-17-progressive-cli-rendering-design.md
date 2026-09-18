@@ -167,8 +167,7 @@ class AnalysisRenderOptions:
     width: int = 88
 
 
-def render_analysis(result: AnalysisResult, options: AnalysisRenderOptions) -> str:
-    ...
+def render_analysis(result: AnalysisResult, options: AnalysisRenderOptions) -> str: ...
 ```
 
 Exact helper decomposition may follow repository conventions, but rendering must remain pure for a supplied result/options pair.
