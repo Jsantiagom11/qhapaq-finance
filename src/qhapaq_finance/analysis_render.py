@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from textwrap import wrap
@@ -13,6 +15,7 @@ _ANSI_RESET = "\x1b[0m"
 _ANSI_GREEN = "\x1b[32m"
 _ANSI_YELLOW = "\x1b[33m"
 _ANSI_RED = "\x1b[31m"
+_SEC_INCORPORATION_SUFFIX = re.compile(r"\s*/[A-Z]{2}\s*$")
 
 
 @dataclass(frozen=True)
@@ -44,13 +47,22 @@ def render_analysis(result: AnalysisResult, options: AnalysisRenderOptions) -> s
 
 def _render_header(result: AnalysisResult, options: AnalysisRenderOptions, width: int) -> list[str]:
     identity = result.plan.identity
-    title_parts = ["QHAPAQ"]
-    if identity.display_name:
-        title_parts.append(identity.display_name)
-    title_parts.append(identity.ticker)
-    title = " - ".join(title_parts)
-    separator = "-" if options.plain else "─"
-    return [title, separator * min(width, len(title)), ""]
+    canonical = result.canonical_result
+    canonical_name = canonical.issuer.get("display_name") if canonical is not None else None
+    display_name = _sanitize_company_name(
+        canonical_name if isinstance(canonical_name, str) and canonical_name.strip() else identity.display_name
+    )
+    separator_glyph = "-" if options.plain else "─"
+    title_separator = " - " if options.plain else " — "
+    title = f"QHAPAQ{title_separator}{display_name} ({identity.ticker})" if display_name else f"QHAPAQ{title_separator}{identity.ticker}"
+    return [title, separator_glyph * min(width, len(title)), ""]
+
+
+def _sanitize_company_name(value: str | None) -> str | None:
+    if value is None:
+        return None
+    cleaned = _SEC_INCORPORATION_SUFFIX.sub("", value).strip()
+    return cleaned or None
 
 
 def _render_completed(
@@ -69,92 +81,92 @@ def _render_completed(
         )
         return lines
 
-    lines.extend(
-        _fields(
-            (
-                ("ISSUER", canonical.issuer.get("display_name")),
-                ("SECURITY", canonical.security.get("ticker")),
-                ("AS OF", canonical.research_as_of.isoformat()),
-            ),
-            width,
-        )
-    )
-    lines.extend(["", "FINANCIAL SNAPSHOT"])
-    lines.extend(
-        _fields(
-            (
-                ("RECONSTRUCTED FCFF", _number(canonical.valuation.get("reconstructed_fcff"))),
-                ("NORMALIZED FCFF", _number(canonical.valuation.get("normalized_fcff"))),
-                ("NOPAT", _number(canonical.valuation.get("nopat"))),
-            ),
-            width,
-        )
-    )
-    lines.extend(["", "CAPITAL EFFICIENCY"])
-    lines.extend(
-        _fields(
-            (
-                ("ROIC", _percentage(canonical.valuation.get("roic"))),
-                ("ROIC - WACC", _percentage(canonical.valuation.get("roic_minus_wacc"))),
-                ("FCFF YIELD", _percentage(canonical.valuation.get("fcff_yield"))),
-            ),
-            width,
-        )
-    )
-    lines.extend(["", "COST OF CAPITAL"])
-    lines.extend(_field("WACC", _percentage(canonical.valuation.get("wacc")), width))
+    lines.extend(_field("AS OF", canonical.research_as_of.isoformat(), width))
+
     lines.extend(["", "MARKET EXPECTATIONS"])
     lines.extend(
         _fields(
             (
                 ("MARKET PRICE", _number(canonical.market_comparison.get("price"))),
                 (
-                    "FCFF IMPLIED RATE",
-                    _percentage(canonical.market_comparison.get("fcff_implied_discount_rate")),
-                ),
-                (
-                    "IMPLIED GROWTH",
+                    "IMPLIED FCF GROWTH",
                     _percentage(canonical.reverse_valuation.get("implied_growth")),
                 ),
                 (
-                    "EXPECTATION GAP",
-                    _percentage(canonical.reverse_valuation.get("expectation_growth_gap")),
+                    "IMPLIED DISCOUNT RATE",
+                    _percentage(canonical.market_comparison.get("fcff_implied_discount_rate")),
                 ),
             ),
             width,
         )
     )
-    lines.extend(["", "SCENARIO SUMMARY"])
-    lines.extend(_scenario_summary(canonical.valuation.get("scenarios"), width))
-    lines.extend(["", "EVIDENCE SUMMARY"])
-    quality = canonical.financial_evidence.get("quality")
-    quality_ready = quality.get("research_ready") if isinstance(quality, Mapping) else None
+
+    lines.extend(["", "BUSINESS ECONOMICS"])
+    lines.extend(
+        _fields(
+            (
+                ("NORMALIZED FCFF", _number(canonical.valuation.get("normalized_fcff"))),
+                ("ROIC", _percentage(canonical.valuation.get("roic"))),
+                ("WACC", _percentage(canonical.valuation.get("wacc"))),
+                ("ROIC - WACC", _percentage(canonical.valuation.get("roic_minus_wacc"))),
+            ),
+            width,
+        )
+    )
+
+    lines.extend(["", "BOTTOM LINE"])
+    lines.extend(_completed_bottom_line(canonical, width))
+
+    lines.extend(["", "EVIDENCE"])
     lines.extend(
         _fields(
             (
                 ("EVIDENCE KIND", canonical.financial_evidence.get("kind")),
-                ("QUALITY READY", quality_ready),
-                (
-                    "RESEARCH READY",
-                    canonical.readiness.get("deterministic_research_ready"),
-                ),
-                ("VALUATION READY", canonical.readiness.get("valuation_ready")),
+                ("MARKET SOURCE", canonical.market_provenance.source_mode),
             ),
             width,
         )
     )
-    lines.extend(["", "BOTTOM LINE"])
-    lines.extend(
-        _paragraph(
-            "Qhapaq completed the canonical analysis from the currently verified evidence. "
-            "Review the market-expectations and scenario sections together with evidence "
-            "readiness.",
-            width,
-        )
-    )
+
     if options.detail:
         lines.extend(_render_detail(result, width))
     return lines
+
+
+def _completed_bottom_line(canonical: object, width: int) -> list[str]:
+    reverse = getattr(canonical, "reverse_valuation")
+    valuation = getattr(canonical, "valuation")
+    growth = reverse.get("implied_growth")
+    spread = valuation.get("roic_minus_wacc")
+
+    sentences: list[str] = []
+    if _is_finite_number(growth):
+        sentences.append(
+            "At the current market price, the model implies approximately "
+            f"{_percentage(growth)} FCF growth under the stated assumptions."
+        )
+    else:
+        sentences.append(
+            "At the current market price, implied FCF growth is unavailable under the stated "
+            "assumptions."
+        )
+
+    if _is_finite_number(spread):
+        numeric_spread = float(spread)
+        if numeric_spread > 0:
+            sentences.append(
+                "Current business economics show ROIC "
+                f"{_percentage_points(numeric_spread)} percentage points above WACC."
+            )
+        elif numeric_spread < 0:
+            sentences.append(
+                "Current business economics show ROIC "
+                f"{_percentage_points(numeric_spread)} percentage points below WACC."
+            )
+        else:
+            sentences.append("Current business economics show ROIC approximately equal to WACC.")
+
+    return _paragraph(" ".join(sentences), width)
 
 
 def _render_evidence_required(
@@ -277,16 +289,32 @@ def _paragraph(text: str, width: int) -> list[str]:
     return wrap(text, width=width, break_long_words=False, break_on_hyphens=False) or [""]
 
 
+def _is_finite_number(value: object) -> bool:
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(float(value))
+    )
+
+
 def _number(value: object) -> str:
+    if _is_finite_number(value):
+        return f"{float(value):,.2f}"
     if isinstance(value, (int, float)) and not isinstance(value, bool):
-        return f"{value:,.2f}"
+        return "Unavailable"
     return _scalar(value)
 
 
 def _percentage(value: object) -> str:
+    if _is_finite_number(value):
+        return f"{float(value):.2%}"
     if isinstance(value, (int, float)) and not isinstance(value, bool):
-        return f"{value:.2%}"
+        return "Unavailable"
     return _scalar(value)
+
+
+def _percentage_points(value: float) -> str:
+    return f"{abs(value) * 100:.2f}"
 
 
 def _scalar(value: object) -> str:
@@ -294,8 +322,10 @@ def _scalar(value: object) -> str:
         return "Unavailable"
     if isinstance(value, bool):
         return "Yes" if value else "No"
-    if isinstance(value, (str, int, float)):
-        return str(value)
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return str(value) if _is_finite_number(value) else "Unavailable"
+    if isinstance(value, str):
+        return value
     if isinstance(value, Sequence) and not isinstance(value, (str, bytes)):
         return ", ".join(_scalar(item) for item in value) if value else "None"
     return str(value)
@@ -311,18 +341,20 @@ def _scenario_summary(value: object, width: int) -> list[str]:
         scenario = value.get(name)
         if not isinstance(scenario, Mapping):
             continue
-        lines.extend(
-            _fields(
-                (
-                    (
-                        f"{name.upper()} VALUE/SHARE",
-                        _number(scenario.get("intrinsic_value_per_share")),
-                    ),
-                    (f"{name.upper()} MARGIN", _percentage(scenario.get("margin_of_safety"))),
-                ),
-                width,
-            )
-        )
+        fields: list[tuple[str, object]] = [
+            (f"{name.upper()} VALUE/SHARE", _number(scenario.get("intrinsic_value_per_share"))),
+            (f"{name.upper()} MARGIN", _percentage(scenario.get("margin_of_safety"))),
+            (f"{name.upper()} EXPLICIT GROWTH", _percentage(scenario.get("explicit_growth"))),
+            (f"{name.upper()} TERMINAL GROWTH", _percentage(scenario.get("terminal_growth"))),
+            (
+                f"{name.upper()} TERMINAL SHARE",
+                _percentage(scenario.get("terminal_value_share")),
+            ),
+        ]
+        warnings = scenario.get("warnings")
+        if warnings:
+            fields.append((f"{name.upper()} WARNINGS", warnings))
+        lines.extend(_fields(tuple(fields), width))
     return lines or _field("SCENARIOS", "Unavailable", width)
 
 
@@ -364,13 +396,28 @@ def _render_detail(result: AnalysisResult, width: int) -> list[str]:
     if canonical is None:
         return lines
 
+    lines.extend(["", "FINANCIAL DETAIL"])
+    lines.extend(
+        _fields(
+            (
+                ("RECONSTRUCTED FCFF", _number(canonical.valuation.get("reconstructed_fcff"))),
+                ("NOPAT", _number(canonical.valuation.get("nopat"))),
+                ("FCFF YIELD", _percentage(canonical.valuation.get("fcff_yield"))),
+                (
+                    "EXPECTATION GAP",
+                    _percentage(canonical.reverse_valuation.get("expectation_growth_gap")),
+                ),
+            ),
+            width,
+        )
+    )
     lines.extend(["", "FINANCIAL EVIDENCE"])
     lines.extend(_nested_fields(canonical.financial_evidence, width))
-    lines.extend(["", "VALUATION SCENARIOS"])
+    lines.extend(["", "DCF SCENARIOS"])
     scenarios = canonical.valuation.get("scenarios")
-    lines.extend(_nested_fields(scenarios, width))
+    lines.extend(_scenario_summary(scenarios, width))
     diagnostics = canonical.valuation.get("diagnostics")
-    lines.extend(_field("diagnostics", diagnostics, width))
+    lines.extend(_field("DIAGNOSTICS", diagnostics, width))
     lines.extend(["", "READINESS"])
     lines.extend(_nested_fields(canonical.readiness, width))
     lines.extend(["", "MARKET PROVENANCE"])
