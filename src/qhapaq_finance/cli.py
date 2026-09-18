@@ -1,5 +1,6 @@
 import argparse
 import os
+import shutil
 import sys
 import webbrowser
 from collections.abc import Callable
@@ -8,6 +9,7 @@ from pathlib import Path
 from typing import cast
 
 from .analysis import AnalysisOrchestrator
+from .analysis_render import AnalysisRenderOptions, render_analysis
 from .backtest import run_backtest
 from .company_resolver import CompanyResolver
 from .config import ResearchConfig
@@ -252,9 +254,24 @@ def _analyze(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(description="Run one generic offline Qhapaq analysis")
     parser.add_argument("ticker")
     parser.add_argument("--repository-root", type=Path, default=Path("."))
+    human_or_json = parser.add_mutually_exclusive_group()
+    human_or_json.add_argument("--json", action="store_true", help="emit canonical machine JSON")
+    human_or_json.add_argument("--detail", action="store_true", help="show expanded analyst detail")
+    parser.add_argument("--plain", action="store_true", help="use ASCII text without ANSI color")
     args = parser.parse_args(arguments)
+    if args.json and args.plain:
+        parser.error("--json cannot be combined with --plain")
     result = AnalysisOrchestrator(args.repository_root).analyze(args.ticker)
-    print(canonical_json(result.to_dict()), end="")
+    if args.json:
+        print(canonical_json(result.to_dict()), end="")
+        return
+    options = AnalysisRenderOptions(
+        detail=args.detail,
+        plain=args.plain,
+        color=not args.plain and sys.stdout.isatty() and "NO_COLOR" not in os.environ,
+        width=shutil.get_terminal_size(fallback=(88, 24)).columns,
+    )
+    print(render_analysis(result, options), end="")
 
 
 def _print_research_result(result: ResearchResult) -> None:
