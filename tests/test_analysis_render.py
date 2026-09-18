@@ -87,6 +87,11 @@ def _result(status: AnalysisStatus, reason: str) -> AnalysisResult:
     return AnalysisResult("analysis-result-v1", status, plan, None)
 
 
+def _rendered_value(text: str, label: str) -> str:
+    line = next(line for line in text.splitlines() if line.startswith(label))
+    return line[len(label) :].strip()
+
+
 def test_evidence_required_executive_view_is_human_and_omits_empty_valuation() -> None:
     result = _result(
         AnalysisStatus.EVIDENCE_REQUIRED,
@@ -95,7 +100,7 @@ def test_evidence_required_executive_view_is_human_and_omits_empty_valuation() -
 
     text = render_analysis(result, AnalysisRenderOptions(plain=True, width=72))
 
-    assert "QHAPAQ - JPMorgan Chase & Co. - JPM" in text
+    assert "QHAPAQ - JPMorgan Chase & Co. (JPM)" in text
     assert "STATUS" in text
     assert "EVIDENCE REQUIRED" in text
     assert "Company facts" in text
@@ -177,29 +182,105 @@ def test_unsupported_ticker_view_does_not_show_financial_sections() -> None:
     assert "VALUATION" not in text
 
 
-def test_completed_executive_view_projects_canonical_values() -> None:
+def test_completed_executive_view_prioritizes_expectations_and_business_economics() -> None:
     result = AnalysisOrchestrator(ROOT).analyze("QCOM")
     canonical = result.canonical_result
     assert canonical is not None
 
     text = render_analysis(result, AnalysisRenderOptions(plain=True, width=88))
 
+    assert "QHAPAQ - QUALCOMM Incorporated (QCOM)" in text
     assert "COMPLETED" in text
-    assert "FINANCIAL SNAPSHOT" in text
-    assert "CAPITAL EFFICIENCY" in text
     assert "MARKET EXPECTATIONS" in text
-    assert "SCENARIO SUMMARY" in text
-    assert "EVIDENCE SUMMARY" in text
+    assert "IMPLIED FCF GROWTH" in text
+    assert "IMPLIED DISCOUNT RATE" in text
+    assert "BUSINESS ECONOMICS" in text
+    assert "NORMALIZED FCFF" in text
+    assert "ROIC - WACC" in text
+    assert "EVIDENCE" in text
     assert "BOTTOM LINE" in text
     assert f"{canonical.valuation['wacc']:.2%}" in text
     assert f"{canonical.valuation['roic']:.2%}" in text
     assert f"{canonical.market_comparison['price']:,.2f}" in text
+    assert "SCENARIO SUMMARY" not in text
+    assert "BEAR VALUE/SHARE" not in text
+    assert "RECONSTRUCTED FCFF" not in text
+    assert "NOPAT" not in text
+    assert "VALUATION READY" not in text
     assert canonical.content_identity not in text
     assert "BUY" not in text
     assert "SELL" not in text
 
 
-def test_detail_adds_provenance_scenarios_and_content_identity() -> None:
+def test_completed_bottom_line_uses_canonical_spread_and_handles_negative_growth() -> None:
+    result = AnalysisOrchestrator(ROOT).analyze("QCOM")
+    canonical = result.canonical_result
+    assert canonical is not None
+    canonical = replace(
+        canonical,
+        valuation={
+            **canonical.valuation,
+            "roic": 0.50,
+            "wacc": 0.01,
+            "roic_minus_wacc": -0.03,
+        },
+        reverse_valuation={**canonical.reverse_valuation, "implied_growth": -0.052},
+    )
+
+    text = render_analysis(
+        replace(result, canonical_result=canonical),
+        AnalysisRenderOptions(plain=True, width=88),
+    )
+
+    assert _rendered_value(text, "IMPLIED FCF GROWTH") == "-5.20%"
+    assert "3.00 percentage points below WACC" in text
+    assert "49.00 percentage points above WACC" not in text
+
+
+def test_completed_non_finite_reverse_dcf_values_render_as_unavailable() -> None:
+    result = AnalysisOrchestrator(ROOT).analyze("QCOM")
+    canonical = result.canonical_result
+    assert canonical is not None
+    canonical = replace(
+        canonical,
+        valuation={**canonical.valuation, "roic_minus_wacc": float("nan")},
+        market_comparison={
+            **canonical.market_comparison,
+            "fcff_implied_discount_rate": float("inf"),
+        },
+        reverse_valuation={**canonical.reverse_valuation, "implied_growth": float("nan")},
+    )
+
+    text = render_analysis(
+        replace(result, canonical_result=canonical),
+        AnalysisRenderOptions(plain=True, width=88),
+    )
+
+    assert _rendered_value(text, "IMPLIED FCF GROWTH") == "Unavailable"
+    assert _rendered_value(text, "IMPLIED DISCOUNT RATE") == "Unavailable"
+    assert "nan%" not in text.lower()
+    assert "inf%" not in text.lower()
+
+
+def test_completed_header_prefers_canonical_identity_and_sec_fallback_is_sanitized() -> None:
+    completed = AnalysisOrchestrator(ROOT).analyze("QCOM")
+    completed_text = render_analysis(completed, AnalysisRenderOptions(plain=True))
+    assert "QHAPAQ - QUALCOMM Incorporated (QCOM)" in completed_text
+    assert "/DE" not in completed_text.splitlines()[0]
+
+    unresolved = _result(
+        AnalysisStatus.EVIDENCE_REQUIRED,
+        "checksum-verified canonical evidence is not available",
+    )
+    fallback_identity = replace(unresolved.plan.identity, ticker="ACME", display_name="ACME INC/DE")
+    fallback = replace(unresolved, plan=replace(unresolved.plan, identity=fallback_identity))
+    fallback_text = render_analysis(fallback, AnalysisRenderOptions(plain=True))
+
+    assert "QHAPAQ - ACME INC (ACME)" in fallback_text
+    assert "Acme Inc" not in fallback_text
+
+
+def test_detail_adds_scenarios_provenance_readiness_and_content_identity() -> None:
     result = AnalysisOrchestrator(ROOT).analyze("QCOM")
     canonical = result.canonical_result
     assert canonical is not None
@@ -209,10 +290,12 @@ def test_detail_adds_provenance_scenarios_and_content_identity() -> None:
 
     assert "ANALYSIS STAGES" not in executive
     assert "EVIDENCE DETAIL" not in executive
+    assert "DCF SCENARIOS" not in executive
+    assert "READINESS" not in executive
     assert "MARKET PROVENANCE" not in executive
     assert "ANALYSIS STAGES" in detail
     assert "EVIDENCE DETAIL" in detail
-    assert "VALUATION SCENARIOS" in detail
+    assert "DCF SCENARIOS" in detail
     assert "READINESS" in detail
     assert "MARKET PROVENANCE" in detail
     assert "AUDIT" in detail
@@ -275,4 +358,4 @@ def test_completed_without_canonical_result_does_not_fabricate_financials() -> N
 
     assert "COMPLETED" in text
     assert "no canonical analysis result is available" in text
-    assert "FINANCIAL SNAPSHOT" not in text
+    assert "MARKET EXPECTATIONS" not in text
