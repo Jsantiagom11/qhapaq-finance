@@ -10,6 +10,7 @@ from textwrap import wrap
 
 from .analysis import AnalysisResult, AnalysisStage, AnalysisStageState, AnalysisStatus
 from .evidence_orchestration import EvidenceItem, EvidenceState
+from .research_result import CanonicalResearchResult
 
 _ANSI_RESET = "\x1b[0m"
 _ANSI_GREEN = "\x1b[32m"
@@ -139,9 +140,9 @@ def _render_completed(
     return lines
 
 
-def _completed_bottom_line(canonical: object, width: int) -> list[str]:
-    reverse = getattr(canonical, "reverse_valuation")
-    valuation = getattr(canonical, "valuation")
+def _completed_bottom_line(canonical: CanonicalResearchResult, width: int) -> list[str]:
+    reverse = canonical.reverse_valuation
+    valuation = canonical.valuation
     growth = reverse.get("implied_growth")
     spread = valuation.get("roic_minus_wacc")
 
