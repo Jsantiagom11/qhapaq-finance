@@ -65,6 +65,21 @@ def test_fcff_uses_canonical_positive_cash_use_signs() -> None:
     )
 
 
+def test_maintenance_capex_reduces_fcff_exactly_once() -> None:
+    growth_capex = 15.0
+    maintenance_capex = 7.0
+    common_inputs = {
+        "nopat": 80.0,
+        "depreciation_amortization": 10.0,
+        "change_in_working_capital": 5.0,
+    }
+
+    without_maintenance = calculate_fcff(capex=growth_capex, **common_inputs)
+    with_maintenance = calculate_fcff(capex=growth_capex + maintenance_capex, **common_inputs)
+
+    assert with_maintenance - without_maintenance == -maintenance_capex
+
+
 @pytest.mark.parametrize(
     "field",
     ("nopat", "depreciation_amortization", "capex", "change_in_working_capital"),
