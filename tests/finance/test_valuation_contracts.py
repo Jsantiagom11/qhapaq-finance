@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import inspect
+from dataclasses import replace
 
 import pytest
 
@@ -67,3 +68,26 @@ def test_run_valuation_with_invested_capital_adds_optional_extensions() -> None:
     assert result.roic == pytest.approx(0.30)
     assert result.implied_growth_from_reinvestment == pytest.approx(0.12)
     assert result.roic_minus_wacc == pytest.approx(0.21)
+
+
+def test_run_valuation_enforces_closed_reinvestment_rate_boundary() -> None:
+    ValuationInput, run_valuation = _contract()
+    inputs = ValuationInput(
+        fcff=110.0,
+        nopat=150.0,
+        wacc=0.09,
+        market_equity=1_000.0,
+        debt=100.0,
+        cash=80.0,
+        marketable_securities=20.0,
+        invested_capital=InvestedCapitalPair(opening=400.0, closing=600.0),
+    )
+
+    full_reinvestment = run_valuation(replace(inputs, reinvestment_rate=1.0))
+    assert full_reinvestment.implied_growth_from_reinvestment == pytest.approx(
+        full_reinvestment.roic
+    )
+
+    for invalid_rate in (-0.01, 1.01):
+        with pytest.raises(valuation.ValuationError, match="between 0% and 100%"):
+            run_valuation(replace(inputs, reinvestment_rate=invalid_rate))
