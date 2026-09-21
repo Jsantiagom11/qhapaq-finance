@@ -528,3 +528,159 @@ def test_completed_without_canonical_result_does_not_fabricate_financials() -> N
     assert "COMPLETED" in text
     assert "no canonical analysis result is available" in text
     assert "MARKET EXPECTATIONS" not in text
+
+
+# --- Task 7 acquisition rendering contracts ---
+
+
+def _task7_acquisition_result(
+    result: AnalysisResult,
+    state: AnalysisStageState,
+    reason: str,
+) -> AnalysisResult:
+    return replace(
+        result,
+        plan=replace(
+            result.plan,
+            acquisition=AnalysisStage(state, reason),
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "reason",
+    [
+        "SEC fast path canonical evidence verified",
+        "SEC filing fallback canonical evidence verified: MISSING_STANDARD_CONCEPT",
+    ],
+)
+def test_task7_renderer_surfaces_completed_sec_acquisition_summary(
+    reason: str,
+) -> None:
+    result = AnalysisOrchestrator(ROOT).analyze("QCOM")
+    result = _task7_acquisition_result(
+        result,
+        AnalysisStageState.COMPLETED,
+        reason,
+    )
+
+    text = render_analysis(
+        result,
+        AnalysisRenderOptions(plain=True),
+    )
+
+    assert "ACQUISITION" in text
+    assert "SEC" in text
+    if "fallback" in reason:
+        assert "filing fallback canonical evidence verified" in text
+        assert "MISSING_STANDARD_CONCEPT" in text
+    else:
+        assert reason in text
+
+
+def test_task7_renderer_detail_preserves_typed_fallback_reason() -> None:
+    result = AnalysisOrchestrator(ROOT).analyze("QCOM")
+    result = _task7_acquisition_result(
+        result,
+        AnalysisStageState.COMPLETED,
+        "SEC filing fallback canonical evidence verified: MISSING_STANDARD_CONCEPT",
+    )
+
+    text = render_analysis(
+        result,
+        AnalysisRenderOptions(detail=True, plain=True),
+    )
+
+    assert "ACQUISITION" in text
+    assert "MISSING_STANDARD_CONCEPT" in text
+
+
+def test_task7_evidence_required_after_acquisition_avoids_manual_sec_instruction() -> None:
+    result = _result(
+        AnalysisStatus.EVIDENCE_REQUIRED,
+        "SEC canonical evidence gap after fallback: REQUIRED_COMPONENT_MISSING",
+    )
+    result = _task7_acquisition_result(
+        result,
+        AnalysisStageState.COMPLETED,
+        "SEC canonical evidence gap after fallback: REQUIRED_COMPONENT_MISSING",
+    )
+
+    text = render_analysis(
+        result,
+        AnalysisRenderOptions(plain=True),
+    )
+
+    assert "ACQUISITION" in text
+    assert "SEC acquisition" in text
+    assert "Acquire and verify the missing SEC evidence." not in text
+
+
+def test_task7_blocked_after_sec_acquisition_has_sec_oriented_next_action() -> None:
+    result = _result(
+        AnalysisStatus.BLOCKED,
+        "SEC acquisition or canonicalization could not complete",
+    )
+    result = _task7_acquisition_result(
+        result,
+        AnalysisStageState.BLOCKED,
+        "SEC acquisition or canonicalization could not complete",
+    )
+
+    text = render_analysis(
+        result,
+        AnalysisRenderOptions(plain=True),
+    )
+
+    assert "BLOCKED" in text
+    assert "\nNEXT\n" in text
+
+    next_section = text.split("\nNEXT\n", maxsplit=1)[1]
+    assert "SEC" in next_section
+
+    assert "Traceback" not in text
+    assert "RuntimeError" not in text
+
+
+def test_completed_acquisition_does_not_render_stale_preexecution_evidence() -> None:
+    result = _result(
+        AnalysisStatus.EVIDENCE_REQUIRED,
+        "SEC canonical evidence gap after fallback: MISSING_STANDARD_CONCEPT",
+    )
+    result = _task7_acquisition_result(
+        result,
+        AnalysisStageState.COMPLETED,
+        "SEC canonical evidence gap after fallback: MISSING_STANDARD_CONCEPT",
+    )
+
+    text = render_analysis(
+        result,
+        AnalysisRenderOptions(plain=True),
+    )
+
+    assert "Latest 10-K" not in text
+    assert "Latest 10-Q" not in text
+    assert "Automatic SEC acquisition already ran" in text
+    assert "MISSING_STANDARD_CONCEPT" in text
+
+
+def test_completed_acquisition_detail_reports_post_acquisition_gap_not_stale_plan() -> None:
+    result = _result(
+        AnalysisStatus.EVIDENCE_REQUIRED,
+        "SEC canonical evidence gap after fallback: MISSING_STANDARD_CONCEPT",
+    )
+    result = _task7_acquisition_result(
+        result,
+        AnalysisStageState.COMPLETED,
+        "SEC canonical evidence gap after fallback: MISSING_STANDARD_CONCEPT",
+    )
+
+    text = render_analysis(
+        result,
+        AnalysisRenderOptions(detail=True, plain=True),
+    )
+
+    assert "POST-ACQUISITION EVIDENCE" in text
+    assert "MISSING_STANDARD_CONCEPT" in text
+    assert "LATEST 10-K" not in text
+    assert "LATEST 10-Q" not in text

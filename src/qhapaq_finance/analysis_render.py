@@ -78,6 +78,7 @@ def _render_completed(
 ) -> list[str]:
     canonical = result.canonical_result
     lines = _field("STATUS", _status_label(result.status, options), width)
+    lines.extend(_render_acquisition(result, width))
     if canonical is None:
         lines.extend(["", "BOTTOM LINE"])
         lines.extend(
@@ -189,6 +190,7 @@ def _render_evidence_required(
         ),
         width,
     )
+    lines.extend(_render_acquisition(result, width))
     unresolved = _unready_critical_evidence(result)
     if unresolved:
         lines.extend(["", "EVIDENCE"])
@@ -212,7 +214,18 @@ def _render_evidence_required(
             )
         )
     lines.extend(["", "NEXT"])
-    if unresolved:
+    acquisition = result.plan.acquisition
+    if acquisition.state is not AnalysisStageState.NOT_REQUESTED:
+        if acquisition.state is AnalysisStageState.BLOCKED:
+            next_action = "Resolve the SEC acquisition or canonicalization blocker before retrying."
+        else:
+            next_action = (
+                "Automatic SEC acquisition already ran, but canonical financial evidence "
+                "is still insufficient. Review the acquisition detail and remaining "
+                "evidence gap before retrying."
+            )
+        lines.extend(_paragraph(next_action, width))
+    elif unresolved:
         lines.extend(_paragraph("Acquire and verify the missing SEC evidence.", width))
     else:
         lines.extend(_paragraph(_blocking_reason(result), width))
@@ -228,16 +241,33 @@ def _render_blocked(
     lines = _field("STATUS", _status_label(result.status, options), width)
     if identity.cik:
         lines.extend(_field("CIK", identity.cik, width))
+    lines.extend(_render_acquisition(result, width))
     reason = _blocking_reason(result)
     lines.extend(["", "BLOCKING REASON", *_paragraph(reason, width)])
     lines.extend(["", "BOTTOM LINE"])
-    lines.extend(
-        _paragraph(
-            f"Analysis for {identity.ticker} is BLOCKED because {reason}. "
-            "Resolve the operational blocker before retrying.",
-            width,
+    acquisition = result.plan.acquisition
+    if acquisition.state is AnalysisStageState.NOT_REQUESTED:
+        lines.extend(
+            _paragraph(
+                f"Analysis for {identity.ticker} is BLOCKED because {reason}. "
+                "Resolve the operational blocker before retrying.",
+                width,
+            )
         )
-    )
+    else:
+        lines.extend(
+            _paragraph(
+                f"Analysis for {identity.ticker} is BLOCKED because {reason}.",
+                width,
+            )
+        )
+        lines.extend(["", "NEXT"])
+        lines.extend(
+            _paragraph(
+                "Resolve the SEC acquisition or canonicalization blocker before retrying.",
+                width,
+            )
+        )
     if options.detail:
         lines.extend(_render_detail(result, width))
     return lines
@@ -257,6 +287,27 @@ def _render_unsupported(
     if options.detail:
         lines.extend(_render_detail(result, width))
     return lines
+
+
+def _render_acquisition(result: AnalysisResult, width: int) -> list[str]:
+    """Render acquisition state without interpreting exception text or doing I/O."""
+
+    acquisition = result.plan.acquisition
+    if acquisition.state is AnalysisStageState.NOT_REQUESTED:
+        return []
+
+    detail = acquisition.reason or "No additional acquisition detail"
+    return [
+        "",
+        "ACQUISITION",
+        *_fields(
+            (
+                ("STATE", acquisition.state.value.replace("_", " ")),
+                ("DETAIL", detail),
+            ),
+            width,
+        ),
+    ]
 
 
 def _status_label(status: AnalysisStatus, options: AnalysisRenderOptions) -> str:
@@ -440,6 +491,14 @@ def _detail_field(
 
 
 def _evidence_plan_fields(result: AnalysisResult, width: int) -> list[str]:
+    acquisition = result.plan.acquisition
+    if acquisition.state is not AnalysisStageState.NOT_REQUESTED:
+        detail = acquisition.reason or "Automatic SEC acquisition completed"
+        return _detail_fields(
+            (("POST-ACQUISITION EVIDENCE", detail),),
+            width,
+        )
+
     plan = result.plan.evidence_plan
     if plan is None or not plan.items:
         return []
@@ -568,6 +627,12 @@ def _is_meaningful(value: object) -> bool:
 
 
 def _unready_critical_evidence(result: AnalysisResult) -> tuple[EvidenceItem, ...]:
+    # EvidencePlan describes the pre-execution acquisition surface.
+    # Once automatic acquisition ran, those item states are stale and must
+    # not be presented as the current post-acquisition evidence state.
+    if result.plan.acquisition.state is not AnalysisStageState.NOT_REQUESTED:
+        return ()
+
     plan = result.plan.evidence_plan
     if plan is None:
         return ()

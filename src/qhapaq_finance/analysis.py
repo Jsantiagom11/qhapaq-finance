@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
 from enum import Enum
 from pathlib import Path
 
+from .accounting import AccountingSnapshot
 from .capital_cost import CapitalCostResult
 from .company_resolver import (
     CompanyResolver,
@@ -15,15 +17,33 @@ from .company_resolver import (
     ResolvedCompany,
     SymbolResolver,
 )
-from .evidence_orchestration import EvidencePlan, EvidencePlanner
+from .evidence_orchestration import EvidencePlan, EvidencePlanner, EvidenceState
+from .financial_canonicalization import RawFact, extract_company_facts
 from .market_inputs import MarketInput, MarketInputError, canonical_market_input
 from .research_result import (
     CanonicalResearchResult,
     ResearchResultError,
     build_canonical_research_result,
 )
+from .sec_canonical_gate import (
+    SecCanonicalGateState,
+    SecCanonicalReason,
+    evaluate_sec_canonical_gate,
+)
 from .sec_client import SecClient
 from .sec_config import SecConfig
+from .sec_corpus import export_sec_filing
+from .sec_evidence_provider import (
+    SecFilingDescriptor,
+    SecSubmissionsBundle,
+    StructuredSecProvider,
+)
+from .sec_filing_plan import FilingRequirementContext, plan_filing_fallback
+from .sec_filing_xbrl import (
+    FilingArtifact,
+    VerifiedFilingArtifacts,
+    parse_filing_native_evidence,
+)
 from .universe import DomainRegistry, UniverseError
 
 
@@ -44,6 +64,34 @@ class AnalysisStageState(str, Enum):
     READY = "READY"
     COMPLETED = "COMPLETED"
     BLOCKED = "BLOCKED"
+
+
+class AnalysisProgressKind(str, Enum):
+    """Presentation-neutral milestones emitted by analysis orchestration."""
+
+    RESOLUTION_STARTED = "RESOLUTION_STARTED"
+    FAST_PATH_ACQUISITION_STARTED = "FAST_PATH_ACQUISITION_STARTED"
+    FAST_PATH_ACQUISITION_COMPLETED = "FAST_PATH_ACQUISITION_COMPLETED"
+    CANONICAL_GATE_READY = "CANONICAL_GATE_READY"
+    CANONICAL_GATE_GAP = "CANONICAL_GATE_GAP"
+    FILING_FALLBACK_STARTED = "FILING_FALLBACK_STARTED"
+    FILING_FALLBACK_COMPLETED = "FILING_FALLBACK_COMPLETED"
+    CANONICALIZATION_COMPLETED = "CANONICALIZATION_COMPLETED"
+
+
+@dataclass(frozen=True)
+class AnalysisProgressEvent:
+    """One typed orchestration milestone with optional stable detail."""
+
+    kind: AnalysisProgressKind
+    detail: str | None = None
+
+
+@dataclass(frozen=True)
+class _SecRecoveryResult:
+    status: AnalysisStatus
+    snapshot: AccountingSnapshot | None
+    reason: str
 
 
 @dataclass(frozen=True)
@@ -150,12 +198,14 @@ class AnalysisOrchestrator:
         resolver: SymbolResolver | None = None,
         evidence_planner: EvidencePlanner | None = None,
         sec_client_factory: Callable[[], SecClient] | None = None,
+        progress_observer: Callable[[AnalysisProgressEvent], None] | None = None,
     ) -> None:
         self.root = Path(repository_root)
         self.registry = DomainRegistry(self.root)
         self.resolver = resolver or CompanyResolver(self.root)
         self.evidence_planner = evidence_planner or EvidencePlanner(self.root)
         self.sec_client_factory = sec_client_factory or self._sec_client_from_env
+        self.progress_observer = progress_observer
 
     def plan(self, ticker: str) -> AnalysisPlan:
         """Resolve identity and readiness without acquiring, valuing, or publishing."""
@@ -169,8 +219,18 @@ class AnalysisOrchestrator:
             )
         return self._plan_resolved(normalized, resolved)
 
-    def _plan_resolved(self, normalized: str, resolved: ResolvedCompany) -> AnalysisPlan:
+    def _plan_resolved(
+        self,
+        normalized: str,
+        resolved: ResolvedCompany,
+        *,
+        accounting_snapshot: AccountingSnapshot | None = None,
+        acquisition: AnalysisStage | None = None,
+    ) -> AnalysisPlan:
         """Plan from one already-resolved identity without repeating resolution."""
+        acquisition_stage = acquisition or AnalysisStage(
+            AnalysisStageState.NOT_REQUESTED, "automatic acquisition is disabled"
+        )
         try:
             security = self.registry.security(normalized)
         except UniverseError:
@@ -184,11 +244,29 @@ class AnalysisOrchestrator:
                 resolved.cik,
                 resolved.provenance.to_dict(),
             )
+            evidence_plan = self.evidence_planner.plan(identity)
+            snapshot = accounting_snapshot or self._generic_accounting_snapshot(identity)
+            if snapshot is not None:
+                market_blocked = AnalysisStage(
+                    AnalysisStageState.BLOCKED, "canonical market evidence is not available"
+                )
+                return AnalysisPlan(
+                    "analysis-plan-v1",
+                    AnalysisStatus.EVIDENCE_REQUIRED,
+                    identity,
+                    acquisition_stage,
+                    AnalysisStage(AnalysisStageState.COMPLETED),
+                    market_blocked,
+                    market_blocked,
+                    AnalysisStage(AnalysisStageState.NOT_REQUESTED, "publishing is not requested"),
+                    evidence_plan,
+                )
             return self._blocked_plan(
                 AnalysisStatus.EVIDENCE_REQUIRED,
                 identity,
                 "checksum-verified canonical evidence is not available",
-                self.evidence_planner.plan(identity),
+                evidence_plan,
+                acquisition=acquisition_stage,
             )
 
         issuer = self.registry.issuer_for(security.ticker)
@@ -211,7 +289,7 @@ class AnalysisOrchestrator:
             else None,
         )
         if research.get("kind") != "evidence-backed":
-            snapshot = self._generic_accounting_snapshot(identity)
+            snapshot = accounting_snapshot or self._generic_accounting_snapshot(identity)
             if snapshot is not None:
                 market_as_of = self._research_as_of(research)
                 market_input = self._canonical_market_input(
@@ -225,9 +303,7 @@ class AnalysisOrchestrator:
                         "analysis-plan-v1",
                         AnalysisStatus.EVIDENCE_REQUIRED,
                         identity,
-                        AnalysisStage(
-                            AnalysisStageState.NOT_REQUESTED, "automatic acquisition is disabled"
-                        ),
+                        acquisition_stage,
                         AnalysisStage(AnalysisStageState.COMPLETED),
                         market_blocked,
                         market_blocked,
@@ -248,10 +324,7 @@ class AnalysisOrchestrator:
                         "analysis-plan-v1",
                         AnalysisStatus.READY,
                         identity,
-                        AnalysisStage(
-                            AnalysisStageState.NOT_REQUESTED,
-                            "automatic acquisition is disabled",
-                        ),
+                        acquisition_stage,
                         ready,
                         ready,
                         ready,
@@ -268,9 +341,7 @@ class AnalysisOrchestrator:
                     "analysis-plan-v1",
                     AnalysisStatus.EVIDENCE_REQUIRED,
                     identity,
-                    AnalysisStage(
-                        AnalysisStageState.NOT_REQUESTED, "automatic acquisition is disabled"
-                    ),
+                    acquisition_stage,
                     AnalysisStage(AnalysisStageState.COMPLETED),
                     AnalysisStage(AnalysisStageState.COMPLETED),
                     AnalysisStage(
@@ -287,6 +358,7 @@ class AnalysisOrchestrator:
                 identity,
                 "checksum-verified canonical evidence is not available",
                 evidence_plan,
+                acquisition=acquisition_stage,
             )
         if not capability.deterministic_research_ready:
             return self._blocked_plan(
@@ -294,13 +366,14 @@ class AnalysisOrchestrator:
                 identity,
                 "validated evidence and model requirements are not ready",
                 evidence_plan,
+                acquisition=acquisition_stage,
             )
         ready = AnalysisStage(AnalysisStageState.READY)
         return AnalysisPlan(
             "analysis-plan-v1",
             AnalysisStatus.READY,
             identity,
-            AnalysisStage(AnalysisStageState.NOT_REQUESTED, "automatic acquisition is disabled"),
+            acquisition_stage,
             ready,
             ready,
             ready,
@@ -311,6 +384,7 @@ class AnalysisOrchestrator:
     def analyze(self, ticker: str) -> AnalysisResult:
         """Resolve offline-first, refreshing the authoritative reference at most once."""
         normalized = ticker.strip().upper()
+        self._emit(AnalysisProgressKind.RESOLUTION_STARTED, normalized)
         try:
             resolved = self.resolver.resolve(normalized)
         except Exception:
@@ -347,11 +421,33 @@ class AnalysisOrchestrator:
                 )
 
         plan = self._plan_resolved(normalized, resolved)
+        acquired_snapshot: AccountingSnapshot | None = None
         if plan.status is not AnalysisStatus.READY:
-            return AnalysisResult("analysis-result-v1", plan.status, plan, None)
+            if not self._requires_sec_acquisition(plan):
+                return AnalysisResult("analysis-result-v1", plan.status, plan, None)
+            recovery = self._recover_sec_evidence(plan.identity)
+            if recovery.status is not AnalysisStatus.READY or recovery.snapshot is None:
+                terminal = self._post_acquisition_plan(
+                    plan,
+                    recovery.status,
+                    recovery.reason,
+                )
+                return AnalysisResult("analysis-result-v1", recovery.status, terminal, None)
+            acquired_snapshot = recovery.snapshot
+            plan = self._plan_resolved(
+                normalized,
+                resolved,
+                accounting_snapshot=acquired_snapshot,
+                acquisition=AnalysisStage(AnalysisStageState.COMPLETED, recovery.reason),
+            )
+            if plan.status is not AnalysisStatus.READY:
+                return AnalysisResult("analysis-result-v1", plan.status, plan, None)
         try:
             if plan.market_input is not None and plan.market_research_as_of is not None:
-                canonical = self._generic_canonical_result(plan)
+                canonical = self._generic_canonical_result(
+                    plan,
+                    accounting_snapshot=acquired_snapshot,
+                )
             else:
                 canonical = build_canonical_research_result(
                     plan.identity.ticker,
@@ -376,6 +472,279 @@ class AnalysisOrchestrator:
             plan.evidence_plan,
         )
         return AnalysisResult("analysis-result-v1", AnalysisStatus.COMPLETED, completed, canonical)
+
+    def _requires_sec_acquisition(self, plan: AnalysisPlan) -> bool:
+        """Return whether the offline plan exposes an acquisition-eligible SEC gap."""
+        if (
+            plan.status is not AnalysisStatus.EVIDENCE_REQUIRED
+            or plan.evidence.state is not AnalysisStageState.BLOCKED
+            or plan.evidence_plan is None
+        ):
+            return False
+        return any(
+            item.requirement.provider == "SEC"
+            and item.requirement.critical
+            and item.state in {EvidenceState.MISSING, EvidenceState.STALE}
+            for item in plan.evidence_plan.items
+        )
+
+    def _recover_sec_evidence(self, identity: CompanyIdentity) -> _SecRecoveryResult:
+        """Run one SEC fast path and at most one filing-native fallback phase."""
+        self._emit(AnalysisProgressKind.FAST_PATH_ACQUISITION_STARTED)
+        try:
+            client = self.sec_client_factory()
+            provider = StructuredSecProvider(client, self.root / "data/raw/sec")
+            bundle = provider.acquire_fast_path(identity)
+            self._emit(AnalysisProgressKind.FAST_PATH_ACQUISITION_COMPLETED)
+
+            raw_facts = extract_company_facts(
+                bundle.companyfacts,
+                source_identity=bundle.companyfacts_staged.sha256,
+            )
+            gate = evaluate_sec_canonical_gate(raw_facts)
+            if gate.state is SecCanonicalGateState.READY:
+                if gate.snapshot is None:
+                    raise ValueError("READY SEC gate has no accounting snapshot")
+                self._emit(AnalysisProgressKind.CANONICAL_GATE_READY)
+                self._emit(AnalysisProgressKind.CANONICALIZATION_COMPLETED)
+                return _SecRecoveryResult(
+                    AnalysisStatus.READY,
+                    gate.snapshot,
+                    "SEC fast path canonical evidence verified",
+                )
+            if gate.state is SecCanonicalGateState.BLOCKED:
+                return self._blocked_sec_recovery(gate.reason)
+            if gate.reason is None:
+                raise ValueError("GAP SEC gate has no typed reason")
+
+            self._emit(AnalysisProgressKind.CANONICAL_GATE_GAP, gate.reason.value)
+            fallback = plan_filing_fallback(
+                gate.reason,
+                bundle.submissions,
+                self._filing_requirement_context(bundle.submissions, raw_facts),
+            )
+            if fallback is None:
+                return _SecRecoveryResult(
+                    AnalysisStatus.EVIDENCE_REQUIRED,
+                    None,
+                    f"SEC canonical evidence gap: {gate.reason.value}",
+                )
+            if len({filing.accession for filing in fallback.filings}) != len(
+                fallback.filings
+            ) or any(
+                filing.amendment or filing.form not in {"10-K", "10-Q"}
+                for filing in fallback.filings
+            ):
+                raise ValueError("filing fallback plan violates original-filing invariant")
+
+            self._emit(AnalysisProgressKind.FILING_FALLBACK_STARTED, gate.reason.value)
+            issuer_root = self.root / "data/cache/sec_corpus_live" / identity.ticker
+            verified = tuple(
+                self._verified_filing_artifacts(
+                    identity,
+                    filing,
+                    export_sec_filing(
+                        client,
+                        staging_root=self.root / "data/raw/sec",
+                        issuer_root=issuer_root,
+                        ticker=identity.ticker,
+                        cik=identity.cik or "",
+                        filing=filing,
+                    ),
+                    issuer_root,
+                    raw_facts,
+                )
+                for filing in fallback.filings
+            )
+            filing_evidence = parse_filing_native_evidence(verified)
+            self._emit(AnalysisProgressKind.FILING_FALLBACK_COMPLETED, gate.reason.value)
+            post_fallback = evaluate_sec_canonical_gate(
+                (*raw_facts, *filing_evidence.raw_facts),
+                semantic_extensions=filing_evidence.semantic_extensions,
+            )
+            if post_fallback.state is SecCanonicalGateState.READY:
+                if post_fallback.snapshot is None:
+                    raise ValueError("READY SEC gate has no accounting snapshot")
+                self._emit(AnalysisProgressKind.CANONICAL_GATE_READY)
+                self._emit(AnalysisProgressKind.CANONICALIZATION_COMPLETED)
+                return _SecRecoveryResult(
+                    AnalysisStatus.READY,
+                    post_fallback.snapshot,
+                    f"SEC filing fallback canonical evidence verified: {gate.reason.value}",
+                )
+            if post_fallback.state is SecCanonicalGateState.GAP:
+                reason = post_fallback.reason or gate.reason
+                return _SecRecoveryResult(
+                    AnalysisStatus.EVIDENCE_REQUIRED,
+                    None,
+                    f"SEC canonical evidence gap after fallback: {reason.value}",
+                )
+            return self._blocked_sec_recovery(post_fallback.reason)
+        except Exception:
+            return _SecRecoveryResult(
+                AnalysisStatus.BLOCKED,
+                None,
+                "SEC acquisition or canonicalization could not complete",
+            )
+
+    @staticmethod
+    def _blocked_sec_recovery(reason: SecCanonicalReason | None) -> _SecRecoveryResult:
+        detail = reason.value if reason is not None else "UNKNOWN"
+        return _SecRecoveryResult(
+            AnalysisStatus.BLOCKED,
+            None,
+            f"SEC canonical evidence blocked: {detail}",
+        )
+
+    @staticmethod
+    def _filing_requirement_context(
+        submissions: SecSubmissionsBundle,
+        raw_facts: tuple[RawFact, ...],
+    ) -> FilingRequirementContext:
+        originals = tuple(
+            filing
+            for filing in submissions.filings
+            if not filing.amendment
+            and filing.form in {"10-K", "10-Q"}
+            and filing.report_date is not None
+        )
+        annual = next((filing for filing in originals if filing.form == "10-K"), None)
+        quarters = tuple(filing for filing in originals if filing.form == "10-Q")
+        current = quarters[0] if quarters else None
+        prior: SecFilingDescriptor | None = None
+        if current is not None:
+            identities = AnalysisOrchestrator._filing_fact_identities(raw_facts)
+            current_identity = identities.get(current.accession)
+            if current_identity is not None:
+                current_year, current_period = current_identity
+                prior = next(
+                    (
+                        filing
+                        for filing in quarters[1:]
+                        if identities.get(filing.accession) == (current_year - 1, current_period)
+                    ),
+                    None,
+                )
+            if prior is None and current.report_date is not None:
+                current_date = date.fromisoformat(current.report_date)
+                prior = next(
+                    (
+                        filing
+                        for filing in quarters[1:]
+                        if filing.report_date is not None
+                        and date.fromisoformat(filing.report_date).year == current_date.year - 1
+                    ),
+                    None,
+                )
+        return FilingRequirementContext(
+            annual_report_date=annual.report_date if annual is not None else None,
+            current_ytd_report_date=current.report_date if current is not None else None,
+            prior_ytd_report_date=prior.report_date if prior is not None else None,
+        )
+
+    @staticmethod
+    def _filing_fact_identities(
+        raw_facts: tuple[RawFact, ...],
+    ) -> dict[str, tuple[int, str]]:
+        candidates: dict[str, set[tuple[int, str]]] = {}
+        for fact in raw_facts:
+            if fact.fiscal_year > 0 and fact.fiscal_period in {"FY", "Q1", "Q2", "Q3"}:
+                candidates.setdefault(fact.accession, set()).add(
+                    (fact.fiscal_year, fact.fiscal_period)
+                )
+        return {
+            accession: next(iter(identities))
+            for accession, identities in candidates.items()
+            if len(identities) == 1
+        }
+
+    @classmethod
+    def _verified_filing_artifacts(
+        cls,
+        identity: CompanyIdentity,
+        filing: SecFilingDescriptor,
+        records: list[dict[str, object]],
+        issuer_root: Path,
+        raw_facts: tuple[RawFact, ...],
+    ) -> VerifiedFilingArtifacts:
+        if identity.cik is None or filing.report_date is None or not records:
+            raise ValueError("filing export identity is incomplete")
+        root = issuer_root.resolve()
+        artifacts: list[FilingArtifact] = []
+        seen_paths: set[Path] = set()
+        for record in records:
+            artifact_kind = record.get("artifact_kind")
+            if artifact_kind not in {"filing-index", "filing-artifact"}:
+                raise ValueError("filing export record has unsupported artifact kind")
+            expected = {
+                "accession": filing.accession,
+                "form": filing.form,
+                "filing_date": filing.filing_date,
+                "report_date": filing.report_date,
+            }
+            if any(record.get(key) != value for key, value in expected.items()):
+                raise ValueError("filing export record disagrees with its plan")
+            path_value = record.get("path")
+            checksum = record.get("sha256")
+            if not isinstance(path_value, str) or not isinstance(checksum, str):
+                raise ValueError("filing export record is malformed")
+            relative = Path(path_value)
+            if relative.is_absolute() or ".." in relative.parts:
+                raise ValueError("filing export path escapes issuer root")
+            path = (issuer_root / relative).resolve()
+            if root not in path.parents or path in seen_paths or not path.is_file():
+                raise ValueError("filing export path is absent or duplicated")
+            if hashlib.sha256(path.read_bytes()).hexdigest() != checksum:
+                raise ValueError("filing export checksum mismatch")
+            seen_paths.add(path)
+            if artifact_kind == "filing-artifact":
+                artifacts.append(FilingArtifact(path, checksum))
+
+        if not artifacts:
+            raise ValueError("filing export contains no filing artifacts")
+
+        filing_identity = cls._filing_fact_identities(raw_facts).get(filing.accession)
+        if filing_identity is None:
+            raise ValueError("filing fiscal identity is unavailable")
+        fiscal_year, fiscal_period = filing_identity
+        return VerifiedFilingArtifacts(
+            filing.accession,
+            filing.form,
+            date.fromisoformat(filing.filing_date),
+            date.fromisoformat(filing.report_date),
+            fiscal_year,
+            fiscal_period,
+            identity.cik,
+            tuple(artifacts),
+        )
+
+    @staticmethod
+    def _post_acquisition_plan(
+        plan: AnalysisPlan,
+        status: AnalysisStatus,
+        reason: str,
+    ) -> AnalysisPlan:
+        acquisition_state = (
+            AnalysisStageState.BLOCKED
+            if status is AnalysisStatus.BLOCKED
+            else AnalysisStageState.COMPLETED
+        )
+        blocked = AnalysisStage(AnalysisStageState.BLOCKED, reason)
+        return AnalysisPlan(
+            plan.schema_version,
+            status,
+            plan.identity,
+            AnalysisStage(acquisition_state, reason),
+            blocked,
+            blocked,
+            blocked,
+            plan.publishing,
+            plan.evidence_plan,
+        )
+
+    def _emit(self, kind: AnalysisProgressKind, detail: str | None = None) -> None:
+        if self.progress_observer is not None:
+            self.progress_observer(AnalysisProgressEvent(kind, detail))
 
     def _generic_capital_cost(
         self,
@@ -598,6 +967,8 @@ class AnalysisOrchestrator:
     def _generic_canonical_result(
         self,
         plan: AnalysisPlan,
+        *,
+        accounting_snapshot: AccountingSnapshot | None = None,
     ) -> CanonicalResearchResult:
         """Build reverse-DCF research without inventing forward scenarios."""
         from .accounting import AccountingSnapshot
@@ -609,7 +980,7 @@ class AnalysisOrchestrator:
             solve_fcff_implied_growth,
         )
 
-        snapshot = self._generic_accounting_snapshot(plan.identity)
+        snapshot = accounting_snapshot or self._generic_accounting_snapshot(plan.identity)
         market_input = plan.market_input
         research_as_of = plan.market_research_as_of
 
@@ -868,13 +1239,16 @@ class AnalysisOrchestrator:
         identity: CompanyIdentity,
         reason: str,
         evidence_plan: EvidencePlan | None = None,
+        *,
+        acquisition: AnalysisStage | None = None,
     ) -> AnalysisPlan:
         blocked = AnalysisStage(AnalysisStageState.BLOCKED, reason)
         return AnalysisPlan(
             "analysis-plan-v1",
             status,
             identity,
-            AnalysisStage(AnalysisStageState.NOT_REQUESTED, "automatic acquisition is disabled"),
+            acquisition
+            or AnalysisStage(AnalysisStageState.NOT_REQUESTED, "automatic acquisition is disabled"),
             blocked,
             blocked,
             blocked,
