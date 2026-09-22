@@ -689,6 +689,18 @@ def main(argv: list[str] | None = None) -> None:
         _market(arguments[1:])
     elif arguments and arguments[0] == "investigate":
         _investigate(arguments[1:])
+    elif arguments and arguments[0] == "screen":
+        from .diamond.cli import screen_command
+
+        screen_command(arguments[1:])
+    elif arguments and arguments[0] == "inspect":
+        from .diamond.cli import inspect_command
+
+        inspect_command(arguments[1:])
+    elif arguments and arguments[0] == "provider-benchmark":
+        from .diamond.cli import provider_benchmark_command
+
+        provider_benchmark_command(arguments[1:])
     elif arguments and arguments[0] == "reverse-dcf":
         _reverse_dcf(arguments[1:])
     elif arguments and not arguments[0].startswith("-"):
