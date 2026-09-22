@@ -385,8 +385,10 @@ RECENT_AS_OF_DAYS = 2
 RECENT_TTL = timedelta(hours=6)
 HISTORICAL_TTL = timedelta(days=7)
 
+
 class SecEvidenceError(RuntimeError):
     """SEC evidence cannot be trusted or refreshed."""
+
 
 @dataclass(frozen=True, slots=True)
 class SecEvidenceManifest:
@@ -402,6 +404,7 @@ class SecEvidenceManifest:
     etag: str | None
     last_modified: str | None
     blob_name: str
+
 
 @dataclass(frozen=True, slots=True)
 class ResolvedSecEvidence:
@@ -439,10 +442,24 @@ Add tests with these exact assertions:
 ```python
 def test_fresh_manifest_performs_zero_sec_requests(tmp_path: Path) -> None:
     now = datetime(2026, 9, 22, 12, tzinfo=timezone.utc)
-    client = FakeSecHttpClient([SecResponse(200, {"ETag": '"v1"'}, json.dumps(revenue_payload(amendment_filed="2026-08-15", amendment_value=110.0)).encode())])
-    store = SecEvidenceStore(root=tmp_path / "sec", client=client, legacy_cache=None, now=lambda: now)
+    client = FakeSecHttpClient(
+        [
+            SecResponse(
+                200,
+                {"ETag": '"v1"'},
+                json.dumps(
+                    revenue_payload(amendment_filed="2026-08-15", amendment_value=110.0)
+                ).encode(),
+            )
+        ]
+    )
+    store = SecEvidenceStore(
+        root=tmp_path / "sec", client=client, legacy_cache=None, now=lambda: now
+    )
     first = store.resolve("0000320193", date(2026, 9, 22))
-    replay = SecEvidenceStore(root=tmp_path / "sec", client=None, legacy_cache=None, now=lambda: now + timedelta(hours=1))
+    replay = SecEvidenceStore(
+        root=tmp_path / "sec", client=None, legacy_cache=None, now=lambda: now + timedelta(hours=1)
+    )
     second = replay.resolve("0000320193", date(2026, 9, 22))
     assert first.manifest.evidence_revision_sha256 == second.manifest.evidence_revision_sha256
     assert second.facts is None
@@ -454,10 +471,19 @@ def test_fresh_manifest_performs_zero_sec_requests(tmp_path: Path) -> None:
 def test_stale_manifest_with_etag_304_preserves_revision(tmp_path: Path) -> None:
     base = datetime(2026, 9, 22, 0, tzinfo=timezone.utc)
     payload = revenue_payload(amendment_filed="2026-08-15", amendment_value=110.0)
-    seed_client = FakeSecHttpClient([SecResponse(200, {"ETag": '"v1"'}, json.dumps(payload).encode())])
-    SecEvidenceStore(root=tmp_path / "sec", client=seed_client, legacy_cache=None, now=lambda: base).resolve("0000320193", date(2026, 9, 22))
+    seed_client = FakeSecHttpClient(
+        [SecResponse(200, {"ETag": '"v1"'}, json.dumps(payload).encode())]
+    )
+    SecEvidenceStore(
+        root=tmp_path / "sec", client=seed_client, legacy_cache=None, now=lambda: base
+    ).resolve("0000320193", date(2026, 9, 22))
     revalidate_client = FakeSecHttpClient([SecResponse(304, {"ETag": '"v1"'}, b"")])
-    store = SecEvidenceStore(root=tmp_path / "sec", client=revalidate_client, legacy_cache=None, now=lambda: base + timedelta(hours=7))
+    store = SecEvidenceStore(
+        root=tmp_path / "sec",
+        client=revalidate_client,
+        legacy_cache=None,
+        now=lambda: base + timedelta(hours=7),
+    )
     resolved = store.resolve("0000320193", date(2026, 9, 22))
     assert revalidate_client.calls[0][1] == {"If-None-Match": '"v1"'}
     assert resolved.facts is None
@@ -469,9 +495,16 @@ def test_stale_manifest_without_validators_refetches_unconditionally(tmp_path: P
     first_payload = revenue_payload(amendment_filed="2026-08-15", amendment_value=110.0)
     second_payload = revenue_payload(amendment_filed="2026-08-20", amendment_value=111.0)
     seed = FakeSecHttpClient([SecResponse(200, {}, json.dumps(first_payload).encode())])
-    first = SecEvidenceStore(root=tmp_path / "sec", client=seed, legacy_cache=None, now=lambda: base).resolve("0000320193", date(2026, 9, 22))
+    first = SecEvidenceStore(
+        root=tmp_path / "sec", client=seed, legacy_cache=None, now=lambda: base
+    ).resolve("0000320193", date(2026, 9, 22))
     refresh = FakeSecHttpClient([SecResponse(200, {}, json.dumps(second_payload).encode())])
-    second = SecEvidenceStore(root=tmp_path / "sec", client=refresh, legacy_cache=None, now=lambda: base + timedelta(hours=7)).resolve("0000320193", date(2026, 9, 22))
+    second = SecEvidenceStore(
+        root=tmp_path / "sec",
+        client=refresh,
+        legacy_cache=None,
+        now=lambda: base + timedelta(hours=7),
+    ).resolve("0000320193", date(2026, 9, 22))
     assert refresh.calls[0][1] == {}
     assert first.manifest.evidence_revision_sha256 != second.manifest.evidence_revision_sha256
 ```
@@ -560,7 +593,9 @@ git commit -m "feat: add amendment-aware SEC evidence store"
 Create:
 
 ```python
-def sample_snapshot(*, revision: str = "rev-a", version: str = "sec-canonicalizer-v2") -> CanonicalIssuerSnapshot:
+def sample_snapshot(
+    *, revision: str = "rev-a", version: str = "sec-canonicalizer-v2"
+) -> CanonicalIssuerSnapshot:
     return CanonicalIssuerSnapshot(
         schema_version="diamond-canonical-issuer-v1",
         canonicalizer_version=version,
@@ -608,12 +643,15 @@ def test_canonical_cache_round_trips_snapshot(tmp_path: Path) -> None:
 def test_canonicalizer_version_change_is_a_cache_miss(tmp_path: Path) -> None:
     cache = CanonicalIssuerCache(DiamondCache(tmp_path / "canonical"))
     cache.store(sample_snapshot(version="sec-canonicalizer-v1"))
-    assert cache.load(
-        issuer_id="sec-cik:0000320193",
-        as_of=date(2026, 9, 22),
-        history_years=5,
-        evidence_revision_sha256="rev-a",
-    ) is None
+    assert (
+        cache.load(
+            issuer_id="sec-cik:0000320193",
+            as_of=date(2026, 9, 22),
+            history_years=5,
+            evidence_revision_sha256="rev-a",
+        )
+        is None
+    )
 ```
 
 - [ ] **Step 2: Run and verify RED**
@@ -724,7 +762,9 @@ def test_sec_canonicalizer_uses_in_scope_10q_amendment(tmp_path: Path) -> None:
         )
     )
     provider = make_sec_first_provider(tmp_path=tmp_path, payload=payload, market_provider=None)
-    record = provider.fundamentals(provider.universe("sp500", date(2026, 9, 22)), date(2026, 9, 22))[0]
+    record = provider.fundamentals(
+        provider.universe("sp500", date(2026, 9, 22)), date(2026, 9, 22)
+    )[0]
     assert value(record, "revenue", FiscalSlot.TTM) == pytest.approx(120.0)
 ```
 
@@ -752,6 +792,7 @@ def _promotion_form(form: str) -> str:
     if form == "10-Q/A":
         return "10-Q"
     return form
+
 
 promotion_facts = tuple(
     replace(item, filing_form=_promotion_form(item.filing_form)) for item in facts
@@ -1007,17 +1048,21 @@ class SplitCoverage:
     source_identity: str
     event_dates: tuple[date, ...] = ()
 
+
 @dataclass(frozen=True, slots=True)
 class MarketCapDecision:
     market_cap: float | None
     diagnostic: str | None
+
 
 class SplitAdjustmentProvider(Protocol):
     provider_requests: int
     cache_hits: int
     cache_misses: int
 
-    def coverage(self, ticker: str, start_date: date, end_date: date, as_of: date) -> SplitCoverage | None:
+    def coverage(
+        self, ticker: str, start_date: date, end_date: date, as_of: date
+    ) -> SplitCoverage | None:
         raise NotImplementedError
 ```
 
@@ -1163,11 +1208,30 @@ def test_cached_membership_uses_live_validation(tmp_path: Path, field: str, valu
 def test_distinct_tickers_may_share_one_cik(tmp_path: Path) -> None:
     cache = DiamondCache(tmp_path / "universe")
     rows = [
-        {"ticker": "AAA", "cik": "320193", "company_name": "Issuer A", "sector": "Industrials", "industry_group": "Machinery"},
-        {"ticker": "AAB", "cik": "320193", "company_name": "Issuer A Class B", "sector": "Industrials", "industry_group": "Machinery"},
+        {
+            "ticker": "AAA",
+            "cik": "320193",
+            "company_name": "Issuer A",
+            "sector": "Industrials",
+            "industry_group": "Machinery",
+        },
+        {
+            "ticker": "AAB",
+            "cik": "320193",
+            "company_name": "Issuer A Class B",
+            "sector": "Industrials",
+            "industry_group": "Machinery",
+        },
     ]
-    cache.store(Sp500UniverseProvider.SOURCE_URL, provider=Sp500UniverseProvider.PROVIDER, data_as_of=date(2026, 9, 22), payload=rows)
-    securities = Sp500UniverseProvider(client=None, cache=cache).universe("sp500", date(2026, 9, 22))
+    cache.store(
+        Sp500UniverseProvider.SOURCE_URL,
+        provider=Sp500UniverseProvider.PROVIDER,
+        data_as_of=date(2026, 9, 22),
+        payload=rows,
+    )
+    securities = Sp500UniverseProvider(client=None, cache=cache).universe(
+        "sp500", date(2026, 9, 22)
+    )
     assert [item.ticker for item in securities] == ["AAA", "AAB"]
     assert {item.issuer_id for item in securities} == {"sec-cik:0000320193"}
 ```
@@ -1228,7 +1292,9 @@ def test_observation_order_does_not_change_identity() -> None:
 def test_one_observation_change_changes_identity() -> None:
     record = valid_record("AAA")
     first = record.observations[0]
-    changed = replace(record, observations=(replace(first, value=first.value + 1.0), *record.observations[1:]))
+    changed = replace(
+        record, observations=(replace(first, value=first.value + 1.0), *record.observations[1:])
+    )
     assert dataset_identity((record,)) != dataset_identity((changed,))
 ```
 
@@ -1298,11 +1364,25 @@ git commit -m "fix: canonicalize Diamond dataset identity"
 Monkeypatch constructors and assert the production factory passes these exact roots and refresh values:
 
 ```python
-def test_production_funnel_wires_debt_zero_cache_roots(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_production_funnel_wires_debt_zero_cache_roots(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     seen: dict[str, Path] = {}
-    monkeypatch.setattr(diamond_cli, "SecEvidenceStore", lambda *, root, client, legacy_cache, now=None: capture_store(seen, "sec", root, client, legacy_cache))
-    monkeypatch.setattr(diamond_cli, "CanonicalIssuerCache", lambda cache: capture_cache(seen, "canonical", cache))
-    monkeypatch.setattr(diamond_cli, "YahooSplitAdjustmentProvider", lambda *, client, cache, refresh: capture_split(seen, cache, refresh))
+    monkeypatch.setattr(
+        diamond_cli,
+        "SecEvidenceStore",
+        lambda *, root, client, legacy_cache, now=None: capture_store(
+            seen, "sec", root, client, legacy_cache
+        ),
+    )
+    monkeypatch.setattr(
+        diamond_cli, "CanonicalIssuerCache", lambda cache: capture_cache(seen, "canonical", cache)
+    )
+    monkeypatch.setattr(
+        diamond_cli,
+        "YahooSplitAdjustmentProvider",
+        lambda *, client, cache, refresh: capture_split(seen, cache, refresh),
+    )
     diamond_cli._production_funnel_provider(tmp_path, refresh=False)
     assert seen["sec"] == tmp_path / "sec"
     assert seen["canonical"] == tmp_path / "canonical"
