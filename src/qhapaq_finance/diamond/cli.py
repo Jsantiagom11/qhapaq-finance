@@ -4,13 +4,23 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
+from dataclasses import asdict
 from datetime import date
 from pathlib import Path
 
+from qhapaq_finance.sec_client import SecClient, SecClientError
+from qhapaq_finance.sec_config import SecConfig
+
 from .archetypes import Archetype
+from .cache import DiamondCache, DiamondCacheError
 from .engine import DiamondResult, evaluate_universe
+from .funnel import FunnelRun, run_funnel
 from .providers.benchmark import benchmark_provider_sample
 from .providers.local import LocalJsonProvider
+from .providers.sec import SecFirstProvider, SecFirstProviderError
+from .providers.sp500 import Sp500ProviderError, Sp500UniverseProvider, WikipediaTextClient
+from .providers.yahoo import YahooBatchMarketProvider, YahooClient, YahooProviderError
 from .serialization import canonical_diamond_json, diamond_csv, diamond_result_dict
 
 
@@ -187,3 +197,145 @@ def provider_benchmark_command(arguments: list[str]) -> None:
     print(f"share_basis_pass_rate={result.share_basis_pass_rate:.3f}")
     print(f"canonical_parse_pass_rate={result.canonical_parse_pass_rate:.3f}")
     print(f"diagnostics={','.join(result.diagnostics) or 'none'}")
+
+
+def _funnel_json(run: FunnelRun) -> str:
+    payload = {
+        "schema_version": "diamond-funnel-run-v1",
+        "metadata": asdict(run.metadata),
+        "results": [diamond_result_dict(item) for item in run.results],
+    }
+    return (
+        json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+        + "\n"
+    )
+
+
+def _print_funnel_metadata(run: FunnelRun) -> None:
+    metadata = run.metadata
+    print(
+        (
+            f"universe={metadata.universe_count} "
+            f"canonical={metadata.canonical_records} "
+            f"ranked={metadata.ranked_records} "
+            f"unranked={metadata.unranked_records}"
+        ),
+        file=sys.stderr,
+    )
+    print(
+        (
+            f"provider_requests={metadata.provider_requests} "
+            f"cache_hits={metadata.cache_hits} "
+            f"cache_misses={metadata.cache_misses}"
+        ),
+        file=sys.stderr,
+    )
+    print(
+        (
+            f"acquisition_seconds="
+            f"{metadata.acquisition_seconds:.3f} "
+            f"evaluation_seconds="
+            f"{metadata.evaluation_seconds:.3f}"
+        ),
+        file=sys.stderr,
+    )
+    print(
+        f"dataset_identity={metadata.dataset_identity}",
+        file=sys.stderr,
+    )
+
+
+def _production_funnel_provider(cache_root: Path, *, refresh: bool) -> SecFirstProvider:
+    try:
+        sec_config = SecConfig.from_env()
+    except RuntimeError as exc:
+        raise SecFirstProviderError(f"SEC_CONFIG_INVALID:{exc}") from exc
+    universe_provider = Sp500UniverseProvider(
+        client=WikipediaTextClient(),
+        cache=DiamondCache(cache_root / "universe"),
+        refresh=refresh,
+    )
+    market_provider = YahooBatchMarketProvider(
+        client=YahooClient(),
+        cache=DiamondCache(cache_root / "market"),
+        refresh=refresh,
+    )
+    return SecFirstProvider(
+        universe_provider=universe_provider,
+        sec_client=SecClient(sec_config),
+        sec_cache=DiamondCache(cache_root / "sec"),
+        market_provider=market_provider,
+        refresh=refresh,
+    )
+
+
+def funnel_command(arguments: list[str]) -> None:
+    parser = argparse.ArgumentParser(
+        description=("Run the production Diamond Funnel discovery layer")
+    )
+    parser.add_argument(
+        "--universe",
+        choices=("sp500",),
+        default="sp500",
+    )
+    parser.add_argument(
+        "--depth",
+        type=int,
+        default=10,
+    )
+    parser.add_argument(
+        "--as-of",
+        type=_iso_date,
+        default=date.today(),
+    )
+    parser.add_argument(
+        "--format",
+        choices=("table", "json", "csv"),
+        default="table",
+    )
+    parser.add_argument(
+        "--cache-root",
+        type=Path,
+        default=Path("data/cache/diamond"),
+    )
+    parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help="bypass cache and reacquire provider evidence",
+    )
+    args = parser.parse_args(arguments)
+
+    if args.depth < 1:
+        parser.error("--depth must be positive")
+
+    try:
+        provider = _production_funnel_provider(args.cache_root, refresh=args.refresh)
+        run = run_funnel(
+            provider,
+            universe_id=args.universe,
+            as_of=args.as_of,
+            depth=args.depth,
+        )
+    except (
+        DiamondCacheError,
+        SecClientError,
+        SecFirstProviderError,
+        Sp500ProviderError,
+        YahooProviderError,
+    ) as exc:
+        parser.error(str(exc))
+
+    if args.format == "json":
+        print(_funnel_json(run), end="")
+    elif args.format == "csv":
+        print(diamond_csv(run.results), end="")
+    else:
+        _print_screen_table(run.results)
+
+    _print_funnel_metadata(run)

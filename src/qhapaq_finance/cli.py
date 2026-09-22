@@ -689,6 +689,10 @@ def main(argv: list[str] | None = None) -> None:
         _market(arguments[1:])
     elif arguments and arguments[0] == "investigate":
         _investigate(arguments[1:])
+    elif arguments and arguments[0] == "funnel":
+        from .diamond.cli import funnel_command
+
+        funnel_command(arguments[1:])
     elif arguments and arguments[0] == "screen":
         from .diamond.cli import screen_command
 
