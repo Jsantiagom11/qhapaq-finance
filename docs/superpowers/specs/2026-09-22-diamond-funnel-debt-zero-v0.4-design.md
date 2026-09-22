@@ -16,7 +16,7 @@ A warm replay of the same evidence snapshot must use zero network requests and c
 
 ## Current problems
 
-The v0.3 SEC-first funnel is functionally live, but four structural debts remain:
+The v0.3 SEC-first funnel is functionally live, but five structural debts remain:
 
 1. SEC `companyfacts` cache hits still deserialize, checksum, filter, promote, and rebuild issuer fundamentals on every replay.
 2. The current SEC form filter accepts `10-K` and `10-Q` but not `10-K/A` or `10-Q/A`, so amendments are not represented explicitly.
