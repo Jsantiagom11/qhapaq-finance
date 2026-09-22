@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xbrl xmlns="http://www.xbrl.org/2003/instance"
+      xmlns:xbrli="http://www.xbrl.org/2003/instance"
+      xmlns:xbrldi="http://xbrl.org/2006/xbrldi"
+      xmlns:iso4217="http://www.xbrl.org/2003/iso4217"
+      xmlns:us-gaap="http://fasb.org/us-gaap/2025"
+      xmlns:acme="http://example.com/acme/2025">
+  <context id="annual">
+    <entity><identifier scheme="http://www.sec.gov/CIK">0000000123</identifier></entity>
+    <period><startDate>2025-01-01</startDate><endDate>2025-12-31</endDate></period>
+  </context>
+  <context id="dimensional">
+    <entity>
+      <identifier scheme="http://www.sec.gov/CIK">0000000123</identifier>
+      <segment><xbrldi:explicitMember dimension="acme:RegionAxis">acme:NorthMember</xbrldi:explicitMember></segment>
+    </entity>
+    <period><startDate>2025-01-01</startDate><endDate>2025-12-31</endDate></period>
+  </context>
+  <unit id="usd"><measure>iso4217:USD</measure></unit>
+  <unit id="eur"><measure>iso4217:EUR</measure></unit>
+  <us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax id="standard" contextRef="annual" unitRef="usd" decimals="0">100</us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax>
+  <acme:CustomRevenue id="extension" contextRef="annual" unitRef="usd" decimals="0">100</acme:CustomRevenue>
+  <acme:CustomRevenue id="extension-dimensional" contextRef="dimensional" unitRef="usd" decimals="0">25</acme:CustomRevenue>
+  <acme:CustomRevenue id="extension-eur" contextRef="annual" unitRef="eur" decimals="0">90</acme:CustomRevenue>
+  <acme:LabelOnlyRevenue id="label-only" contextRef="annual" unitRef="usd" decimals="0">100</acme:LabelOnlyRevenue>
+</xbrl>

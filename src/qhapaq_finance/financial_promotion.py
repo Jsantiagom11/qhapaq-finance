@@ -20,8 +20,27 @@ from .financial_canonicalization import RawFact
 from .financial_primitives import FinancialPrimitiveError, calculate_net_working_capital
 
 
+class FinancialPromotionFailureKind(str, Enum):
+    """Whether SEC promotion is recoverably incomplete or fail-closed."""
+
+    MISSING_STANDARD_CONCEPT = "MISSING_STANDARD_CONCEPT"
+    STANDARD_CONCEPT_COVERAGE_GAP = "STANDARD_CONCEPT_COVERAGE_GAP"
+    REQUIRED_COMPONENT_MISSING = "REQUIRED_COMPONENT_MISSING"
+    PERIOD_COVERAGE_GAP = "PERIOD_COVERAGE_GAP"
+    AMBIGUOUS_CONTEXT = "AMBIGUOUS_CONTEXT"
+    CANONICAL_INVARIANT = "CANONICAL_INVARIANT"
+
+
 class FinancialPromotionError(ValueError):
     """No unique compatible SEC period set can be promoted."""
+
+    def __init__(
+        self,
+        message: str,
+        kind: FinancialPromotionFailureKind = FinancialPromotionFailureKind.CANONICAL_INVARIANT,
+    ) -> None:
+        super().__init__(message)
+        self.kind = kind
 
 
 class PromotionStrategy(str, Enum):
@@ -144,6 +163,7 @@ def accounting_evidence_policies(
         ("IntangibleAssetsNetExcludingGoodwill",),
         "USD",
         PromotionStrategy.DIRECT_INSTANT,
+        target_end=closing_end,
     )
     current_debt = MetricPromotionPolicy(
         "current_debt",
@@ -165,9 +185,25 @@ def accounting_evidence_policies(
     )
     marketable_securities_current = MetricPromotionPolicy(
         "marketable_securities_current",
-        ("MarketableSecuritiesCurrent",),
+        (),
         "USD",
-        PromotionStrategy.DIRECT_INSTANT,
+        PromotionStrategy.ALTERNATIVE,
+        alternatives=(
+            MetricPromotionPolicy(
+                "marketable_securities_current",
+                ("MarketableSecuritiesCurrent",),
+                "USD",
+                PromotionStrategy.DIRECT_INSTANT,
+                target_end=closing_end,
+            ),
+            MetricPromotionPolicy(
+                "marketable_securities_current",
+                ("ShortTermInvestments",),
+                "USD",
+                PromotionStrategy.DIRECT_INSTANT,
+                target_end=closing_end,
+            ),
+        ),
         target_end=closing_end,
     )
     marketable_securities_noncurrent = MetricPromotionPolicy(
@@ -313,19 +349,51 @@ def accounting_evidence_policies(
         ),
         MetricPromotionPolicy(
             "marketable_securities_current_opening",
-            ("MarketableSecuritiesCurrent",),
+            (),
             "USD",
-            PromotionStrategy.DIRECT_INSTANT,
+            PromotionStrategy.ALTERNATIVE,
+            alternatives=(
+                MetricPromotionPolicy(
+                    "marketable_securities_current_opening",
+                    ("MarketableSecuritiesCurrent",),
+                    "USD",
+                    PromotionStrategy.DIRECT_INSTANT,
+                    target_end=opening_end,
+                ),
+                MetricPromotionPolicy(
+                    "marketable_securities_current_opening",
+                    ("ShortTermInvestments",),
+                    "USD",
+                    PromotionStrategy.DIRECT_INSTANT,
+                    target_end=opening_end,
+                ),
+            ),
             target_end=opening_end,
         ),
         MetricPromotionPolicy(
             "marketable_securities_opening",
-            ("MarketableSecuritiesCurrent", "MarketableSecuritiesNoncurrent"),
+            (),
             "USD",
-            PromotionStrategy.COMPOSITE_INSTANT,
-            component_coverages=(
-                "current-marketable-securities",
-                "noncurrent-marketable-securities",
+            PromotionStrategy.ALTERNATIVE,
+            alternatives=(
+                MetricPromotionPolicy(
+                    "marketable_securities_opening",
+                    ("MarketableSecuritiesCurrent", "MarketableSecuritiesNoncurrent"),
+                    "USD",
+                    PromotionStrategy.COMPOSITE_INSTANT,
+                    component_coverages=(
+                        "current-marketable-securities",
+                        "noncurrent-marketable-securities",
+                    ),
+                    target_end=opening_end,
+                ),
+                MetricPromotionPolicy(
+                    "marketable_securities_opening",
+                    ("ShortTermInvestments",),
+                    "USD",
+                    PromotionStrategy.DIRECT_INSTANT,
+                    target_end=opening_end,
+                ),
             ),
             target_end=opening_end,
         ),
@@ -408,12 +476,28 @@ def accounting_evidence_policies(
         ),
         MetricPromotionPolicy(
             "marketable_securities",
-            ("MarketableSecuritiesCurrent", "MarketableSecuritiesNoncurrent"),
+            (),
             "USD",
-            PromotionStrategy.COMPOSITE_INSTANT,
-            component_coverages=(
-                "current-marketable-securities",
-                "noncurrent-marketable-securities",
+            PromotionStrategy.ALTERNATIVE,
+            alternatives=(
+                MetricPromotionPolicy(
+                    "marketable_securities",
+                    ("MarketableSecuritiesCurrent", "MarketableSecuritiesNoncurrent"),
+                    "USD",
+                    PromotionStrategy.COMPOSITE_INSTANT,
+                    component_coverages=(
+                        "current-marketable-securities",
+                        "noncurrent-marketable-securities",
+                    ),
+                    target_end=closing_end,
+                ),
+                MetricPromotionPolicy(
+                    "marketable_securities",
+                    ("ShortTermInvestments",),
+                    "USD",
+                    PromotionStrategy.DIRECT_INSTANT,
+                    target_end=closing_end,
+                ),
             ),
             target_end=closing_end,
         ),
@@ -574,23 +658,50 @@ class MultiPeriodFinancialPromoter:
         if result.unit != policy.unit:
             raise FinancialPromotionError("policy unit mismatch")
         if policy.target_end is not None and result.period_end != policy.target_end:
-            raise FinancialPromotionError("duration target end mismatch")
+            raise FinancialPromotionError(
+                "duration target end mismatch",
+                FinancialPromotionFailureKind.PERIOD_COVERAGE_GAP,
+            )
         return result
 
     def _alternative(self, facts: tuple[RawFact, ...], policy: MetricPromotionPolicy):
         if not policy.alternatives:
             raise FinancialPromotionError("alternative policy requires authorized representations")
 
-        last_error: FinancialPromotionError | None = None
+        errors: list[FinancialPromotionError] = []
         for alternative in policy.alternatives:
             try:
                 return self.promote(facts, policy=alternative)
             except FinancialPromotionError as exc:
-                last_error = exc
+                if exc.kind not in {
+                    FinancialPromotionFailureKind.MISSING_STANDARD_CONCEPT,
+                    FinancialPromotionFailureKind.STANDARD_CONCEPT_COVERAGE_GAP,
+                    FinancialPromotionFailureKind.REQUIRED_COMPONENT_MISSING,
+                    FinancialPromotionFailureKind.PERIOD_COVERAGE_GAP,
+                }:
+                    raise
+                errors.append(exc)
+
+        blocking_error = next(
+            (
+                exc
+                for exc in errors
+                if exc.kind
+                not in {
+                    FinancialPromotionFailureKind.MISSING_STANDARD_CONCEPT,
+                    FinancialPromotionFailureKind.STANDARD_CONCEPT_COVERAGE_GAP,
+                    FinancialPromotionFailureKind.PERIOD_COVERAGE_GAP,
+                }
+            ),
+            None,
+        )
+        if blocking_error is not None:
+            raise blocking_error
 
         raise FinancialPromotionError(
-            "no authorized alternative representation can be promoted"
-        ) from last_error
+            "no authorized alternative representation can be promoted",
+            errors[-1].kind,
+        ) from errors[-1]
 
     def _composite_duration(
         self, facts: tuple[RawFact, ...], policy: MetricPromotionPolicy
@@ -603,7 +714,20 @@ class MultiPeriodFinancialPromoter:
         ):
             raise FinancialPromotionError("composite policy requires distinct covered components")
 
-        components = tuple(self.promote_ttm(facts, concept=concept) for concept in policy.concepts)
+        try:
+            components = tuple(
+                self.promote_ttm(facts, concept=concept) for concept in policy.concepts
+            )
+        except FinancialPromotionError as exc:
+            if exc.kind in {
+                FinancialPromotionFailureKind.MISSING_STANDARD_CONCEPT,
+                FinancialPromotionFailureKind.STANDARD_CONCEPT_COVERAGE_GAP,
+            }:
+                raise FinancialPromotionError(
+                    "requires every composite duration component",
+                    FinancialPromotionFailureKind.REQUIRED_COMPONENT_MISSING,
+                ) from exc
+            raise
 
         if any(item.unit != policy.unit for item in components):
             raise FinancialPromotionError("policy unit mismatch")
@@ -644,13 +768,24 @@ class MultiPeriodFinancialPromoter:
             and item.filing_form in {"10-K", "10-Q"}
         ]
         if not candidates:
-            raise FinancialPromotionError("requires one canonical instant fact")
+            kind = (
+                FinancialPromotionFailureKind.MISSING_STANDARD_CONCEPT
+                if not any(
+                    item.taxonomy == policy.taxonomy and item.concept == policy.concepts[0]
+                    for item in facts
+                )
+                else FinancialPromotionFailureKind.STANDARD_CONCEPT_COVERAGE_GAP
+            )
+            raise FinancialPromotionError("requires one canonical instant fact", kind)
         rank = max((item.end, item.filing_date, item.accession) for item in candidates)
         winners = [
             item for item in candidates if (item.end, item.filing_date, item.accession) == rank
         ]
         if len(winners) != 1:
-            raise FinancialPromotionError("ambiguous canonical instant facts")
+            raise FinancialPromotionError(
+                "ambiguous canonical instant facts",
+                FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT,
+            )
         raw = winners[0]
         return FinancialFact(
             raw.fact_id,
@@ -714,13 +849,46 @@ class MultiPeriodFinancialPromoter:
             ):
                 complete.append(selected)
         if not complete:
+            missing_raw_component = any(
+                not any(
+                    item.taxonomy == policy.taxonomy and item.concept == concept for item in facts
+                )
+                for concept in policy.concepts
+            )
+            ambiguous_component_context = any(
+                all(
+                    sum(item.concept == concept for item in selected) >= 1
+                    for concept in policy.concepts
+                )
+                and any(
+                    sum(item.concept == concept for item in selected) > 1
+                    for concept in policy.concepts
+                )
+                for selected in (
+                    tuple(item for item in eligible if self._context(item) == context)
+                    for context in contexts
+                )
+            )
+            kind = (
+                FinancialPromotionFailureKind.REQUIRED_COMPONENT_MISSING
+                if missing_raw_component
+                else (
+                    FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT
+                    if ambiguous_component_context
+                    else FinancialPromotionFailureKind.STANDARD_CONCEPT_COVERAGE_GAP
+                )
+            )
             raise FinancialPromotionError(
-                "requires every composite component in one instant context"
+                "requires every composite component in one instant context",
+                kind,
             )
         latest = max(self._context(items[0]) for items in complete)
         winners = [items for items in complete if self._context(items[0]) == latest]
         if len(winners) != 1:
-            raise FinancialPromotionError("ambiguous composite instant facts")
+            raise FinancialPromotionError(
+                "ambiguous composite instant facts",
+                FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT,
+            )
         components_by_concept = {item.concept: item for item in winners[0]}
         components = tuple(components_by_concept[concept] for concept in policy.concepts)
         first = components[0]
@@ -847,7 +1015,10 @@ class MultiPeriodFinancialPromoter:
             rank = max((item.filing_date, item.accession) for item in observations)
             winners = [item for item in observations if (item.filing_date, item.accession) == rank]
             if len({item.value for item in winners}) != 1:
-                raise FinancialPromotionError("ambiguous SEC duration observations")
+                raise FinancialPromotionError(
+                    "ambiguous SEC duration observations",
+                    FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT,
+                )
             selected.append(winners[0])
         annuals = [item for item in selected if item.fiscal_period == "FY"]
         ytd = [item for item in selected if item.fiscal_period != "FY"]
@@ -865,14 +1036,25 @@ class MultiPeriodFinancialPromoter:
         ]
         if not triples:
             if ytd:
-                raise FinancialPromotionError("requires one comparable YTD pair")
+                raise FinancialPromotionError(
+                    "requires one comparable YTD pair",
+                    FinancialPromotionFailureKind.PERIOD_COVERAGE_GAP,
+                )
             if not annuals:
-                raise FinancialPromotionError("requires one canonical annual fact")
+                kind = (
+                    FinancialPromotionFailureKind.MISSING_STANDARD_CONCEPT
+                    if not candidates
+                    else FinancialPromotionFailureKind.PERIOD_COVERAGE_GAP
+                )
+                raise FinancialPromotionError("requires one canonical annual fact", kind)
 
             latest_annual_end = max(item.end for item in annuals)
             latest_annual = [item for item in annuals if item.end == latest_annual_end]
             if len(latest_annual) != 1:
-                raise FinancialPromotionError("ambiguous canonical annual facts")
+                raise FinancialPromotionError(
+                    "ambiguous canonical annual facts",
+                    FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT,
+                )
 
             return self._fact(latest_annual[0])
         latest_end = max(current.end for _, _, current in triples)
@@ -892,13 +1074,19 @@ class MultiPeriodFinancialPromoter:
         latest_annual_end = max(annual.end for annual, _, _ in ttm_winners)
         ttm_winners = [item for item in ttm_winners if item[0].end == latest_annual_end]
         if len(ttm_winners) != 1:
-            raise FinancialPromotionError("ambiguous annual and comparable YTD facts")
+            raise FinancialPromotionError(
+                "ambiguous annual and comparable YTD facts",
+                FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT,
+            )
         annual, prior, current = ttm_winners[0]
 
         latest_direct_end = max(item.end for item in annuals)
         latest_direct = [item for item in annuals if item.end == latest_direct_end]
         if len(latest_direct) != 1:
-            raise FinancialPromotionError("ambiguous canonical annual facts")
+            raise FinancialPromotionError(
+                "ambiguous canonical annual facts",
+                FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT,
+            )
 
         if latest_direct[0].end >= current.end:
             return self._fact(latest_direct[0])

@@ -820,3 +820,140 @@ def test_alternative_policy_falls_back_to_next_authorized_representation() -> No
     assert result.period_start == date(2025, 7, 1)
     assert result.period_end == date(2026, 6, 30)
     assert set(result.inputs) == {"dep-fy26", "amort-fy26"}
+
+
+def test_marketable_securities_accepts_short_term_investments_only() -> None:
+    policies = accounting_evidence_policies(
+        opening_end=date(2025, 6, 30),
+        closing_end=date(2026, 6, 30),
+    )
+    by_metric = {policy.metric_id: policy for policy in policies}
+
+    for metric_id in (
+        "marketable_securities_current",
+        "marketable_securities_current_opening",
+        "marketable_securities_opening",
+        "marketable_securities",
+    ):
+        policy = by_metric[metric_id]
+
+        assert policy.strategy is PromotionStrategy.ALTERNATIVE
+
+        assert any(
+            alternative.strategy is PromotionStrategy.DIRECT_INSTANT
+            and alternative.concepts == ("ShortTermInvestments",)
+            for alternative in policy.alternatives
+        )
+
+        assert all(
+            "LongTermInvestments" not in alternative.concepts for alternative in policy.alternatives
+        )
+
+
+def test_net_intangibles_component_is_bound_to_closing_endpoint() -> None:
+    closing_end = date(2026, 6, 30)
+
+    policies = accounting_evidence_policies(
+        opening_end=date(2025, 6, 30),
+        closing_end=closing_end,
+    )
+    by_metric = {policy.metric_id: policy for policy in policies}
+
+    assert by_metric["net_intangibles"].target_end == closing_end
+
+
+def test_alternative_blocks_ambiguous_marketable_facts() -> None:
+    policy = next(
+        item
+        for item in accounting_evidence_policies(closing_end=date(2025, 12, 31))
+        if item.metric_id == "marketable_securities_current"
+    )
+    facts = (
+        _instant(fact_id="marketable-a", concept="MarketableSecuritiesCurrent", value=10),
+        _instant(fact_id="marketable-b", concept="MarketableSecuritiesCurrent", value=11),
+        _instant(fact_id="short-term", concept="ShortTermInvestments", value=20),
+    )
+    promoter = MultiPeriodFinancialPromoter()
+    expected = financial_promotion.FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT
+
+    with pytest.raises(FinancialPromotionError) as primary:
+        promoter.promote(facts, policy=policy.alternatives[0])
+    assert primary.value.kind is expected
+    assert promoter.promote(facts, policy=policy.alternatives[1]).value == 20
+
+    with pytest.raises(FinancialPromotionError) as combined:
+        promoter.promote(facts, policy=policy)
+    assert combined.value.kind is expected
+
+
+def test_alternative_blocks_incompatible_component_periods() -> None:
+    registered = next(
+        item
+        for item in accounting_evidence_policies()
+        if item.metric_id == "depreciation_amortization"
+    )
+    aggregate, composite = registered.alternatives
+    policy = replace(registered, alternatives=(composite, aggregate))
+    facts = (
+        replace(
+            _fact(100, date(2025, 1, 1), date(2025, 12, 31), "FY"),
+            concept="Depreciation",
+            fact_id="dep-2025",
+        ),
+        replace(
+            _fact(20, date(2026, 1, 1), date(2026, 12, 31), "FY"),
+            concept="AmortizationOfIntangibleAssets",
+            fact_id="amort-2026",
+            fiscal_year=2026,
+        ),
+        replace(
+            _fact(150, date(2026, 1, 1), date(2026, 12, 31), "FY"),
+            concept="DepreciationDepletionAndAmortization",
+            fact_id="aggregate-2026",
+            fiscal_year=2026,
+        ),
+    )
+    promoter = MultiPeriodFinancialPromoter()
+    expected = financial_promotion.FinancialPromotionFailureKind.CANONICAL_INVARIANT
+
+    with pytest.raises(FinancialPromotionError) as primary:
+        promoter.promote(facts, policy=composite)
+    assert primary.value.kind is expected
+    assert promoter.promote(facts, policy=aggregate).value == 150
+
+    with pytest.raises(FinancialPromotionError) as combined:
+        promoter.promote(facts, policy=policy)
+    assert combined.value.kind is expected
+
+
+@pytest.mark.parametrize(
+    ("metric_id", "endpoint"),
+    (
+        ("marketable_securities_current", date(2025, 12, 31)),
+        ("marketable_securities", date(2025, 12, 31)),
+        ("marketable_securities_current_opening", date(2024, 12, 31)),
+        ("marketable_securities_opening", date(2024, 12, 31)),
+    ),
+)
+def test_marketable_short_term_fallback_remains_available(metric_id: str, endpoint: date) -> None:
+    policy = next(
+        item
+        for item in accounting_evidence_policies(
+            opening_end=date(2024, 12, 31),
+            closing_end=date(2025, 12, 31),
+        )
+        if item.metric_id == metric_id
+    )
+    fact = _instant(
+        fact_id="short-term",
+        concept="ShortTermInvestments",
+        value=20,
+        end=endpoint,
+        fiscal_year=endpoint.year,
+    )
+
+    result = MultiPeriodFinancialPromoter().promote((fact,), policy=policy)
+
+    assert result.value == 20
+    assert result.period_end == endpoint
+    assert result.id == "short-term"

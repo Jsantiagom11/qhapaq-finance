@@ -8,7 +8,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import cast
 
-from .analysis import AnalysisOrchestrator
+from .analysis import (
+    AnalysisOrchestrator,
+    AnalysisProgressEvent,
+    AnalysisProgressKind,
+)
 from .analysis_render import AnalysisRenderOptions, render_analysis
 from .backtest import run_backtest
 from .company_resolver import CompanyResolver
@@ -250,6 +254,34 @@ def _sec(arguments: list[str]) -> None:
     raise AssertionError("unreachable")
 
 
+def _analysis_progress_to_stderr(event: AnalysisProgressEvent) -> None:
+    """Render one typed orchestration milestone without leaking into stdout."""
+
+    messages = {
+        AnalysisProgressKind.RESOLUTION_STARTED: "Resolving company identity",
+        AnalysisProgressKind.FAST_PATH_ACQUISITION_STARTED: (
+            "SEC: acquiring submissions and company facts"
+        ),
+        AnalysisProgressKind.FAST_PATH_ACQUISITION_COMPLETED: ("SEC: aggregate evidence acquired"),
+        AnalysisProgressKind.CANONICAL_GATE_READY: ("SEC: canonical accounting evidence ready"),
+        AnalysisProgressKind.CANONICAL_GATE_GAP: ("SEC: canonical accounting evidence gap"),
+        AnalysisProgressKind.FILING_FALLBACK_STARTED: (
+            "SEC: acquiring filing-native fallback evidence"
+        ),
+        AnalysisProgressKind.FILING_FALLBACK_COMPLETED: ("SEC: filing fallback evidence acquired"),
+        AnalysisProgressKind.CANONICALIZATION_COMPLETED: ("SEC: canonicalization complete"),
+    }
+    message = messages.get(event.kind)
+    if message is None:
+        return
+    if event.detail and event.kind in {
+        AnalysisProgressKind.CANONICAL_GATE_GAP,
+        AnalysisProgressKind.FILING_FALLBACK_STARTED,
+    }:
+        message = f"{message}: {event.detail}"
+    print(message, file=sys.stderr, flush=True)
+
+
 def _analyze(arguments: list[str]) -> None:
     parser = argparse.ArgumentParser(description="Run one generic offline Qhapaq analysis")
     parser.add_argument("ticker")
@@ -261,7 +293,12 @@ def _analyze(arguments: list[str]) -> None:
     args = parser.parse_args(arguments)
     if args.json and args.plain:
         parser.error("--json cannot be combined with --plain")
-    result = AnalysisOrchestrator(args.repository_root).analyze(args.ticker)
+    human_tty = not args.json and sys.stdout.isatty() and sys.stderr.isatty()
+    progress_observer = _analysis_progress_to_stderr if human_tty else None
+    result = AnalysisOrchestrator(
+        args.repository_root,
+        progress_observer=progress_observer,
+    ).analyze(args.ticker)
     if args.json:
         print(canonical_json(result.to_dict()), end="")
         return
@@ -652,6 +689,22 @@ def main(argv: list[str] | None = None) -> None:
         _market(arguments[1:])
     elif arguments and arguments[0] == "investigate":
         _investigate(arguments[1:])
+    elif arguments and arguments[0] == "funnel":
+        from .diamond.cli import funnel_command
+
+        funnel_command(arguments[1:])
+    elif arguments and arguments[0] == "screen":
+        from .diamond.cli import screen_command
+
+        screen_command(arguments[1:])
+    elif arguments and arguments[0] == "inspect":
+        from .diamond.cli import inspect_command
+
+        inspect_command(arguments[1:])
+    elif arguments and arguments[0] == "provider-benchmark":
+        from .diamond.cli import provider_benchmark_command
+
+        provider_benchmark_command(arguments[1:])
     elif arguments and arguments[0] == "reverse-dcf":
         _reverse_dcf(arguments[1:])
     elif arguments and not arguments[0].startswith("-"):

@@ -8,7 +8,10 @@ from typing import Any
 import pytest
 
 import qhapaq_finance.sec_corpus as sec_corpus
+from qhapaq_finance.analysis import CompanyIdentity
 from qhapaq_finance.sec_acquisition import ImmutableArtifactConflictError
+from qhapaq_finance.sec_client import SecResponse
+from qhapaq_finance.sec_evidence_provider import StructuredSecProvider
 
 _CORPUS_TICKERS = ("AAPL", "QCOM", "NVDA", "COST", "AMZN", "VRTX")
 _CORPUS_CIKS = {
@@ -372,3 +375,94 @@ def test_targeted_sec_corpus_build_preserves_existing_root_manifest(
     assert result["issuers"][0]["ticker"] == "MSFT"
     assert (root / "MSFT" / "manifest.json").is_file()
     assert root_manifest.read_bytes() == original
+
+
+def test_explicit_filing_export_does_not_refetch_sec_aggregates(tmp_path: Path) -> None:
+    filing = sec_corpus.Filing("0000000123-26-000003", "10-Q", "2026-07-30", "2026-06-30", "q2.htm")
+    base = "https://www.sec.gov/Archives/edgar/data/123/000000012326000003"
+
+    class RecordingClient:
+        def __init__(self) -> None:
+            self.urls: list[str] = []
+
+        def get(self, url: str) -> SecResponse:
+            self.urls.append(url)
+            if url == f"{base}/index.json":
+                body = b'{"directory":{"item":[{"name":"q2.htm"}]}}'
+            elif url == f"{base}/q2.htm":
+                body = b"<html><body>quarterly report</body></html>"
+            else:
+                raise AssertionError(f"unexpected SEC request: {url}")
+            return SecResponse(200, {"Content-Type": "application/json"}, body)
+
+    client = RecordingClient()
+
+    records = sec_corpus.export_sec_filing(
+        client,  # type: ignore[arg-type]
+        staging_root=tmp_path / "staging",
+        issuer_root=tmp_path / "issuer",
+        ticker="ACME",
+        cik="0000000123",
+        filing=filing,
+    )
+
+    assert client.urls == [f"{base}/index.json", f"{base}/q2.htm"]
+    assert [record["accession"] for record in records] == [filing.accession, filing.accession]
+
+
+def test_explicit_filing_export_accepts_prefetched_provider_descriptor(tmp_path: Path) -> None:
+    identity = CompanyIdentity("ACME", None, None, "Acme", None, None, "0000000123", None)
+    base = "https://www.sec.gov/Archives/edgar/data/123/000000012326000003"
+
+    class RecordingClient:
+        def __init__(self) -> None:
+            self.urls: list[str] = []
+
+        def get(self, url: str) -> SecResponse:
+            self.urls.append(url)
+            if url == "https://data.sec.gov/submissions/CIK0000000123.json":
+                payload: dict[str, object] = {
+                    "cik": 123,
+                    "tickers": ["ACME"],
+                    "filings": {
+                        "recent": {
+                            "accessionNumber": ["0000000123-26-000003"],
+                            "form": ["10-Q"],
+                            "filingDate": ["2026-07-30"],
+                            "reportDate": ["2026-06-30"],
+                            "primaryDocument": ["q2.htm"],
+                        }
+                    },
+                }
+                body = json.dumps(payload).encode()
+            elif url == "https://data.sec.gov/api/xbrl/companyfacts/CIK0000000123.json":
+                body = b'{"cik":123,"facts":{}}'
+            elif url == f"{base}/index.json":
+                body = b'{"directory":{"item":[{"name":"q2.htm"}]}}'
+            elif url == f"{base}/q2.htm":
+                body = b"<html><body>quarterly report</body></html>"
+            else:
+                raise AssertionError(f"unexpected SEC request: {url}")
+            return SecResponse(200, {"Content-Type": "application/json"}, body)
+
+    client = RecordingClient()
+    provider = StructuredSecProvider(client, tmp_path / "staging")  # type: ignore[arg-type]
+    prefetched = provider.acquire_fast_path(identity)
+    filing = provider.original_filing(prefetched.submissions, "10-Q")
+
+    records = sec_corpus.export_sec_filing(
+        client,  # type: ignore[arg-type]
+        staging_root=tmp_path / "staging",
+        issuer_root=tmp_path / "issuer",
+        ticker=identity.ticker,
+        cik=identity.cik or "",
+        filing=filing,
+    )
+
+    assert client.urls == [
+        "https://data.sec.gov/submissions/CIK0000000123.json",
+        "https://data.sec.gov/api/xbrl/companyfacts/CIK0000000123.json",
+        f"{base}/index.json",
+        f"{base}/q2.htm",
+    ]
+    assert [record["accession"] for record in records] == [filing.accession, filing.accession]
