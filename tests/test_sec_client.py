@@ -293,3 +293,27 @@ def test_process_limiter_keeps_aggregate_spacing_with_configured_max_rps() -> No
     assert all(
         later - earlier >= interval for earlier, later in zip(ordered, ordered[1:], strict=False)
     )
+
+
+def test_get_merges_conditional_headers_and_accepts_explicit_304() -> None:
+    transport = FakeTransport([SecResponse(304, {"ETag": '"abc"'}, b"")])
+    client = SecClient(config(), transport=transport)
+
+    response = client.get(
+        "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+        request_headers={"If-None-Match": '"abc"'},
+        accepted_statuses=frozenset({304}),
+    )
+
+    assert response.status_code == 304
+    sent_headers = transport.calls[0][1]
+    assert sent_headers["User-Agent"] == config().headers["User-Agent"]
+    assert sent_headers["If-None-Match"] == '"abc"'
+
+
+def test_unaccepted_304_remains_an_http_error() -> None:
+    transport = FakeTransport([SecResponse(304, {}, b"")])
+    client = SecClient(config(), transport=transport)
+
+    with pytest.raises(SecHttpError, match="HTTP 304"):
+        client.get("https://www.sec.gov/data.json")

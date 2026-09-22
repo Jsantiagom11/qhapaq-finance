@@ -248,13 +248,26 @@ class SecClient:
         self._wall_clock = wall_clock or (lambda: datetime.now(timezone.utc))
         self._rate_limiter = _process_rate_limiter(config.max_rps, clock, sleep)
 
-    def get(self, url: str) -> SecResponse:
+    def get(
+        self,
+        url: str,
+        *,
+        request_headers: Mapping[str, str] | None = None,
+        accepted_statuses: frozenset[int] = frozenset(),
+    ) -> SecResponse:
         """Fetch ``url``, retrying only throttling and transient server failures."""
+        headers = dict(self.config.headers)
+        if request_headers is not None:
+            headers.update(request_headers)
+
         for attempt in range(self.max_retries + 1):
             try:
                 with self._rate_limiter.request_slot():
                     response = self._transport(
-                        url, self.config.headers, self.connect_timeout, self.read_timeout
+                        url,
+                        headers,
+                        self.connect_timeout,
+                        self.read_timeout,
                     )
             except OSError:
                 if attempt == self.max_retries:
@@ -262,7 +275,7 @@ class SecClient:
                 self._sleep(self._backoff_delay(attempt))
                 continue
 
-            if 200 <= response.status_code < 300:
+            if 200 <= response.status_code < 300 or response.status_code in accepted_statuses:
                 return response
             if not self._is_retryable(response.status_code) or attempt == self.max_retries:
                 raise SecHttpError(response.status_code, url, response.content)
