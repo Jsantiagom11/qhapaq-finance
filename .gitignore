@@ -24,3 +24,6 @@ logs/
 output/
 
 .env
+
+.worktrees/
+.superpowers/
