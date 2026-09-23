@@ -83,3 +83,61 @@ def test_run_funnel_uses_existing_diamond_engine() -> None:
     assert run.metadata.ranked_records == 20
     assert run.metadata.unranked_records == 2
     assert run.metadata.dataset_identity
+
+
+def test_provider_record_order_does_not_change_funnel_identity() -> None:
+    source = LocalJsonProvider(Path("tests/fixtures/diamond/minimal-universe.json"))
+    securities = source.universe(
+        source.universe_id,
+        source.data_as_of,
+    )
+    records = source.fundamentals(
+        securities,
+        source.data_as_of,
+    )
+
+    class OrderedProvider:
+        provider_requests = 0
+        cache_hits = 0
+        cache_misses = 0
+
+        def __init__(self, security_order, record_order) -> None:
+            self._securities = security_order
+            self._records = record_order
+
+        def universe(self, universe_id: str, as_of: date):
+            assert universe_id == source.universe_id
+            assert as_of == source.data_as_of
+            return self._securities
+
+        def fundamentals(
+            self,
+            securities,
+            as_of: date,
+            history_years: int = 5,
+        ):
+            assert securities == self._securities
+            assert as_of == source.data_as_of
+            assert history_years == 5
+            return self._records
+
+    forward = run_funnel(
+        OrderedProvider(securities, records),
+        universe_id=source.universe_id,
+        as_of=source.data_as_of,
+        depth=10,
+    )
+    reversed_run = run_funnel(
+        OrderedProvider(
+            tuple(reversed(securities)),
+            tuple(reversed(records)),
+        ),
+        universe_id=source.universe_id,
+        as_of=source.data_as_of,
+        depth=10,
+    )
+
+    assert forward.metadata.dataset_identity == reversed_run.metadata.dataset_identity
+    assert [item.ticker for item in forward.results] == [
+        item.ticker for item in reversed_run.results
+    ]

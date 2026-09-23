@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass
 from datetime import date
 from time import perf_counter
 
+from .dataset_identity import dataset_identity
 from .engine import DiamondResult, evaluate_universe
 from .providers.protocol import FundamentalDataProvider
 
@@ -42,10 +42,6 @@ def _ranked(
             item.ticker,
         ),
     )
-
-
-def _dataset_identity(records: object) -> str:
-    return hashlib.sha256(repr(records).encode("utf-8")).hexdigest()
 
 
 def _counter(provider: object, name: str) -> int:
@@ -106,6 +102,6 @@ def run_funnel(
             cache_misses=(_counter(provider, "cache_misses") - misses_before),
             acquisition_seconds=acquisition_seconds,
             evaluation_seconds=evaluation_seconds,
-            dataset_identity=_dataset_identity(records),
+            dataset_identity=dataset_identity(records),
         ),
     )
