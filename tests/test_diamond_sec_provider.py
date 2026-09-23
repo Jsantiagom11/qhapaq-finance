@@ -1,16 +1,39 @@
 from __future__ import annotations
 
-from datetime import date
+import json
+from collections.abc import Mapping
+from datetime import date, datetime, timezone
 from pathlib import Path
+from typing import cast
 
 import pytest
 
+import qhapaq_finance.diamond.providers.sec as sec_module
 from qhapaq_finance.diamond.cache import DiamondCache
 from qhapaq_finance.diamond.contracts import FiscalSlot, Methodology, SecurityRef
 from qhapaq_finance.diamond.metrics import value
-from qhapaq_finance.diamond.providers.market import MarketProviderError, MarketQuote
-from qhapaq_finance.diamond.providers.sec import SecFirstProvider, SecFirstProviderError
+from qhapaq_finance.diamond.providers.market import (
+    BatchMarketProvider,
+    MarketProviderError,
+    MarketQuote,
+)
+from qhapaq_finance.diamond.providers.sec import (
+    SecFirstProvider,
+    UniverseMetadataProvider,
+)
+from qhapaq_finance.diamond.providers.sec_canonical import (
+    CanonicalIssuerCache,
+    CanonicalIssuerSnapshot,
+    SecCanonicalError,
+)
+from qhapaq_finance.diamond.providers.sec_evidence import (
+    SecEvidenceError,
+    SecEvidenceManifest,
+    SecEvidenceStore,
+)
 from qhapaq_finance.diamond.providers.sp500 import Sp500Company
+from qhapaq_finance.financial_canonicalization import RawFact
+from qhapaq_finance.sec_client import SecResponse
 
 
 def _duration(
@@ -230,14 +253,76 @@ class FakeUniverse:
         return self.company
 
 
-class FakeSecClient:
-    def __init__(self) -> None:
-        self.requests = 0
+class TwoClassUniverse(FakeUniverse):
+    def universe(self, universe_id: str, as_of: date) -> tuple[SecurityRef, ...]:
+        assert universe_id == "sp500"
+        return (
+            SecurityRef("AAA", "sp500:AAA", "sec-cik:0000320193"),
+            SecurityRef("AAB", "sp500:AAB", "sec-cik:0000320193"),
+        )
 
-    def get_json(self, url: str) -> object:
+    def metadata(self, ticker: str) -> Sp500Company:
+        return Sp500Company(
+            ticker=ticker,
+            cik="0000320193",
+            company_name=f"Issuer {ticker}",
+            sector="Information Technology",
+            industry_group="Technology Hardware",
+        )
+
+
+class FakeSecClient:
+    def __init__(self, payload: dict[str, object] | None = None) -> None:
+        self.payload = payload if payload is not None else _companyfacts()
+        self.calls: list[tuple[str, dict[str, str], frozenset[int]]] = []
+
+    @property
+    def requests(self) -> int:
+        return len(self.calls)
+
+    def get(
+        self,
+        url: str,
+        *,
+        request_headers: Mapping[str, str] | None = None,
+        accepted_statuses: frozenset[int] = frozenset(),
+    ) -> SecResponse:
         assert url.endswith("/CIK0000320193.json")
-        self.requests += 1
-        return _companyfacts()
+        self.calls.append((url, dict(request_headers or {}), accepted_statuses))
+        return SecResponse(200, {}, json.dumps(self.payload).encode())
+
+
+class InstrumentedEvidenceStore(SecEvidenceStore):
+    load_facts_calls = 0
+
+    def load_facts(self, manifest: SecEvidenceManifest) -> tuple[RawFact, ...]:
+        self.load_facts_calls += 1
+        return super().load_facts(manifest)
+
+
+def make_sec_first_provider(
+    *,
+    tmp_path: Path,
+    payload: dict[str, object],
+    market_provider: BatchMarketProvider | None,
+    universe_provider: UniverseMetadataProvider | None = None,
+    allow_network: bool = True,
+    refresh: bool = False,
+    client: FakeSecClient | None = None,
+) -> SecFirstProvider:
+    evidence_client = client or (FakeSecClient(payload) if allow_network else None)
+    return SecFirstProvider(
+        universe_provider=universe_provider or FakeUniverse(),
+        evidence_store=InstrumentedEvidenceStore(
+            root=tmp_path / "sec-evidence",
+            client=evidence_client,
+            legacy_cache=None,
+            now=lambda: datetime(2026, 9, 22, 12, tzinfo=timezone.utc),
+        ),
+        canonical_cache=CanonicalIssuerCache(DiamondCache(tmp_path / "canonical")),
+        market_provider=market_provider,
+        refresh=refresh,
+    )
 
 
 class FakeMarketProvider:
@@ -270,13 +355,117 @@ class BlockedMarketProvider:
         raise MarketProviderError("MARKET_PROVIDER_BLOCKED")
 
 
+def test_sec_canonicalizer_uses_in_scope_10q_amendment(tmp_path: Path) -> None:
+    payload = _companyfacts()
+    facts = cast(dict[str, object], payload["facts"])
+    gaap = cast(dict[str, object], facts["us-gaap"])
+    revenue = cast(
+        dict[str, object],
+        gaap["RevenueFromContractWithCustomerExcludingAssessedTax"],
+    )
+    units = cast(dict[str, list[dict[str, object]]], revenue["units"])
+    units["USD"].append(
+        _duration(
+            60.0,
+            start="2026-01-01",
+            end="2026-06-30",
+            filed="2026-08-15",
+            fiscal_year=2026,
+            fiscal_period="Q2",
+            form="10-Q/A",
+        )
+    )
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=payload,
+        market_provider=None,
+    )
+
+    record = provider.fundamentals(
+        provider.universe("sp500", date(2026, 9, 22)),
+        date(2026, 9, 22),
+    )[0]
+
+    assert value(record, "revenue", FiscalSlot.TTM) == pytest.approx(120.0)
+
+
+def test_sec_canonicalizer_uses_in_scope_10k_amendment(tmp_path: Path) -> None:
+    payload = _companyfacts()
+    facts = cast(dict[str, object], payload["facts"])
+    gaap = cast(dict[str, object], facts["us-gaap"])
+    revenue = cast(
+        dict[str, object],
+        gaap["RevenueFromContractWithCustomerExcludingAssessedTax"],
+    )
+    units = cast(dict[str, list[dict[str, object]]], revenue["units"])
+    units["USD"].append(
+        _duration(
+            125.0,
+            start="2025-01-01",
+            end="2025-12-31",
+            filed="2026-03-01",
+            fiscal_year=2025,
+            fiscal_period="FY",
+            form="10-K/A",
+        )
+    )
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=payload,
+        market_provider=None,
+    )
+
+    record = provider.fundamentals(
+        provider.universe("sp500", date(2026, 9, 22)),
+        date(2026, 9, 22),
+    )[0]
+
+    assert value(record, "revenue", FiscalSlot.FY1) == pytest.approx(125.0)
+
+
+def test_sec_canonicalizer_rejects_same_rank_conflicting_amendment(
+    tmp_path: Path,
+) -> None:
+    payload = _companyfacts()
+    facts = cast(dict[str, object], payload["facts"])
+    gaap = cast(dict[str, object], facts["us-gaap"])
+    revenue = cast(
+        dict[str, object],
+        gaap["RevenueFromContractWithCustomerExcludingAssessedTax"],
+    )
+    units = cast(dict[str, list[dict[str, object]]], revenue["units"])
+    for amended_value in (125.0, 126.0):
+        units["USD"].append(
+            _duration(
+                amended_value,
+                start="2024-01-01",
+                end="2024-12-31",
+                filed="2025-03-01",
+                fiscal_year=2024,
+                fiscal_period="FY",
+                form="10-K/A",
+            )
+        )
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=payload,
+        market_provider=None,
+    )
+
+    with pytest.raises(SecCanonicalError, match="SEC_.*_FACT_AMBIGUOUS"):
+        provider.fundamentals(
+            provider.universe("sp500", date(2026, 9, 22)),
+            date(2026, 9, 22),
+        )
+
+
 def test_sec_provider_reuses_ttm_and_promotion_primitives(tmp_path: Path) -> None:
     client = FakeSecClient()
-    provider = SecFirstProvider(
-        universe_provider=FakeUniverse(),
-        sec_client=client,
-        sec_cache=DiamondCache(tmp_path / "sec"),
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=client.payload,
         market_provider=None,
+        client=client,
     )
     securities = provider.universe("sp500", date(2026, 9, 22))
 
@@ -294,15 +483,18 @@ def test_sec_provider_reuses_ttm_and_promotion_primitives(tmp_path: Path) -> Non
     assert value(record, "total_debt", FiscalSlot.LATEST) == pytest.approx(22.0)
     assert value(record, "total_equity", FiscalSlot.FY2) == pytest.approx(43.0)
     assert value(record, "shares_outstanding_latest", FiscalSlot.LATEST) == pytest.approx(17.0)
+    assert record.provider_identity.startswith("sec-evidence:")
+    assert {item.source_identity for item in record.observations} == {record.provider_identity}
     assert record.market_age_trading_days is None
     assert client.requests == 1
+    assert provider.provider_requests == 1
+    assert provider.cache_misses == 2
 
 
 def test_sec_provider_derives_market_cap_only_when_price_and_shares_exist(tmp_path: Path) -> None:
-    provider = SecFirstProvider(
-        universe_provider=FakeUniverse(),
-        sec_client=FakeSecClient(),
-        sec_cache=DiamondCache(tmp_path / "sec"),
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=_companyfacts(),
         market_provider=FakeMarketProvider(),
     )
     securities = provider.universe("sp500", date(2026, 9, 22))
@@ -316,10 +508,9 @@ def test_sec_provider_derives_market_cap_only_when_price_and_shares_exist(tmp_pa
 def test_sec_first_funnel_continues_when_optional_market_provider_is_blocked(
     tmp_path: Path,
 ) -> None:
-    provider = SecFirstProvider(
-        universe_provider=FakeUniverse(),
-        sec_client=FakeSecClient(),
-        sec_cache=DiamondCache(tmp_path / "sec"),
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=_companyfacts(),
         market_provider=BlockedMarketProvider(),
     )
     securities = provider.universe("sp500", date(2026, 9, 22))
@@ -331,10 +522,10 @@ def test_sec_first_funnel_continues_when_optional_market_provider_is_blocked(
 
 
 def test_sec_provider_keeps_financials_visible_but_unrankable(tmp_path: Path) -> None:
-    provider = SecFirstProvider(
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=_companyfacts(),
         universe_provider=FakeUniverse(sector="Financials"),
-        sec_client=FakeSecClient(),
-        sec_cache=DiamondCache(tmp_path / "sec"),
         market_provider=None,
     )
     securities = provider.universe("sp500", date(2026, 9, 22))
@@ -344,47 +535,163 @@ def test_sec_provider_keeps_financials_visible_but_unrankable(tmp_path: Path) ->
     assert record.methodology is Methodology.UNSUPPORTED_FINANCIAL
 
 
-def test_sec_provider_replays_companyfacts_without_network(tmp_path: Path) -> None:
+def test_warm_canonical_hit_does_not_load_raw_sec_blob(tmp_path: Path) -> None:
     as_of = date(2026, 9, 22)
-    cache = DiamondCache(tmp_path / "sec")
-    live = SecFirstProvider(
-        universe_provider=FakeUniverse(),
-        sec_client=FakeSecClient(),
-        sec_cache=cache,
+    payload = _companyfacts()
+    live = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=payload,
         market_provider=None,
     )
     securities = live.universe("sp500", as_of)
     expected = live.fundamentals(securities, as_of)
 
-    replay = SecFirstProvider(
-        universe_provider=FakeUniverse(),
-        sec_client=None,
-        sec_cache=cache,
+    replay = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=payload,
         market_provider=None,
+        allow_network=False,
     )
     replay.universe("sp500", as_of)
     actual = replay.fundamentals(securities, as_of)
 
     assert actual == expected
+    assert replay.evidence_store.load_facts_calls == 0
+    assert replay.canonical_cache.cache_hits == 1
     assert replay.provider_requests == 0
-    assert replay.cache_hits == 1
+    assert replay.cache_hits == 2
     assert replay.cache_misses == 0
 
 
 def test_sec_provider_rejects_companyfacts_for_a_different_cik(tmp_path: Path) -> None:
-    class WrongIssuerClient(FakeSecClient):
-        def get_json(self, url: str) -> object:
-            payload = _companyfacts()
-            payload["cik"] = 789019
-            return payload
-
-    provider = SecFirstProvider(
-        universe_provider=FakeUniverse(),
-        sec_client=WrongIssuerClient(),
-        sec_cache=DiamondCache(tmp_path / "sec"),
+    payload = _companyfacts()
+    payload["cik"] = 789019
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=payload,
         market_provider=None,
     )
     securities = provider.universe("sp500", date(2026, 9, 22))
 
-    with pytest.raises(SecFirstProviderError, match="SEC_COMPANYFACTS_CIK_MISMATCH"):
+    with pytest.raises(SecEvidenceError, match="SEC_CIK_MISMATCH"):
         provider.fundamentals(securities, date(2026, 9, 22))
+
+
+def test_two_share_classes_reuse_one_issuer_snapshot(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls = 0
+    original = sec_module.canonicalize_issuer
+
+    def counted_canonicalize(
+        *,
+        issuer_id: str,
+        cik: str,
+        as_of: date,
+        history_years: int,
+        evidence_revision_sha256: str,
+        facts: tuple[RawFact, ...],
+    ) -> CanonicalIssuerSnapshot | None:
+        nonlocal calls
+        calls += 1
+        return original(
+            issuer_id=issuer_id,
+            cik=cik,
+            as_of=as_of,
+            history_years=history_years,
+            evidence_revision_sha256=evidence_revision_sha256,
+            facts=facts,
+        )
+
+    monkeypatch.setattr(sec_module, "canonicalize_issuer", counted_canonicalize)
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=_companyfacts(),
+        universe_provider=TwoClassUniverse(),
+        market_provider=None,
+    )
+
+    securities = provider.universe("sp500", date(2026, 9, 22))
+    records = provider.fundamentals(securities, date(2026, 9, 22))
+
+    assert [item.ticker for item in records] == ["AAA", "AAB"]
+    assert {item.issuer_id for item in records} == {"sec-cik:0000320193"}
+    assert calls == 1
+    assert provider.canonical_cache.cache_misses == 1
+
+
+def test_universe_metadata_does_not_invalidate_canonical_snapshot(
+    tmp_path: Path,
+) -> None:
+    payload = _companyfacts()
+    first = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=payload,
+        universe_provider=FakeUniverse(sector="Information Technology"),
+        market_provider=None,
+    )
+    securities = first.universe("sp500", date(2026, 9, 22))
+    first.fundamentals(securities, date(2026, 9, 22))
+
+    replay = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=payload,
+        universe_provider=FakeUniverse(sector="Industrials"),
+        market_provider=None,
+        allow_network=False,
+    )
+    record = replay.fundamentals(securities, date(2026, 9, 22))[0]
+
+    assert record.sector == "Industrials"
+    assert record.peer_group_id == "Industrials"
+    assert replay.canonical_cache.cache_hits == 1
+    assert replay.evidence_store.load_facts_calls == 0
+
+
+def test_refresh_rebuilds_canonical_snapshot_from_new_evidence_revision(
+    tmp_path: Path,
+) -> None:
+    as_of = date(2026, 9, 22)
+    first = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=_companyfacts(),
+        market_provider=None,
+    )
+    securities = first.universe("sp500", as_of)
+    initial = first.fundamentals(securities, as_of)[0]
+
+    amended = _companyfacts()
+    facts = cast(dict[str, object], amended["facts"])
+    gaap = cast(dict[str, object], facts["us-gaap"])
+    revenue = cast(
+        dict[str, object],
+        gaap["RevenueFromContractWithCustomerExcludingAssessedTax"],
+    )
+    units = cast(dict[str, list[dict[str, object]]], revenue["units"])
+    units["USD"].append(
+        _duration(
+            125.0,
+            start="2025-01-01",
+            end="2025-12-31",
+            filed="2026-03-01",
+            fiscal_year=2025,
+            fiscal_period="FY",
+            form="10-K/A",
+        )
+    )
+    client = FakeSecClient(amended)
+    refreshed = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=amended,
+        market_provider=None,
+        refresh=True,
+        client=client,
+    )
+    updated = refreshed.fundamentals(securities, as_of)[0]
+
+    assert value(initial, "revenue", FiscalSlot.FY1) == pytest.approx(100.0)
+    assert value(updated, "revenue", FiscalSlot.FY1) == pytest.approx(125.0)
+    assert client.calls[0][1] == {}
+    assert refreshed.canonical_cache.cache_misses == 1
+    assert updated.provider_identity != initial.provider_identity

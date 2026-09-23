@@ -132,6 +132,47 @@ def test_fresh_manifest_performs_zero_sec_requests(tmp_path: Path) -> None:
     assert replay.cache_misses == 0
 
 
+def test_refresh_bypasses_ttl_and_refetches_unconditionally(tmp_path: Path) -> None:
+    now = datetime(2026, 9, 22, 12, tzinfo=timezone.utc)
+    original = revenue_payload(
+        amendment_filed="2026-08-15",
+        amendment_value=110.0,
+    )
+    amended = revenue_payload(
+        amendment_filed="2026-08-20",
+        amendment_value=111.0,
+    )
+    seed_client = FakeSecHttpClient(
+        [SecResponse(200, {"ETag": '"v1"'}, json.dumps(original).encode())]
+    )
+    first = SecEvidenceStore(
+        root=tmp_path / "sec",
+        client=seed_client,
+        legacy_cache=None,
+        now=lambda: now,
+    ).resolve("0000320193", date(2026, 9, 22))
+
+    refresh_client = FakeSecHttpClient(
+        [SecResponse(200, {"ETag": '"v2"'}, json.dumps(amended).encode())]
+    )
+    refreshed = SecEvidenceStore(
+        root=tmp_path / "sec",
+        client=refresh_client,
+        legacy_cache=None,
+        now=lambda: now + timedelta(hours=1),
+    ).resolve("0000320193", date(2026, 9, 22), refresh=True)
+
+    assert refresh_client.calls == [
+        (
+            "https://data.sec.gov/api/xbrl/companyfacts/CIK0000320193.json",
+            {},
+            frozenset(),
+        )
+    ]
+    assert first.manifest.evidence_revision_sha256 != (refreshed.manifest.evidence_revision_sha256)
+    assert refreshed.facts is not None
+
+
 def test_stale_manifest_with_etag_304_preserves_revision(tmp_path: Path) -> None:
     base = datetime(2026, 9, 22, 0, tzinfo=timezone.utc)
     payload = revenue_payload(amendment_filed="2026-08-15", amendment_value=110.0)

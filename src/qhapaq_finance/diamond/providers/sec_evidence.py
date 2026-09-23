@@ -183,7 +183,13 @@ class SecEvidenceStore:
         normalized = _normalize_cik(cik)
         return f"https://data.sec.gov/api/xbrl/companyfacts/CIK{normalized}.json"
 
-    def resolve(self, cik: str, as_of: date) -> ResolvedSecEvidence:
+    def resolve(
+        self,
+        cik: str,
+        as_of: date,
+        *,
+        refresh: bool = False,
+    ) -> ResolvedSecEvidence:
         normalized_cik = _normalize_cik(cik)
         identity = self.request_identity(normalized_cik)
         manifest = self._load_manifest(identity)
@@ -195,6 +201,15 @@ class SecEvidenceStore:
                 request_identity=identity,
             )
 
+        if refresh:
+            self.cache_misses += 1
+            return self._fetch(
+                cik=normalized_cik,
+                request_identity=identity,
+                as_of=as_of,
+            )
+
+        if manifest is not None:
             if manifest.data_as_of == as_of and self._is_fresh(manifest):
                 self.cache_hits += 1
                 return ResolvedSecEvidence(manifest=manifest, facts=None)
