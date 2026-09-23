@@ -3,8 +3,13 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
+import pytest
+
 from qhapaq_finance.diamond.cache import DiamondCache
-from qhapaq_finance.diamond.providers.sp500 import Sp500UniverseProvider
+from qhapaq_finance.diamond.providers.sp500 import (
+    Sp500ProviderError,
+    Sp500UniverseProvider,
+)
 
 HTML = """
 <html><body>
@@ -73,3 +78,111 @@ def test_sp500_universe_replays_from_cache_without_a_client(tmp_path: Path) -> N
     assert replay.cache_hits == 1
     assert replay.cache_misses == 0
     assert replay.metadata("BRK.B").company_name == "Berkshire Hathaway"
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("ticker", "BAD TICKER"),
+        ("cik", "not-a-cik"),
+        ("company_name", ""),
+        ("sector", ""),
+        ("industry_group", ""),
+    ],
+)
+def test_cached_membership_uses_live_validation(
+    tmp_path: Path,
+    field: str,
+    value: str,
+) -> None:
+    cache = DiamondCache(tmp_path / "universe")
+    row = {
+        "ticker": "AAA",
+        "cik": "0000320193",
+        "company_name": "Issuer A",
+        "sector": "Industrials",
+        "industry_group": "Machinery",
+    }
+    row[field] = value
+    cache.store(
+        Sp500UniverseProvider.SOURCE_URL,
+        provider=Sp500UniverseProvider.PROVIDER,
+        data_as_of=date(2026, 9, 22),
+        payload=[row],
+    )
+
+    provider = Sp500UniverseProvider(client=None, cache=cache)
+
+    with pytest.raises(
+        Sp500ProviderError,
+        match="SP500_CONSTITUENT_ROW_INVALID",
+    ):
+        provider.universe("sp500", date(2026, 9, 22))
+
+
+def test_distinct_tickers_may_share_one_cik(tmp_path: Path) -> None:
+    cache = DiamondCache(tmp_path / "universe")
+    rows = [
+        {
+            "ticker": "AAA",
+            "cik": "320193",
+            "company_name": "Issuer A",
+            "sector": "Industrials",
+            "industry_group": "Machinery",
+        },
+        {
+            "ticker": "AAB",
+            "cik": "320193",
+            "company_name": "Issuer A Class B",
+            "sector": "Industrials",
+            "industry_group": "Machinery",
+        },
+    ]
+    cache.store(
+        Sp500UniverseProvider.SOURCE_URL,
+        provider=Sp500UniverseProvider.PROVIDER,
+        data_as_of=date(2026, 9, 22),
+        payload=rows,
+    )
+
+    securities = Sp500UniverseProvider(
+        client=None,
+        cache=cache,
+    ).universe("sp500", date(2026, 9, 22))
+
+    assert [item.ticker for item in securities] == ["AAA", "AAB"]
+    assert {item.issuer_id for item in securities} == {"sec-cik:0000320193"}
+
+
+def test_duplicate_cached_ticker_fails_closed(tmp_path: Path) -> None:
+    cache = DiamondCache(tmp_path / "universe")
+    rows = [
+        {
+            "ticker": "AAA",
+            "cik": "320193",
+            "company_name": "Issuer A",
+            "sector": "Industrials",
+            "industry_group": "Machinery",
+        },
+        {
+            "ticker": "AAA",
+            "cik": "1652044",
+            "company_name": "Different Issuer",
+            "sector": "Industrials",
+            "industry_group": "Machinery",
+        },
+    ]
+    cache.store(
+        Sp500UniverseProvider.SOURCE_URL,
+        provider=Sp500UniverseProvider.PROVIDER,
+        data_as_of=date(2026, 9, 22),
+        payload=rows,
+    )
+
+    provider = Sp500UniverseProvider(client=None, cache=cache)
+
+    with pytest.raises(
+        Sp500ProviderError,
+        match="SP500_DUPLICATE_TICKER",
+    ):
+        provider.universe("sp500", date(2026, 9, 22))

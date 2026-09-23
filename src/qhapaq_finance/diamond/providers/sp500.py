@@ -101,6 +101,66 @@ _EXPECTED_COLUMNS = {
 }
 
 
+def _validate_company(
+    company: Sp500Company,
+    index: int,
+) -> Sp500Company:
+    values = (
+        company.ticker,
+        company.cik,
+        company.company_name,
+        company.sector,
+        company.industry_group,
+    )
+    if not all(isinstance(value, str) for value in values):
+        raise Sp500ProviderError(f"SP500_CONSTITUENT_ROW_INVALID:{index}")
+
+    ticker = company.ticker.strip().upper()
+    cik_raw = company.cik.strip()
+    company_name = company.company_name.strip()
+    sector = company.sector.strip()
+    industry_group = company.industry_group.strip()
+
+    if (
+        not _TICKER.fullmatch(ticker)
+        or not cik_raw.isdigit()
+        or len(cik_raw) > 10
+        or not company_name
+        or not sector
+        or not industry_group
+    ):
+        raise Sp500ProviderError(f"SP500_CONSTITUENT_ROW_INVALID:{index}")
+
+    return Sp500Company(
+        ticker=ticker,
+        cik=cik_raw.zfill(10),
+        company_name=company_name,
+        sector=sector,
+        industry_group=industry_group,
+    )
+
+
+def _validate_companies(
+    companies: tuple[Sp500Company, ...],
+) -> tuple[Sp500Company, ...]:
+    validated: list[Sp500Company] = []
+    seen_tickers: set[str] = set()
+
+    for index, company in enumerate(companies):
+        normalized = _validate_company(company, index)
+
+        if normalized.ticker in seen_tickers:
+            raise Sp500ProviderError("SP500_DUPLICATE_TICKER")
+
+        seen_tickers.add(normalized.ticker)
+        validated.append(normalized)
+
+    if not validated:
+        raise Sp500ProviderError("SP500_UNIVERSE_EMPTY")
+
+    return tuple(validated)
+
+
 def _parse_constituents(html: str) -> tuple[Sp500Company, ...]:
     parser = _ConstituentsParser()
     parser.feed(html)
@@ -110,63 +170,71 @@ def _parse_constituents(html: str) -> tuple[Sp500Company, ...]:
     headers = parser.rows[0]
     if not _EXPECTED_COLUMNS.issubset(headers):
         raise Sp500ProviderError("SP500_CONSTITUENTS_SCHEMA_INVALID")
+
     positions = {name: headers.index(name) for name in _EXPECTED_COLUMNS}
 
     companies: list[Sp500Company] = []
-    seen: set[str] = set()
     for index, row in enumerate(parser.rows[1:]):
         if len(row) < len(headers):
             raise Sp500ProviderError(f"SP500_CONSTITUENT_ROW_INVALID:{index}")
-        ticker = row[positions["Symbol"]].strip().upper()
-        cik_raw = row[positions["CIK"]].strip()
-        company_name = row[positions["Security"]].strip()
-        sector = row[positions["GICS Sector"]].strip()
-        industry_group = row[positions["GICS Sub-Industry"]].strip()
-        if (
-            not _TICKER.fullmatch(ticker)
-            or not cik_raw.isdigit()
-            or len(cik_raw) > 10
-            or not company_name
-            or not sector
-            or not industry_group
+
+        companies.append(
+            Sp500Company(
+                ticker=row[positions["Symbol"]],
+                cik=row[positions["CIK"]],
+                company_name=row[positions["Security"]],
+                sector=row[positions["GICS Sector"]],
+                industry_group=row[positions["GICS Sub-Industry"]],
+            )
+        )
+
+    return _validate_companies(tuple(companies))
+
+
+def _companies_from_payload(
+    payload: object,
+) -> tuple[Sp500Company, ...]:
+    if not isinstance(payload, list):
+        raise Sp500ProviderError("SP500_CACHE_SCHEMA_INVALID")
+
+    companies: list[Sp500Company] = []
+
+    for index, item in enumerate(payload):
+        if not isinstance(item, dict):
+            raise Sp500ProviderError(f"SP500_CACHE_ROW_INVALID:{index}")
+
+        try:
+            ticker = item["ticker"]
+            cik = item["cik"]
+            company_name = item["company_name"]
+            sector = item["sector"]
+            industry_group = item["industry_group"]
+        except KeyError as exc:
+            raise Sp500ProviderError(f"SP500_CACHE_ROW_INVALID:{index}") from exc
+
+        if not all(
+            isinstance(value, str)
+            for value in (
+                ticker,
+                cik,
+                company_name,
+                sector,
+                industry_group,
+            )
         ):
-            raise Sp500ProviderError(f"SP500_CONSTITUENT_ROW_INVALID:{index}")
-        if ticker in seen:
-            raise Sp500ProviderError("SP500_DUPLICATE_TICKER")
-        seen.add(ticker)
+            raise Sp500ProviderError(f"SP500_CACHE_ROW_INVALID:{index}")
+
         companies.append(
             Sp500Company(
                 ticker=ticker,
-                cik=cik_raw.zfill(10),
+                cik=cik,
                 company_name=company_name,
                 sector=sector,
                 industry_group=industry_group,
             )
         )
-    if not companies:
-        raise Sp500ProviderError("SP500_UNIVERSE_EMPTY")
-    return tuple(companies)
 
-
-def _companies_from_payload(payload: object) -> tuple[Sp500Company, ...]:
-    if not isinstance(payload, list):
-        raise Sp500ProviderError("SP500_CACHE_SCHEMA_INVALID")
-    companies: list[Sp500Company] = []
-    for index, item in enumerate(payload):
-        if not isinstance(item, dict):
-            raise Sp500ProviderError(f"SP500_CACHE_ROW_INVALID:{index}")
-        try:
-            company = Sp500Company(
-                ticker=str(item["ticker"]),
-                cik=str(item["cik"]),
-                company_name=str(item["company_name"]),
-                sector=str(item["sector"]),
-                industry_group=str(item["industry_group"]),
-            )
-        except KeyError as exc:
-            raise Sp500ProviderError(f"SP500_CACHE_ROW_INVALID:{index}") from exc
-        companies.append(company)
-    return tuple(companies)
+    return _validate_companies(tuple(companies))
 
 
 class Sp500UniverseProvider:
