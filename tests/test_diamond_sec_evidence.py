@@ -363,3 +363,47 @@ def test_legacy_cache_wrong_as_of_is_not_migrated(tmp_path: Path) -> None:
 
     assert len(client.calls) == 1
     assert resolved.manifest.data_as_of == date(2026, 9, 22)
+
+
+def test_store_response_uses_decoded_gzip_entity_body(tmp_path) -> None:
+    import gzip
+    import json
+    from datetime import date
+
+    from qhapaq_finance.diamond.providers.sec_evidence import SecEvidenceStore
+    from qhapaq_finance.sec_client import SecResponse
+
+    payload = {
+        "cik": 320193,
+        "entityName": "Issuer A",
+        "facts": {},
+    }
+    entity = json.dumps(
+        payload,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+    response = SecResponse(
+        200,
+        {"Content-Encoding": "gzip"},
+        gzip.compress(entity),
+    )
+
+    store = SecEvidenceStore(
+        root=tmp_path / "sec",
+        client=None,
+        legacy_cache=None,
+    )
+
+    resolved = store._store_response(
+        cik="0000320193",
+        request_identity=store.request_identity("0000320193"),
+        as_of=date(2026, 9, 22),
+        response=response,
+    )
+
+    blob = (tmp_path / "sec" / "blobs" / resolved.manifest.blob_name).read_bytes()
+
+    assert blob == response.decoded_content
+    assert not blob.startswith(b"\x1f\x8b")
+    assert json.loads(blob) == payload

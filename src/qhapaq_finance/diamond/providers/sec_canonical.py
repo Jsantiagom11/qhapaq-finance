@@ -28,7 +28,7 @@ from qhapaq_finance.financial_promotion import (
 )
 
 CANONICAL_SCHEMA_VERSION = "diamond-canonical-issuer-v1"
-SEC_CANONICALIZER_VERSION = "sec-canonicalizer-v2"
+SEC_CANONICALIZER_VERSION = "sec-canonicalizer-v3"
 
 
 class SecCanonicalError(RuntimeError):
@@ -107,7 +107,13 @@ def _promote_ttm(
         candidates = tuple(
             fact
             for fact in facts
-            if fact.taxonomy == "us-gaap" and fact.concept == concept and fact.unit == unit
+            if fact.taxonomy == "us-gaap"
+            and fact.concept == concept
+            and fact.unit == unit
+            and (
+                fact.fiscal_period != "FY"
+                or (fact.start is not None and 250 <= (fact.end - fact.start).days <= 450)
+            )
         )
         try:
             return promoter.promote_ttm(candidates, concept=concept)

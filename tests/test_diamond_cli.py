@@ -3,6 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
+import qhapaq_finance.diamond.cli as diamond_cli
 from qhapaq_finance import cli
 from qhapaq_finance.diamond.cli import (
     _production_funnel_provider,
@@ -103,3 +106,135 @@ def test_funnel_cli_does_not_invoke_analysis_orchestrator(monkeypatch, capsys) -
 
     payload = json.loads(capsys.readouterr().out)
     assert payload["results"][0]["ticker"] == "T19"
+
+
+@pytest.mark.parametrize("refresh", [False, True])
+def test_production_funnel_wires_debt_zero_cache_roots(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    refresh: bool,
+) -> None:
+    seen: dict[str, object] = {}
+
+    sec_client = object()
+    universe_provider = object()
+    market_provider = object()
+    evidence_store = object()
+    canonical_cache = object()
+    split_provider = object()
+    final_provider = object()
+
+    monkeypatch.setattr(
+        diamond_cli.SecConfig,
+        "from_env",
+        lambda: SecConfig(
+            "Qhapaq Finance",
+            "research@example.com",
+            8.0,
+        ),
+    )
+    monkeypatch.setattr(
+        diamond_cli,
+        "SecClient",
+        lambda config: sec_client,
+    )
+    monkeypatch.setattr(
+        diamond_cli,
+        "WikipediaTextClient",
+        lambda: object(),
+    )
+    monkeypatch.setattr(
+        diamond_cli,
+        "YahooClient",
+        lambda: object(),
+    )
+
+    def capture_universe(*, client, cache, refresh):
+        seen["universe"] = cache.root
+        seen["universe_refresh"] = refresh
+        return universe_provider
+
+    def capture_market(*, client, cache, refresh):
+        seen["market"] = cache.root
+        seen["market_refresh"] = refresh
+        return market_provider
+
+    def capture_store(*, root, client, legacy_cache, now=None):
+        seen["sec"] = root
+        seen["sec_legacy"] = legacy_cache.root
+        seen["sec_client"] = client
+        return evidence_store
+
+    def capture_canonical(cache):
+        seen["canonical"] = cache.root
+        return canonical_cache
+
+    def capture_split(*, client, cache, refresh):
+        seen["splits"] = cache.root
+        seen["splits_refresh"] = refresh
+        return split_provider
+
+    def capture_provider(**kwargs):
+        seen["provider_kwargs"] = kwargs
+        return final_provider
+
+    monkeypatch.setattr(
+        diamond_cli,
+        "Sp500UniverseProvider",
+        capture_universe,
+    )
+    monkeypatch.setattr(
+        diamond_cli,
+        "YahooBatchMarketProvider",
+        capture_market,
+    )
+    monkeypatch.setattr(
+        diamond_cli,
+        "SecEvidenceStore",
+        capture_store,
+    )
+    monkeypatch.setattr(
+        diamond_cli,
+        "CanonicalIssuerCache",
+        capture_canonical,
+    )
+    monkeypatch.setattr(
+        diamond_cli,
+        "YahooSplitAdjustmentProvider",
+        capture_split,
+    )
+    monkeypatch.setattr(
+        diamond_cli,
+        "SecFirstProvider",
+        capture_provider,
+    )
+
+    provider = diamond_cli._production_funnel_provider(
+        tmp_path,
+        refresh=refresh,
+    )
+
+    assert provider is final_provider
+    assert seen["universe"] == tmp_path / "universe"
+    assert seen["sec"] == tmp_path / "sec"
+    assert seen["sec_legacy"] == tmp_path / "sec"
+    assert seen["canonical"] == tmp_path / "canonical"
+    assert seen["market"] == tmp_path / "market"
+    assert seen["splits"] == tmp_path / "splits"
+
+    assert seen["sec_client"] is sec_client
+    assert seen["universe_refresh"] is refresh
+    assert seen["market_refresh"] is refresh
+    assert seen["splits_refresh"] is refresh
+
+    kwargs = seen["provider_kwargs"]
+    assert isinstance(kwargs, dict)
+    assert kwargs["universe_provider"] is universe_provider
+    assert kwargs["market_provider"] is market_provider
+    assert kwargs["evidence_store"] is evidence_store
+    assert kwargs["canonical_cache"] is canonical_cache
+    assert kwargs["split_provider"] is split_provider
+    assert kwargs["refresh"] is refresh
+
+    assert "sec_client" not in kwargs
+    assert "sec_cache" not in kwargs

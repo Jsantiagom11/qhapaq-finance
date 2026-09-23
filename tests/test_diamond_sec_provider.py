@@ -784,3 +784,70 @@ def test_refresh_rebuilds_canonical_snapshot_from_new_evidence_revision(
     assert client.calls[0][1] == {}
     assert refreshed.canonical_cache.cache_misses == 1
     assert updated.provider_identity != initial.provider_identity
+
+
+def test_ttm_ignores_short_duration_facts_labeled_fy(
+    tmp_path: Path,
+) -> None:
+    payload = _companyfacts()
+
+    facts = payload["facts"]
+    assert isinstance(facts, dict)
+
+    us_gaap = facts["us-gaap"]
+    assert isinstance(us_gaap, dict)
+
+    revenue_concept = next(
+        concept
+        for concept in (
+            "RevenueFromContractWithCustomerExcludingAssessedTax",
+            "Revenues",
+            "SalesRevenueNet",
+        )
+        if concept in us_gaap
+    )
+
+    revenue_fact = us_gaap[revenue_concept]
+    assert isinstance(revenue_fact, dict)
+
+    units = revenue_fact["units"]
+    assert isinstance(units, dict)
+
+    revenues = units["USD"]
+    assert isinstance(revenues, list)
+
+    # CompanyFacts may expose a short period from a 10-K with fp=FY.
+    # It is not an annual observation and must not compete with the
+    # genuine ~12-month FY fact during TTM reconstruction.
+    revenues.append(
+        _duration(
+            25.0,
+            start="2025-10-01",
+            end="2025-12-31",
+            filed="2026-02-15",
+            fiscal_year=2025,
+            fiscal_period="FY",
+            form="10-K",
+        )
+    )
+
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=payload,
+        market_provider=None,
+    )
+    securities = provider.universe(
+        "sp500",
+        date(2026, 9, 22),
+    )
+
+    record = provider.fundamentals(
+        securities,
+        date(2026, 9, 22),
+    )[0]
+
+    assert value(
+        record,
+        "revenue",
+        FiscalSlot.TTM,
+    ) == pytest.approx(110.0)

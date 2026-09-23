@@ -19,8 +19,11 @@ from .funnel import FunnelRun, run_funnel
 from .providers.benchmark import benchmark_provider_sample
 from .providers.local import LocalJsonProvider
 from .providers.sec import SecFirstProvider, SecFirstProviderError
+from .providers.sec_canonical import CanonicalIssuerCache
+from .providers.sec_evidence import SecEvidenceStore
 from .providers.sp500 import Sp500ProviderError, Sp500UniverseProvider, WikipediaTextClient
 from .providers.yahoo import YahooBatchMarketProvider, YahooClient, YahooProviderError
+from .providers.yahoo_splits import YahooSplitAdjustmentProvider
 from .serialization import canonical_diamond_json, diamond_csv, diamond_result_dict
 
 
@@ -251,26 +254,46 @@ def _print_funnel_metadata(run: FunnelRun) -> None:
     )
 
 
-def _production_funnel_provider(cache_root: Path, *, refresh: bool) -> SecFirstProvider:
+def _production_funnel_provider(
+    cache_root: Path,
+    *,
+    refresh: bool,
+) -> SecFirstProvider:
     try:
         sec_config = SecConfig.from_env()
     except RuntimeError as exc:
         raise SecFirstProviderError(f"SEC_CONFIG_INVALID:{exc}") from exc
+
+    sec_client = SecClient(sec_config)
+
     universe_provider = Sp500UniverseProvider(
         client=WikipediaTextClient(),
         cache=DiamondCache(cache_root / "universe"),
         refresh=refresh,
     )
+    evidence_store = SecEvidenceStore(
+        root=cache_root / "sec",
+        client=sec_client,
+        legacy_cache=DiamondCache(cache_root / "sec"),
+    )
+    canonical_cache = CanonicalIssuerCache(DiamondCache(cache_root / "canonical"))
     market_provider = YahooBatchMarketProvider(
         client=YahooClient(),
         cache=DiamondCache(cache_root / "market"),
         refresh=refresh,
     )
+    split_provider = YahooSplitAdjustmentProvider(
+        client=YahooClient(),
+        cache=DiamondCache(cache_root / "splits"),
+        refresh=refresh,
+    )
+
     return SecFirstProvider(
         universe_provider=universe_provider,
-        sec_client=SecClient(sec_config),
-        sec_cache=DiamondCache(cache_root / "sec"),
+        evidence_store=evidence_store,
+        canonical_cache=canonical_cache,
         market_provider=market_provider,
+        split_provider=split_provider,
         refresh=refresh,
     )
 

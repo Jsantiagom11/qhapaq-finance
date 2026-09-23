@@ -356,7 +356,7 @@ class SecEvidenceStore:
             cik=cik,
             request_identity=request_identity,
             as_of=as_of,
-            content=response.content,
+            content=response.decoded_content,
             etag=_response_header(response.headers, "ETag"),
             last_modified=_response_header(
                 response.headers,
