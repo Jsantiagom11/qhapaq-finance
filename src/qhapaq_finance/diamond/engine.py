@@ -119,7 +119,8 @@ def evaluate_universe(
         percentile_map = {
             name: result.percentile for name, result in percentile_results[record.ticker].items()
         }
-        diagnostics = set(validate_record(record))
+        diagnostics = set(record.evidence_diagnostics)
+        diagnostics.update(validate_record(record))
         diagnostics.update(features.diagnostics)
         diagnostics.update(peer_context.diagnostics)
         for result in percentile_results[record.ticker].values():

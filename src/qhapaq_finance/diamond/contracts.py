@@ -145,6 +145,7 @@ class FundamentalRecord:
     provider: str
     provider_identity: str | None
     observations: tuple[FundamentalObservation, ...]
+    evidence_diagnostics: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "ticker", _text(self.ticker, "TICKER_REQUIRED").upper())
@@ -171,6 +172,11 @@ class FundamentalRecord:
             self,
             "provider_identity",
             _optional_text(self.provider_identity, "PROVIDER_IDENTITY_INVALID"),
+        )
+        object.__setattr__(
+            self,
+            "evidence_diagnostics",
+            tuple(_text(item, "EVIDENCE_DIAGNOSTIC_INVALID") for item in self.evidence_diagnostics),
         )
         if self.fundamental_period_end > self.data_as_of:
             raise DiamondContractError("FUNDAMENTAL_PERIOD_AFTER_DATA_AS_OF")

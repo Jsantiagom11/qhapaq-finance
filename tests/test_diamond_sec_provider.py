@@ -16,6 +16,8 @@ from qhapaq_finance.diamond.providers.market import (
     BatchMarketProvider,
     MarketProviderError,
     MarketQuote,
+    SplitAdjustmentProvider,
+    SplitCoverage,
 )
 from qhapaq_finance.diamond.providers.sec import (
     SecFirstProvider,
@@ -309,6 +311,7 @@ def make_sec_first_provider(
     allow_network: bool = True,
     refresh: bool = False,
     client: FakeSecClient | None = None,
+    split_provider: SplitAdjustmentProvider | None = None,
 ) -> SecFirstProvider:
     evidence_client = client or (FakeSecClient(payload) if allow_network else None)
     return SecFirstProvider(
@@ -321,6 +324,7 @@ def make_sec_first_provider(
         ),
         canonical_cache=CanonicalIssuerCache(DiamondCache(tmp_path / "canonical")),
         market_provider=market_provider,
+        split_provider=split_provider,
         refresh=refresh,
     )
 
@@ -329,6 +333,9 @@ class FakeMarketProvider:
     provider_requests = 1
     cache_hits = 0
     cache_misses = 1
+
+    def __init__(self, *, market_cap: float | None = None) -> None:
+        self.market_cap = market_cap
 
     def quotes(self, tickers: tuple[str, ...], as_of: date) -> dict[str, MarketQuote]:
         assert tickers == ("AAPL",)
@@ -339,7 +346,7 @@ class FakeMarketProvider:
                 price=10.0,
                 observed_on=date(2026, 9, 21),
                 currency="USD",
-                market_cap=None,
+                market_cap=self.market_cap,
                 source_provider="market-test",
                 source_identity="market-payload-sha",
             )
@@ -353,6 +360,36 @@ class BlockedMarketProvider:
 
     def quotes(self, tickers: tuple[str, ...], as_of: date) -> dict[str, MarketQuote]:
         raise MarketProviderError("MARKET_PROVIDER_BLOCKED")
+
+
+class FakeSplitProvider:
+    provider_requests = 0
+    cache_hits = 0
+    cache_misses = 0
+
+    def __init__(self, *, fail: bool = False) -> None:
+        self.fail = fail
+        self.calls: list[tuple[str, date, date, date]] = []
+
+    def coverage(
+        self,
+        ticker: str,
+        start_date: date,
+        end_date: date,
+        as_of: date,
+    ) -> SplitCoverage | None:
+        self.calls.append((ticker, start_date, end_date, as_of))
+        if self.fail:
+            raise MarketProviderError("SPLIT_PROVIDER_BLOCKED")
+        return SplitCoverage(
+            ticker=ticker,
+            start_date=start_date,
+            end_date=end_date,
+            cumulative_factor=4.0,
+            source_provider="split-test",
+            source_identity="split-payload-sha",
+            event_dates=(date(2026, 8, 15),),
+        )
 
 
 def test_sec_canonicalizer_uses_in_scope_10q_amendment(tmp_path: Path) -> None:
@@ -491,7 +528,7 @@ def test_sec_provider_reuses_ttm_and_promotion_primitives(tmp_path: Path) -> Non
     assert provider.cache_misses == 2
 
 
-def test_sec_provider_derives_market_cap_only_when_price_and_shares_exist(tmp_path: Path) -> None:
+def test_sec_provider_withholds_market_cap_without_split_evidence(tmp_path: Path) -> None:
     provider = make_sec_first_provider(
         tmp_path=tmp_path,
         payload=_companyfacts(),
@@ -501,8 +538,60 @@ def test_sec_provider_derives_market_cap_only_when_price_and_shares_exist(tmp_pa
 
     record = provider.fundamentals(securities, date(2026, 9, 22))[0]
 
-    assert value(record, "market_cap", FiscalSlot.LATEST) == pytest.approx(170.0)
+    assert value(record, "market_cap", FiscalSlot.LATEST) is None
+    assert "MARKET_CAP_SPLIT_UNVERIFIED" in record.evidence_diagnostics
     assert record.market_age_trading_days == 1
+
+
+def test_sec_provider_derives_market_cap_with_complete_split_evidence(tmp_path: Path) -> None:
+    split_provider = FakeSplitProvider()
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=_companyfacts(),
+        market_provider=FakeMarketProvider(),
+        split_provider=split_provider,
+    )
+    securities = provider.universe("sp500", date(2026, 9, 22))
+
+    record = provider.fundamentals(securities, date(2026, 9, 22))[0]
+
+    assert value(record, "market_cap", FiscalSlot.LATEST) == pytest.approx(680.0)
+    assert record.evidence_diagnostics == ()
+    assert split_provider.calls == [
+        ("AAPL", date(2026, 7, 31), date(2026, 9, 21), date(2026, 9, 22))
+    ]
+
+
+def test_sec_provider_keeps_security_when_optional_split_provider_fails(tmp_path: Path) -> None:
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=_companyfacts(),
+        market_provider=FakeMarketProvider(),
+        split_provider=FakeSplitProvider(fail=True),
+    )
+    securities = provider.universe("sp500", date(2026, 9, 22))
+
+    records = provider.fundamentals(securities, date(2026, 9, 22))
+
+    assert len(records) == 1
+    assert value(records[0], "market_cap", FiscalSlot.LATEST) is None
+    assert "MARKET_CAP_SPLIT_UNVERIFIED" in records[0].evidence_diagnostics
+
+
+def test_sec_provider_does_not_request_splits_for_direct_market_cap(tmp_path: Path) -> None:
+    split_provider = FakeSplitProvider()
+    provider = make_sec_first_provider(
+        tmp_path=tmp_path,
+        payload=_companyfacts(),
+        market_provider=FakeMarketProvider(market_cap=250.0),
+        split_provider=split_provider,
+    )
+    securities = provider.universe("sp500", date(2026, 9, 22))
+
+    record = provider.fundamentals(securities, date(2026, 9, 22))[0]
+
+    assert value(record, "market_cap", FiscalSlot.LATEST) == pytest.approx(250.0)
+    assert split_provider.calls == []
 
 
 def test_sec_first_funnel_continues_when_optional_market_provider_is_blocked(

@@ -73,3 +73,34 @@ def test_stale_market_data_nulls_price_without_erasing_other_categories() -> Non
     assert result.scores.growth is not None
     assert result.scores.capital is not None
     assert "MARKET_DATA_STALE" in result.diagnostics
+
+
+def test_evidence_diagnostic_reaches_result() -> None:
+    record = replace(
+        rich_record("AAA"),
+        evidence_diagnostics=("MARKET_CAP_SPLIT_UNVERIFIED",),
+    )
+
+    result = evaluate_universe((record,))[0]
+
+    assert "MARKET_CAP_SPLIT_UNVERIFIED" in result.diagnostics
+
+
+def test_missing_market_cap_preserves_null_aware_compounder_ranking() -> None:
+    records = list(_universe())
+    records[0] = replace(
+        records[0],
+        observations=tuple(
+            observation
+            for observation in records[0].observations
+            if observation.metric_id != "market_cap"
+        ),
+    )
+
+    results = evaluate_universe(tuple(records))
+    candidate = next(item for item in results if item.ticker == "T00")
+
+    assert len(results) == len(records)
+    assert candidate.scores.price is None
+    assert candidate.archetypes.compounder is not None
+    assert candidate.archetypes.research_priority is not None

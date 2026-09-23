@@ -18,7 +18,13 @@ from ..contracts import (
     SecurityRef,
     UnitKind,
 )
-from .market import BatchMarketProvider, MarketProviderError, MarketQuote
+from .market import (
+    BatchMarketProvider,
+    MarketProviderError,
+    MarketQuote,
+    SplitAdjustmentProvider,
+    derive_safe_market_cap,
+)
 from .sec_canonical import (
     CanonicalIssuerCache,
     CanonicalIssuerSnapshot,
@@ -95,7 +101,7 @@ class SecFirstProvider:
         market_provider: BatchMarketProvider | None,
         evidence_store: SecEvidenceStore | None = None,
         canonical_cache: CanonicalIssuerCache | None = None,
-        split_provider: object | None = None,
+        split_provider: SplitAdjustmentProvider | None = None,
         refresh: bool = False,
         sec_client: SecHttpClient | None = None,
         sec_cache: DiamondCache | None = None,
@@ -264,27 +270,50 @@ class SecFirstProvider:
         as_of: date,
     ) -> FundamentalRecord:
         observations = list(snapshot.observations)
+        evidence_diagnostics: list[str] = []
         market_age = None
         if quote is not None and quote.observed_on <= as_of:
-            market_cap = quote.market_cap
-            if market_cap is None:
-                latest_shares_value = next(
-                    (
-                        item.value
-                        for item in observations
-                        if item.metric_id == "shares_outstanding_latest"
-                        and item.fiscal_slot is FiscalSlot.LATEST
-                    ),
-                    None,
-                )
-                if latest_shares_value is not None:
-                    market_cap = quote.price * latest_shares_value
-            if market_cap is not None:
+            latest_shares = next(
+                (
+                    item
+                    for item in observations
+                    if item.metric_id == "shares_outstanding_latest"
+                    and item.fiscal_slot is FiscalSlot.LATEST
+                ),
+                None,
+            )
+            shares = latest_shares.value if latest_shares is not None else None
+            shares_observed_on = latest_shares.period_end if latest_shares is not None else None
+            split_coverage = None
+            if (
+                self._split_provider is not None
+                and quote.market_cap is None
+                and shares is not None
+                and shares_observed_on is not None
+                and shares_observed_on < quote.observed_on
+            ):
+                try:
+                    split_coverage = self._split_provider.coverage(
+                        security.ticker,
+                        shares_observed_on,
+                        quote.observed_on,
+                        as_of,
+                    )
+                except MarketProviderError:
+                    split_coverage = None
+
+            decision = derive_safe_market_cap(
+                quote=quote,
+                shares=shares,
+                shares_observed_on=shares_observed_on,
+                split_coverage=split_coverage,
+            )
+            if decision.market_cap is not None:
                 observations.append(
                     FundamentalObservation(
                         metric_id="market_cap",
                         fiscal_slot=FiscalSlot.LATEST,
-                        value=market_cap,
+                        value=decision.market_cap,
                         period_start=None,
                         period_end=quote.observed_on,
                         period_kind=PeriodKind.INSTANT,
@@ -293,6 +322,8 @@ class SecFirstProvider:
                         source_identity=quote.source_identity,
                     )
                 )
+            if decision.diagnostic is not None:
+                evidence_diagnostics.append(decision.diagnostic)
             market_age = _business_day_age(quote.observed_on, as_of)
 
         source_identity = f"sec-evidence:{snapshot.evidence_revision_sha256}"
@@ -314,4 +345,5 @@ class SecFirstProvider:
             provider=self.PROVIDER,
             provider_identity=source_identity,
             observations=tuple(observations),
+            evidence_diagnostics=tuple(evidence_diagnostics),
         )
