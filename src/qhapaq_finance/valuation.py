@@ -570,6 +570,24 @@ def _pv_fcff(
     ).enterprise_value
 
 
+def present_value_fcff(
+    *,
+    starting_fcff: float,
+    explicit_growth: float,
+    terminal_growth: float,
+    wacc: float,
+    years: int,
+) -> float:
+    """Evaluate explicit FCFF growth through the canonical DCF engine."""
+    return _pv_fcff(
+        starting_fcff,
+        explicit_growth,
+        terminal_growth,
+        wacc,
+        years,
+    )
+
+
 def _bisect(target: float, evaluate: Any, lower: float, upper: float, label: str) -> float:
     target = _number(target, "solver target")
     if target <= 0:
