@@ -205,3 +205,7 @@ Never:
 If repository reality differs from plan assumptions, record:
 
 `Ruling: <decision> — <repository evidence> — <cost if wrong>`
+
+## Execution Rulings
+
+Ruling: Task 2 cannot literally mutate `ValuationInput.revenue_growth_cagr` because the current `ValuationInput` has no `revenue_growth_cagr` field and `run_valuation()` is the existing FCFF/WACC metric kernel rather than a revenue-growth DCF — repository evidence in `src/qhapaq_finance/valuation.py` — implementing the frozen Task 2 wording literally would require inventing a second valuation path or silently changing the valuation contract. Resolve at Task 2 before implementation; Task 1 is unaffected.
