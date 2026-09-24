@@ -56,8 +56,12 @@ def _analysis_status(module: ModuleType, **overrides: object) -> object:
 
 def _expectation(module: ModuleType, **overrides: object) -> object:
     values: dict[str, object] = {
-        "implied_revenue_growth_cagr": 0.08,
-        "operating_margin_assumption": 0.20,
+        "implied_fcff_growth": 0.08,
+        "starting_fcff": 100.0,
+        "years": 10,
+        "observed_enterprise_value": 1_000.0,
+        "solved_enterprise_value": 1_000.5,
+        "relative_error": 0.0005,
         "hurdle_rate": 0.094,
         "terminal_growth_rate": 0.03,
         "lower_bound": -0.30,
@@ -164,8 +168,11 @@ def test_analysis_status_rejects_empty_optional_reason() -> None:
 @pytest.mark.parametrize(
     "field",
     (
-        "implied_revenue_growth_cagr",
-        "operating_margin_assumption",
+        "implied_fcff_growth",
+        "starting_fcff",
+        "observed_enterprise_value",
+        "solved_enterprise_value",
+        "relative_error",
         "hurdle_rate",
         "terminal_growth_rate",
         "lower_bound",
@@ -188,12 +195,12 @@ def test_expectation_allows_unsolved_growth_to_be_none() -> None:
 
     value = _expectation(
         module,
-        implied_revenue_growth_cagr=None,
+        implied_fcff_growth=None,
         status=module.ImpliedExpectationStatus.NO_SOLUTION_IN_RANGE,
         reason="No root exists inside the bounded search interval.",
     )
 
-    assert value.implied_revenue_growth_cagr is None
+    assert value.implied_fcff_growth is None
 
 
 @pytest.mark.parametrize(

@@ -84,12 +84,16 @@ class ExecutiveAnalysisStatus:
 
 @dataclass(frozen=True)
 class ImpliedExpectationResult:
-    """Bounded revenue-growth expectation and fixed assumptions."""
+    """Bounded market-implied FCFF growth and its fixed assumptions."""
 
-    implied_revenue_growth_cagr: float | None
-    operating_margin_assumption: float
-    hurdle_rate: float
-    terminal_growth_rate: float
+    implied_fcff_growth: float | None
+    starting_fcff: float | None
+    hurdle_rate: float | None
+    terminal_growth_rate: float | None
+    years: int | None
+    observed_enterprise_value: float | None
+    solved_enterprise_value: float | None
+    relative_error: float | None
     lower_bound: float
     upper_bound: float
     iterations: int
@@ -97,16 +101,19 @@ class ImpliedExpectationResult:
     reason: str | None
 
     def __post_init__(self) -> None:
+        _optional_finite(self.implied_fcff_growth, "implied_fcff_growth")
+        _optional_finite(self.starting_fcff, "starting_fcff")
+        _optional_finite(self.hurdle_rate, "hurdle_rate")
+        _optional_finite(self.terminal_growth_rate, "terminal_growth_rate")
         _optional_finite(
-            self.implied_revenue_growth_cagr,
-            "implied_revenue_growth_cagr",
+            self.observed_enterprise_value,
+            "observed_enterprise_value",
         )
-        _finite(
-            self.operating_margin_assumption,
-            "operating_margin_assumption",
+        _optional_finite(
+            self.solved_enterprise_value,
+            "solved_enterprise_value",
         )
-        _finite(self.hurdle_rate, "hurdle_rate")
-        _finite(self.terminal_growth_rate, "terminal_growth_rate")
+        _optional_finite(self.relative_error, "relative_error")
         _finite(self.lower_bound, "lower_bound")
         _finite(self.upper_bound, "upper_bound")
         _optional_text(self.reason, "reason")
