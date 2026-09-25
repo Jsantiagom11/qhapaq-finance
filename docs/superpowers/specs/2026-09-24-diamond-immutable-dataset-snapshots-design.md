@@ -10,10 +10,16 @@ Git worktrees and offline replay.
 For the same `(universe, as_of)`, both commands must consume the exact
 same complete dataset.
 
-Required invariants:
+Required relationships:
 
+    funnel.snapshot_identity == shortlist.snapshot_identity
     funnel.dataset_identity == shortlist.dataset_identity
     shortlist_tickers == funnel_tickers
+
+`snapshot_identity` proves the exact sealed evidence boundary.
+
+`dataset_identity` retains its existing Diamond meaning: identity of the
+resulting FundamentalRecord dataset.
 
 A newer acquisition must never alter an older completed dataset.
 
@@ -135,42 +141,109 @@ Normal acquisition must never modify COMPLETE.
 
 ## Manifest Contract
 
+The manifest describes one exact evidence selection.
+
+It must distinguish two concepts:
+
+1. physical source inventory;
+2. semantic evidence selected for the snapshot.
+
+Raw file counts are not automatically issuer or security counts.
+
+The verified Debt Zero migration source currently contains:
+
+    universe cache objects     1
+    SEC index objects          500
+    SEC blob objects           500
+    canonical cache objects    504
+    market batch objects       51
+    split cache objects        474
+    universe securities        503
+
+These inventory values are observations about the migration source.
+They are not universal completeness constants.
+
+In particular, `canonical cache objects = 504` does not imply 504
+distinct universe securities.
+
+Canonical request identity currently includes:
+
+- issuer_id;
+- as_of;
+- history_years;
+- evidence_revision_sha256;
+- canonical schema version;
+- canonicalizer version.
+
+Therefore multiple physical canonical objects may legitimately exist
+for one logical issuer across revisions or other identity dimensions.
+
+Likewise, SEC evidence is physically represented by an index plus
+content-addressed blobs. The migration source has 500 index objects and
+500 blobs; the manifest must not infer semantic coverage merely from the
+recursive file count.
+
 Conceptual manifest:
 
-    {
-      "schema_version": "diamond-dataset-v1",
-      "universe": "sp500",
-      "as_of": "2026-09-22",
-      "status": "COMPLETE",
-      "dataset_identity": "<sha256>",
-      "coverage": {
-        "universe_count": 503,
-        "canonical_records": 503,
-        "market_batches": 51,
-        "split_records": 474
-      },
-      "components": {
-        "universe_identity": "<sha256>",
-        "sec_identity": "<sha256>",
-        "canonical_identity": "<sha256>",
-        "market_identity": "<sha256>",
-        "splits_identity": "<sha256>"
-      }
-    }
+    schema_version: diamond-dataset-v1
+    universe: sp500
+    as_of: 2026-09-22
+    status: COMPLETE
+    snapshot_identity: <sha256>
 
-Coverage values are observations, not hard-coded universal constants.
+    coverage:
+      universe_securities: <observed>
+      selected_sec_issuers: <observed>
+      selected_canonical_issuers: <observed>
+      market_batches: <observed>
+      selected_split_issuers: <observed>
 
-## Dataset Identity
+    inventory:
+      universe_cache_objects: <observed>
+      sec_index_objects: <observed>
+      sec_blob_objects: <observed>
+      canonical_cache_objects: <observed>
+      market_cache_objects: <observed>
+      split_cache_objects: <observed>
 
-dataset_identity represents the complete logical dataset.
+    components:
+      universe_identity: <sha256>
+      sec_identity: <sha256>
+      canonical_identity: <sha256>
+      market_identity: <sha256>
+      splits_identity: <sha256>
 
-It includes at minimum:
+    legacy:
+      diamond_dataset_identity: <optional existing identity>
 
-- schema version;
+Each semantic coverage value must be derived from evidence actually
+selected by the snapshot resolver.
+
+Each component identity must be deterministic over the exact selected
+evidence references and their verified content identities.
+
+Inventory counts are diagnostic metadata. They must not by themselves
+determine snapshot completeness.
+
+## Identity Model
+
+The architecture has two distinct identities.
+
+### snapshot_identity
+
+`snapshot_identity` is new.
+
+It identifies the exact sealed evidence boundary described by the
+COMPLETE manifest.
+
+It must deterministically include at minimum:
+
+- snapshot schema version;
 - universe;
 - as_of;
-- component identities;
-- actual coverage.
+- semantic coverage;
+- exact selected evidence references;
+- component content identities.
 
 It must exclude:
 
@@ -179,9 +252,39 @@ It must exclude:
 - machine paths;
 - worktree paths.
 
-Equivalent evidence produces the same identity.
+Equivalent sealed evidence produces the same `snapshot_identity`.
 
-Different evidence produces a different identity.
+Any change to selected evidence or its verified content changes
+`snapshot_identity`.
+
+### dataset_identity
+
+`dataset_identity` already exists in Diamond and must retain its current
+meaning.
+
+It is calculated from the resulting FundamentalRecord collection.
+
+This feature must not silently redefine that existing public contract.
+
+The runtime therefore carries both identities:
+
+    snapshot_identity = identity of exact input evidence
+    dataset_identity  = identity of Diamond FundamentalRecord output
+
+The distinction is intentional.
+
+Two different snapshots may theoretically produce the same
+`dataset_identity` if their evidence differences do not alter the
+resulting FundamentalRecords.
+
+Likewise, the same immutable snapshot processed by materially different
+future transformation logic may produce a different `dataset_identity`.
+
+Therefore `snapshot_identity` is the evidence reproducibility boundary,
+while `dataset_identity` remains the Diamond output identity.
+
+For one execution path, Executive Shortlist must transport both
+identities from its Diamond Funnel result without recalculation.
 
 ## Temporal Evidence Identity
 
@@ -210,10 +313,28 @@ Funnel and Shortlist use the same selector:
 
 The selector resolves exactly one COMPLETE manifest.
 
-Both commands expose the same manifest dataset_identity.
+Both commands must expose:
 
-No command may independently reconstruct another logical dataset for
-the same selector.
+    snapshot_identity
+    dataset_identity
+
+For the same invocation and the same resolved Diamond run:
+
+    funnel.snapshot_identity == shortlist.snapshot_identity
+    funnel.dataset_identity == shortlist.dataset_identity
+    shortlist_tickers == funnel_tickers
+
+Shortlist must transport these identities from Diamond.
+
+It must not independently rebuild, reinterpret or hash snapshot
+evidence.
+
+Across arbitrary source-code revisions, only `snapshot_identity` is
+required to remain stable for the same sealed snapshot.
+
+Cross-worktree equality of `dataset_identity` and Top-N is an acceptance
+requirement only when the compared executions use compatible Diamond
+transformation/scoring code.
 
 ## Offline Replay
 
@@ -302,19 +423,40 @@ Offline mode never silently falls back to network.
 
 ## Migration
 
-Use the verified Debt Zero 2026-09-22 dataset as the first migration
+Use the verified Debt Zero 2026-09-22 evidence as the first migration
 source.
 
-Migration:
+Observed physical source inventory:
 
-    copy
-    -> verify checksums
+    universe cache objects     1
+    SEC index objects          500
+    SEC blob objects           500
+    canonical cache objects    504
+    market batch objects       51
+    split cache objects        474
+
+Observed universe cardinality:
+
+    universe securities        503
+
+These numbers describe the legacy source inventory.
+
+They are not hard-coded requirements for future snapshots and must not
+be interpreted as one-object-per-security guarantees.
+
+Migration procedure:
+
+    copy selected evidence
+    -> verify source checksums
+    -> resolve semantic evidence set
+    -> calculate component identities
+    -> calculate snapshot_identity
     -> offline replay
     -> provider_requests == 0
     -> cache_misses == 0
+    -> verify Diamond dataset_identity
     -> verify Top-5
-    -> calculate manifest
-    -> seal COMPLETE
+    -> atomically seal COMPLETE
 
 Migration must not:
 
@@ -322,9 +464,10 @@ Migration must not:
 - mutate Debt Zero;
 - use the mixed Executive cache as authoritative source;
 - fabricate evidence;
-- delete legacy caches.
+- delete legacy caches;
+- infer semantic coverage from raw file counts.
 
-Acceptance target:
+Acceptance target for the existing Diamond output remains:
 
     Top-5:
     MO
@@ -337,9 +480,14 @@ Acceptance target:
     cache_hits = 1526
     cache_misses = 0
 
-If snapshot-v1 generates a new identity, preserve an auditable mapping:
+The known legacy Diamond output identity is:
 
-    legacy_dataset_identity -> snapshot_v1_dataset_identity
+    46677793154fc2a7888361aa613d9c61db124b5f5b1eb414a4b3ad471a05c2a2
+
+Migration introduces a new `snapshot_identity`.
+
+The manifest may record the known legacy `dataset_identity` for audit,
+but the two identities must never be treated as interchangeable.
 
 ## Compatibility
 
@@ -361,18 +509,24 @@ This feature changes evidence lifecycle and reproducibility only.
 1. COMPLETE snapshots are immutable.
 2. Different as_of dates cannot overwrite one another.
 3. Worktrees do not independently own authoritative datasets.
-4. Manifest coverage records actual evidence.
-5. Dataset identity covers required components.
-6. Funnel and Shortlist resolve the same manifest.
-7. Both expose the same dataset identity.
-8. Shortlist preserves Diamond Top-N.
-9. Offline replay makes zero network requests.
-10. Missing required evidence fails explicitly.
-11. BUILDING cannot masquerade as COMPLETE.
-12. Failed acquisition cannot corrupt COMPLETE.
-13. New acquisition cannot alter historical identity.
-14. Migration cannot mutate its source.
-15. Legitimate null financial evidence remains null-aware.
+4. Physical inventory and semantic coverage are distinct.
+5. Manifest coverage describes evidence actually selected.
+6. snapshot_identity covers exact selected input evidence.
+7. Existing dataset_identity semantics remain unchanged.
+8. Funnel and Shortlist resolve the same COMPLETE manifest.
+9. Shortlist transports snapshot_identity without recalculation.
+10. Shortlist transports dataset_identity without recalculation.
+11. Shortlist preserves Diamond Top-N exactly.
+12. Offline replay makes zero network requests.
+13. Missing required evidence fails explicitly.
+14. BUILDING cannot masquerade as COMPLETE.
+15. Failed acquisition cannot corrupt COMPLETE.
+16. New acquisition cannot alter historical snapshot_identity.
+17. Migration cannot mutate its source.
+18. Legitimate null financial evidence remains null-aware.
+19. Raw cache-file counts cannot define completeness by themselves.
+20. Same sealed evidence means same snapshot_identity independent of
+    worktree path.
 
 ## Required Tests
 
@@ -386,16 +540,29 @@ Prove:
     load(URL, 2026-09-22) -> snapshot 22
     load(URL, 2026-09-24) -> snapshot 24
 
-Both physical objects coexist.
+Both temporal objects coexist.
+
+### Physical inventory versus semantic coverage
+
+Construct evidence where multiple physical canonical objects correspond
+to one logical issuer.
+
+Prove that:
+
+- physical object count records inventory;
+- semantic issuer count records selected coverage;
+- completeness does not assume one file per security.
 
 ### Historical preservation
 
 1. seal 2026-09-22;
-2. record identity;
-3. build and seal 2026-09-24;
-4. replay 2026-09-22;
-5. prove identity unchanged;
-6. prove Diamond output unchanged.
+2. record snapshot_identity;
+3. record dataset_identity;
+4. build and seal 2026-09-24;
+5. replay 2026-09-22;
+6. prove snapshot_identity unchanged;
+7. with compatible Diamond code, prove dataset_identity unchanged;
+8. prove Diamond output unchanged.
 
 ### Manifest lifecycle
 
@@ -412,24 +579,41 @@ Prove:
 Prove:
 
 - zero network calls on complete replay;
-- cache miss fails immediately;
-- cache miss does not invoke network;
+- missing evidence fails immediately;
+- missing evidence does not invoke network;
 - COMPLETE replay cannot write.
+
+### Identity separation
+
+Prove independently that:
+
+- changing selected evidence changes snapshot_identity;
+- worktree path does not change snapshot_identity;
+- dataset_identity continues to use the existing FundamentalRecord
+  identity algorithm;
+- Shortlist does not calculate either identity itself.
 
 ### Cross-command acceptance
 
-Prove:
+For one real COMPLETE snapshot:
 
-    funnel_tickers == shortlist_tickers
+    funnel.snapshot_identity == shortlist.snapshot_identity
     funnel.dataset_identity == shortlist.dataset_identity
+    funnel_tickers == shortlist_tickers
     provider_requests == 0
     cache_misses == 0
 
 ### Cross-worktree acceptance
 
-Different source worktrees reading the same shared snapshot resolve:
+Two compatible code worktrees reading the same shared snapshot must
+resolve:
 
     same manifest
+    same snapshot_identity
+
+When their Diamond transformation/scoring revision is equivalent, they
+must additionally produce:
+
     same dataset_identity
     same Diamond Top-N
 
@@ -437,6 +621,8 @@ Different source worktrees reading the same shared snapshot resolve:
 
 Phase 1:
 
+- explicit snapshot_identity contract;
+- preserve existing dataset_identity contract;
 - temporal immutable identities;
 - shared configurable runtime root;
 - snapshot and manifest contracts.
