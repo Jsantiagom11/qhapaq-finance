@@ -237,3 +237,9 @@ Ruling: Task 5 goal-seek inputs are translated only from canonical deterministic
 Ruling: v0.1 executive evidence projects canonical numeric fields with the canonical research content identity as provenance, while contradiction DTOs carry only existing Diamond or canonical-analysis diagnostic identifiers with explicit source prefixes. Task 5 does not infer a new contradiction class or generate an investment conclusion.
 
 Ruling: Task 5 does not manufacture `bottom_line`; it transports the upstream ExecutiveAnalysisStatus value through ExecutiveSynthesis. Incomplete analyses therefore remain `bottom_line=None`, and completed analyses may also remain None until a canonical conclusion-producing boundary exists.
+
+Ruling: Task 6 freezes only the two external I/O boundaries: Diamond acquisition uses the repository's existing `LocalJsonProvider` over `tests/fixtures/diamond/minimal-universe.json`, and deep analysis uses a deterministic synchronous analyzer injected behind the real `DeepAnalysisOrchestrator` — `run_funnel`, Diamond scoring/ranking, bounded concurrent orchestration, Goal Seek, ExecutiveSynthesis, shortlist assembly, and both renderers remain production implementations.
+
+Ruling: Task 6 goldens contain only the stable Executive Shortlist semantic payload and text rendering; variable funnel timing/counter metadata is intentionally excluded from the shortlist representation while `dataset_identity` is retained — this makes exact JSON/text reproducible without weakening dataset provenance.
+
+Ruling: the frozen E2E deliberately includes one completed canonical analysis and one incomplete analysis — this proves both the real Goal Seek/provenance path and the `bottom_line=None`, no-evidence, no-expectations fail-closed path in one deterministic pipeline.

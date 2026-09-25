@@ -1,0 +1,37 @@
+QHAPAQ EXECUTIVE SHORTLIST
+universe=test-operating
+as_of=2026-09-20
+dataset_identity=493294e65e40ea12a3cc96abcee9fb9d6d49ff2e2c29e83da51e8991e91431ff
+count=2
+
+[1] ticker=T19
+surfaced_by=QUALITY_VALUE
+research_priority=86.25
+why_it_surfaced=Diamond surfaced T19 as QUALITY_VALUE with research_priority=86.25
+analysis_status=COMPLETED
+conclusion_available=true
+analysis_reason=-
+expectation_status=SOLVED
+implied_fcff_growth=0.07988281249999998
+starting_fcff=100.0
+hurdle_rate=0.1
+terminal_growth_rate=0.03
+years=5
+observed_enterprise_value=1815.8184042854218
+solved_enterprise_value=1814.9380542246454
+relative_error=0.0004848227436723663
+bottom_line=-
+evidence=[{"metric_id":"normalized_fcff","period_end":null,"source_identity":"frozen-analysis:T19","status":"CANONICAL","value":100.0},{"metric_id":"roic","period_end":null,"source_identity":"frozen-analysis:T19","status":"CANONICAL","value":0.14},{"metric_id":"wacc","period_end":null,"source_identity":"frozen-analysis:T19","status":"CANONICAL","value":0.1},{"metric_id":"enterprise_value","period_end":null,"source_identity":"frozen-analysis:T19","status":"CANONICAL","value":1815.8184042854218}]
+contradictions=[{"description":"Canonical analysis diagnostic: FROZEN_ANALYSIS_FLAG; source=frozen-analysis:T19","flag_id":"ANALYSIS:FROZEN_ANALYSIS_FLAG","severity":"DIAGNOSTIC"}]
+
+[2] ticker=T18
+surfaced_by=QUALITY_VALUE
+research_priority=82.43421052631578
+why_it_surfaced=Diamond surfaced T18 as QUALITY_VALUE with research_priority=82.4342
+analysis_status=EVIDENCE_REQUIRED
+conclusion_available=false
+analysis_reason=-
+expectation_status=-
+bottom_line=-
+evidence=[]
+contradictions=[]
