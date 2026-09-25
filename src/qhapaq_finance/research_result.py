@@ -101,6 +101,7 @@ def _valuation(
                 x.explicit_growth for x in case.scenarios if x.name == item.name
             ),
             "terminal_growth": item.terminal_growth,
+            "years": next(x.years for x in case.scenarios if x.name == item.name),
             "terminal_spread": item.terminal_spread,
             "pv_explicit_period": item.pv_explicit_period,
             "pv_terminal_value": item.pv_terminal_value,

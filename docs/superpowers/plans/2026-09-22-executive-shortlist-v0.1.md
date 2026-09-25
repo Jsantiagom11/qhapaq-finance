@@ -225,3 +225,15 @@ Ruling: `DeepAnalysisResult` wraps the existing `AnalysisResult` and carries the
 Ruling: the Task 4 degradation boundary catches only the concrete repository domain exception classes enumerated before RED (`AccountingError`, `ResolverError`, `FinancialPromotionError`, `LocalSecCorpusError`, `MarketInputError`, `ResearchResultError`, `SecClientError`, `UniverseError`, `ValuationError`) — generic `ValueError`, `TypeError`, `KeyError`, and `Exception` are not wrapper-level degradation policies — broad catches would hide programming defects. Existing broad catches internal to `AnalysisOrchestrator.analyze()` remain unchanged.
 
 Ruling: a normal non-COMPLETED `AnalysisResult` is preserved rather than converted into an exception outcome, with `conclusion_available=False`; COMPLETED is conclusion-available only when `canonical_result` exists — Task 4 is a concurrent execution adapter, not a replacement analysis state machine.
+
+Ruling: Task 5 exposes the existing scenario `years` in `CanonicalResearchResult.valuation.scenarios` — Goal Seek requires `years`, while the canonical result already serializes the same scenario's explicit growth and terminal growth but omitted its horizon — publishing the existing scenario horizon closes provenance without inventing a valuation assumption or introducing a second model.
+
+Ruling: Task 5 reuses Diamond's existing `_production_funnel_provider` wiring rather than reproducing SEC-first/Wikipedia/Yahoo/cache construction inside the executive package — duplicating that wiring would create two production funnel configurations; the private import is accepted as the smallest bounded coupling for v0.1 and can be extracted to a public factory in a later refactor.
+
+Ruling: Executive Shortlist never re-ranks: `run_funnel()` remains the sole selector/orderer, `DeepAnalysisOrchestrator` receives `funnel.results` unchanged, and final entries are assembled with strict index-preserving zip.
+
+Ruling: Task 5 goal-seek inputs are translated only from canonical deterministic research fields: market enterprise value, normalized FCFF, WACC, base terminal growth, and base years. Missing or invalid financial inputs remain unavailable through the existing Goal Seek contract; no assumption is fabricated.
+
+Ruling: v0.1 executive evidence projects canonical numeric fields with the canonical research content identity as provenance, while contradiction DTOs carry only existing Diamond or canonical-analysis diagnostic identifiers with explicit source prefixes. Task 5 does not infer a new contradiction class or generate an investment conclusion.
+
+Ruling: Task 5 does not manufacture `bottom_line`; it transports the upstream ExecutiveAnalysisStatus value through ExecutiveSynthesis. Incomplete analyses therefore remain `bottom_line=None`, and completed analyses may also remain None until a canonical conclusion-producing boundary exists.
