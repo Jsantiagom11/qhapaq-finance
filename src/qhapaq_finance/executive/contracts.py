@@ -77,9 +77,14 @@ class ExecutiveAnalysisStatus:
     source_status: AnalysisStatus
     conclusion_available: bool
     reason: str | None
+    bottom_line: str | None = None
 
     def __post_init__(self) -> None:
         _optional_text(self.reason, "reason")
+        _optional_text(self.bottom_line, "bottom_line")
+
+        if not self.conclusion_available and self.bottom_line is not None:
+            raise ValueError("bottom_line must be None when conclusion_available is False")
 
 
 @dataclass(frozen=True)
