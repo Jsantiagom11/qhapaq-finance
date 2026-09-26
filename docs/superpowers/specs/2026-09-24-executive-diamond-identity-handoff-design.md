@@ -1,6 +1,6 @@
 # Executive ↔ Diamond Authoritative Identity Handoff
 
-Status: Proposed design.
+Status: Approved design.
 
 ## Problem
 
@@ -120,6 +120,24 @@ The evidence hash in provider_identity MUST NOT be inserted into a
 company-reference checksum field because those identities represent
 different semantic objects.
 
+For an authoritative identity supplied directly by Diamond, the
+ResolvedCompany provenance is semantic handoff provenance, not a claim
+that the identity was re-read from the local company-reference cache.
+
+Use:
+
+    CompanyProvenance(
+        source_url="diamond://sec-first/security-ref",
+        fetched_at=None,
+        raw_sha256=None,
+        raw_byte_size=None,
+    )
+
+The synthetic URI identifies the handoff boundary. It MUST NOT be replaced
+with the SEC company-tickers URL unless that file was actually the source
+used for that resolution, and provider_identity MUST NOT be copied into
+raw_sha256.
+
 ## Fallback
 
 The identity-aware resolver is composed with the existing
@@ -135,6 +153,23 @@ Therefore:
 - production Diamond candidates avoid redundant resolution;
 - ordinary qhapaq analyze TICKER semantics stay unchanged;
 - legacy candidates without source_security keep current behavior.
+
+The composed resolver MUST satisfy RefreshableSymbolResolver, not only
+SymbolResolver.
+
+Its behavior is:
+
+    resolve(ticker):
+        1. return exact authoritative Diamond identity when present;
+        2. otherwise delegate to the existing CompanyResolver.
+
+    refresh(client):
+        delegate unchanged to the existing CompanyResolver.
+
+This is required because AnalysisOrchestrator gates its one authoritative
+refresh through RefreshableSymbolResolver. The composition must preserve
+that existing fallback behavior rather than accidentally converting a
+refreshable resolver into a resolve-only resolver.
 
 ## Deep Analysis contract
 
@@ -176,6 +211,37 @@ If there is no BLOCKED-stage reason, reason remains None.
 
 This does not change source_status, conclusion_available, expectations,
 or bottom_line.
+
+## Design review rulings
+
+Repository review was performed against commit `0762ab6`.
+
+Ruling: the composed Executive resolver implements
+RefreshableSymbolResolver and delegates refresh to the existing
+CompanyResolver — AnalysisOrchestrator explicitly requires that protocol
+before its authoritative-refresh path — omitting delegation would change
+the promised legacy fallback behavior.
+
+Ruling: Diamond-authoritative company provenance uses
+`diamond://sec-first/security-ref` with no fabricated fetch timestamp,
+checksum, or byte size — Diamond is the actual identity handoff boundary
+and provider_identity is a different semantic object — using the local
+company-reference URL or evidence hash would assert provenance that did
+not occur.
+
+Repository review also confirmed:
+
+- Diamond public JSON/CSV serialization is an explicit projection rather
+  than an automatic serialization of every DiamondResult field;
+- dataset_identity is calculated from FundamentalRecord inputs, not from
+  DiamondResult;
+- DeepAnalysisOrchestrator already supports an injected synchronous
+  analyzer;
+- AnalysisOrchestrator already supports an injected SymbolResolver;
+- the normal non-exception Deep Analysis path currently discards terminal
+  stage reason by assigning reason=None;
+- Executive baseline tests and Ruff were green before implementation;
+- Dataset Snapshot production implementation remains outside this patch.
 
 ## TDD sequence
 
