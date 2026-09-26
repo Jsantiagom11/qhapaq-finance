@@ -313,13 +313,18 @@ def _expectation_payload(
     }
 
 
+def _stable_output_float(value: float) -> float:
+    """Bound presentation precision so equivalent runtime floats serialize identically."""
+    return float(format(value, ".15g"))
+
+
 def _entry_payload(
     item: ExecutiveShortlistEntry,
 ) -> dict[str, object]:
     return {
         "ticker": item.ticker,
         "surfaced_by": item.surfaced_by.value,
-        "research_priority": item.research_priority,
+        "research_priority": _stable_output_float(item.research_priority),
         "why_it_surfaced": item.why_it_surfaced,
         "evidence": [_evidence_payload(evidence) for evidence in item.evidence],
         "contradictions": [

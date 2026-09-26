@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import importlib
 import json
+from dataclasses import replace
 from pathlib import Path
 from types import ModuleType, SimpleNamespace
 from typing import cast
@@ -355,6 +356,36 @@ def test_json_and_text_are_semantically_equivalent() -> None:
         for evidence in item["evidence"]:
             assert evidence["metric_id"] in text
             assert evidence["source_identity"] in text
+
+
+def test_serialization_normalizes_one_ulp_research_priority_noise() -> None:
+    module = _shortlist()
+    run = _sample_run()
+    entry = run.entries[0]
+
+    lower = replace(
+        run,
+        entries=(
+            replace(
+                entry,
+                research_priority=82.43421052631578,
+            ),
+        ),
+    )
+    upper = replace(
+        run,
+        entries=(
+            replace(
+                entry,
+                research_priority=82.4342105263158,
+            ),
+        ),
+    )
+
+    assert lower.entries[0].research_priority != upper.entries[0].research_priority
+
+    assert module.canonical_shortlist_json(lower) == module.canonical_shortlist_json(upper)
+    assert module.render_shortlist_text(lower) == module.render_shortlist_text(upper)
 
 
 def test_root_cli_routes_shortlist_and_text_is_default(
