@@ -442,3 +442,91 @@ def test_shortlist_rejects_non_positive_depth(
         )
 
     assert "--depth must be positive" in capsys.readouterr().err
+
+def test_run_shortlist_injects_diamond_identity_into_default_analysis(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from qhapaq_finance.analysis import AnalysisOrchestrator
+    from qhapaq_finance.diamond.contracts import SecurityRef
+    from qhapaq_finance.executive.identity_resolver import (
+        DiamondIdentityResolver,
+    )
+
+    module = _shortlist()
+
+    candidate = cast(
+        DiamondResult,
+        SimpleNamespace(
+            ticker="ACME",
+            company_name="Acme Corporation",
+            provider="sec-first",
+            source_security=SecurityRef(
+                ticker="ACME",
+                security_id="security:acme",
+                issuer_id="sec-cik:0000000123",
+            ),
+        ),
+    )
+
+    funnel = cast(
+        FunnelRun,
+        SimpleNamespace(
+            results=(candidate,),
+            metadata=SimpleNamespace(),
+        ),
+    )
+
+    sentinel = object()
+
+    monkeypatch.setattr(
+        module,
+        "run_funnel",
+        lambda *args, **kwargs: funnel,
+    )
+
+    async def capture_build(
+        received_funnel: FunnelRun,
+        *,
+        universe_id: str,
+        as_of: object,
+        deep_analysis: object,
+    ) -> object:
+        assert received_funnel is funnel
+        assert universe_id == "sp500"
+
+        analyzer = deep_analysis._analyzer
+
+        assert isinstance(analyzer, AnalysisOrchestrator)
+        assert isinstance(
+            analyzer.resolver,
+            DiamondIdentityResolver,
+        )
+
+        resolved = analyzer.resolver.resolve("ACME")
+
+        assert resolved is not None
+        assert resolved.cik == "0000000123"
+        assert (
+            resolved.provenance.source_url
+            == "diamond://sec-first/security-ref"
+        )
+
+        return sentinel
+
+    monkeypatch.setattr(
+        module,
+        "build_shortlist_from_funnel",
+        capture_build,
+    )
+
+    result = asyncio.run(
+        module.run_shortlist(
+            object(),
+            universe_id="sp500",
+            as_of=module.date(2026, 9, 22),
+            depth=1,
+            repository_root=Path("."),
+        )
+    )
+
+    assert result is sentinel
