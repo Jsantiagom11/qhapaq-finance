@@ -40,3 +40,14 @@ def test_csv_header_is_stable() -> None:
     header = rendered.splitlines()[0]
     assert header.startswith("ticker,company_name,data_as_of,methodology,peer_scope,peer_count")
     assert "research_priority" in header
+
+def test_source_security_is_not_part_of_public_diamond_serialization() -> None:
+    result = _results()[0]
+    payload = diamond_result_dict(result)
+    rendered_json = canonical_diamond_json((result,))
+    csv_header = diamond_csv((result,)).splitlines()[0]
+
+    assert result.source_security is not None
+    assert "source_security" not in payload
+    assert "source_security" not in rendered_json
+    assert "source_security" not in csv_header

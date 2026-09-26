@@ -8,7 +8,7 @@ from datetime import date
 from types import MappingProxyType
 
 from .archetypes import ArchetypeScores, score_archetypes
-from .contracts import FundamentalRecord, Methodology
+from .contracts import FundamentalRecord, Methodology, SecurityRef
 from .metrics import CompressedMetrics, FinancialFeatureSet, derive_financial_features
 from .percentiles import (
     DEFAULT_PERCENTILE_POLICY,
@@ -60,6 +60,7 @@ class DiamondResult:
     percentiles: Mapping[str, float | None]
     diagnostics: tuple[str, ...]
     coverage: Mapping[str, str]
+    source_security: SecurityRef | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "percentiles", MappingProxyType(dict(self.percentiles)))
@@ -171,6 +172,11 @@ def evaluate_universe(
                 percentile_map,
                 tuple(sorted(diagnostics)),
                 coverage,
+                source_security=SecurityRef(
+                    ticker=record.ticker,
+                    security_id=record.security_id,
+                    issuer_id=record.issuer_id,
+                ),
             )
         )
     return tuple(results)

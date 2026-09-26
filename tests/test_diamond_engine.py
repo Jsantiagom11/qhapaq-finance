@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import replace
 
-from qhapaq_finance.diamond.contracts import FiscalSlot, Methodology
+from qhapaq_finance.diamond.contracts import FiscalSlot, Methodology, SecurityRef
 from qhapaq_finance.diamond.engine import evaluate_universe
 from qhapaq_finance.diamond.serialization import canonical_diamond_json
 
@@ -104,3 +104,13 @@ def test_missing_market_cap_preserves_null_aware_compounder_ranking() -> None:
     assert candidate.scores.price is None
     assert candidate.archetypes.compounder is not None
     assert candidate.archetypes.research_priority is not None
+
+def test_evaluate_universe_preserves_exact_source_security() -> None:
+    record = rich_record("ACME")
+    result = evaluate_universe((record,))[0]
+
+    assert result.source_security == SecurityRef(
+        ticker=record.ticker,
+        security_id=record.security_id,
+        issuer_id=record.issuer_id,
+    )
