@@ -10,7 +10,7 @@ from typing import cast
 import pytest
 
 from qhapaq_finance.accounting import AccountingError
-from qhapaq_finance.analysis import AnalysisResult, AnalysisStatus
+from qhapaq_finance.analysis import AnalysisResult, AnalysisStageState, AnalysisStatus
 from qhapaq_finance.company_resolver import ResolverError
 from qhapaq_finance.diamond.engine import DiamondResult
 from qhapaq_finance.financial_promotion import FinancialPromotionError
@@ -301,3 +301,137 @@ def test_analysis_ticker_mismatch_crashes_instead_of_hiding_defect() -> None:
                 (_candidate("MO"),)
             )
         )
+
+
+def _analysis_result_with_stages(
+    ticker: str,
+    *,
+    status: AnalysisStatus,
+    acquisition: object | None = None,
+    evidence: object | None = None,
+    research: object | None = None,
+    valuation: object | None = None,
+    publishing: object | None = None,
+) -> AnalysisResult:
+    completed = SimpleNamespace(
+        state=AnalysisStageState.COMPLETED,
+        reason=None,
+    )
+    plan = SimpleNamespace(
+        identity=SimpleNamespace(ticker=ticker),
+        acquisition=acquisition or completed,
+        evidence=evidence or completed,
+        research=research or completed,
+        valuation=valuation or completed,
+        publishing=publishing or completed,
+    )
+    return cast(
+        AnalysisResult,
+        SimpleNamespace(
+            status=status,
+            plan=plan,
+            canonical_result=None,
+        ),
+    )
+
+
+def _analysis_stage(
+    state: AnalysisStageState,
+    reason: str | None = None,
+) -> object:
+    return SimpleNamespace(state=state, reason=reason)
+
+
+def test_terminal_blocked_analysis_preserves_stage_reason() -> None:
+    module = _module()
+    expected = "checksum-verified canonical evidence is not available"
+    result = _analysis_result_with_stages(
+        "MO",
+        status=AnalysisStatus.EVIDENCE_REQUIRED,
+        evidence=_analysis_stage(
+            AnalysisStageState.BLOCKED,
+            expected,
+        ),
+    )
+
+    class Analyzer:
+        def analyze(self, ticker: str) -> AnalysisResult:
+            assert ticker == "MO"
+            return result
+
+    output = asyncio.run(
+        module.DeepAnalysisOrchestrator(
+            analyzer=Analyzer(),
+        ).analyze((_candidate("MO"),))
+    )
+
+    status = output[0].analysis_status
+
+    assert status.source_status is AnalysisStatus.EVIDENCE_REQUIRED
+    assert status.conclusion_available is False
+    assert status.reason == expected
+    assert status.bottom_line is None
+
+
+def test_first_non_empty_blocked_stage_reason_wins() -> None:
+    module = _module()
+    result = _analysis_result_with_stages(
+        "MO",
+        status=AnalysisStatus.BLOCKED,
+        acquisition=_analysis_stage(
+            AnalysisStageState.BLOCKED,
+            "",
+        ),
+        evidence=_analysis_stage(
+            AnalysisStageState.BLOCKED,
+            "evidence blocker",
+        ),
+        research=_analysis_stage(
+            AnalysisStageState.BLOCKED,
+            "research blocker",
+        ),
+        valuation=_analysis_stage(
+            AnalysisStageState.BLOCKED,
+            "valuation blocker",
+        ),
+    )
+
+    class Analyzer:
+        def analyze(self, ticker: str) -> AnalysisResult:
+            return result
+
+    output = asyncio.run(
+        module.DeepAnalysisOrchestrator(
+            analyzer=Analyzer(),
+        ).analyze((_candidate("MO"),))
+    )
+
+    assert output[0].analysis_status.reason == "evidence blocker"
+
+
+def test_terminal_analysis_without_blocked_reason_keeps_none() -> None:
+    module = _module()
+    result = _analysis_result_with_stages(
+        "MO",
+        status=AnalysisStatus.BLOCKED,
+        evidence=_analysis_stage(
+            AnalysisStageState.BLOCKED,
+            None,
+        ),
+        research=_analysis_stage(
+            AnalysisStageState.READY,
+            "not a blocked-stage reason",
+        ),
+    )
+
+    class Analyzer:
+        def analyze(self, ticker: str) -> AnalysisResult:
+            return result
+
+    output = asyncio.run(
+        module.DeepAnalysisOrchestrator(
+            analyzer=Analyzer(),
+        ).analyze((_candidate("MO"),))
+    )
+
+    assert output[0].analysis_status.reason is None

@@ -9,6 +9,8 @@ from datetime import date
 from pathlib import Path
 from typing import cast
 
+from qhapaq_finance.analysis import AnalysisOrchestrator
+from qhapaq_finance.company_resolver import CompanyResolver
 from qhapaq_finance.diamond.engine import DiamondResult
 from qhapaq_finance.diamond.funnel import (
     FunnelRun,
@@ -18,6 +20,7 @@ from qhapaq_finance.diamond.funnel import (
 from qhapaq_finance.diamond.providers.protocol import (
     FundamentalDataProvider,
 )
+from qhapaq_finance.executive.identity_resolver import DiamondIdentityResolver
 from qhapaq_finance.research_result import CanonicalResearchResult
 
 from .contracts import (
@@ -249,11 +252,19 @@ async def run_shortlist(
         depth=depth,
     )
 
+    fallback = CompanyResolver(repository_root)
+    resolver = DiamondIdentityResolver(funnel.results, fallback)
+    analyzer = AnalysisOrchestrator(
+        repository_root,
+        resolver=resolver,
+    )
+    deep_analysis = DeepAnalysisOrchestrator(analyzer=analyzer)
+
     return await build_shortlist_from_funnel(
         funnel,
         universe_id=universe_id,
         as_of=as_of,
-        deep_analysis=DeepAnalysisOrchestrator(repository_root),
+        deep_analysis=deep_analysis,
     )
 
 
@@ -302,13 +313,18 @@ def _expectation_payload(
     }
 
 
+def _stable_output_float(value: float) -> float:
+    """Bound presentation precision so equivalent runtime floats serialize identically."""
+    return float(format(value, ".15g"))
+
+
 def _entry_payload(
     item: ExecutiveShortlistEntry,
 ) -> dict[str, object]:
     return {
         "ticker": item.ticker,
         "surfaced_by": item.surfaced_by.value,
-        "research_priority": item.research_priority,
+        "research_priority": _stable_output_float(item.research_priority),
         "why_it_surfaced": item.why_it_surfaced,
         "evidence": [_evidence_payload(evidence) for evidence in item.evidence],
         "contradictions": [

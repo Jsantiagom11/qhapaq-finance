@@ -26,7 +26,7 @@ contradictions=[{"description":"Canonical analysis diagnostic: FROZEN_ANALYSIS_F
 
 [2] ticker=T18
 surfaced_by=QUALITY_VALUE
-research_priority=82.43421052631578
+research_priority=82.4342105263158
 why_it_surfaced=Diamond surfaced T18 as QUALITY_VALUE with research_priority=82.4342
 analysis_status=EVIDENCE_REQUIRED
 conclusion_available=false

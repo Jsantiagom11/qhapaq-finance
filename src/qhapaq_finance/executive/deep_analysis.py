@@ -12,6 +12,7 @@ from qhapaq_finance.accounting import AccountingError
 from qhapaq_finance.analysis import (
     AnalysisOrchestrator,
     AnalysisResult,
+    AnalysisStageState,
     AnalysisStatus,
 )
 from qhapaq_finance.company_resolver import ResolverError
@@ -122,10 +123,33 @@ class DeepAnalysisOrchestrator:
             analysis_status=ExecutiveAnalysisStatus(
                 source_status=result.status,
                 conclusion_available=conclusion_available,
-                reason=None,
+                reason=(
+                    None
+                    if result.status is AnalysisStatus.COMPLETED
+                    else _first_blocked_reason(result)
+                ),
                 bottom_line=None,
             ),
         )
+
+
+def _first_blocked_reason(result: AnalysisResult) -> str | None:
+    for stage_name in (
+        "acquisition",
+        "evidence",
+        "research",
+        "valuation",
+        "publishing",
+    ):
+        stage = getattr(result.plan, stage_name, None)
+        reason = getattr(stage, "reason", None)
+        if (
+            getattr(stage, "state", None) is AnalysisStageState.BLOCKED
+            and isinstance(reason, str)
+            and reason
+        ):
+            return reason
+    return None
 
 
 def _domain_error_reason(exc: Exception) -> str:
