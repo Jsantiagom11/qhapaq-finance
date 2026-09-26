@@ -41,6 +41,7 @@ def test_csv_header_is_stable() -> None:
     assert header.startswith("ticker,company_name,data_as_of,methodology,peer_scope,peer_count")
     assert "research_priority" in header
 
+
 def test_source_security_is_not_part_of_public_diamond_serialization() -> None:
     result = _results()[0]
     payload = diamond_result_dict(result)

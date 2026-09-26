@@ -65,9 +65,7 @@ class DiamondIdentityResolver:
         for candidate in candidates:
             resolved = _authoritative_company(candidate)
             if resolved is not None:
-                self._authoritative[
-                    candidate.ticker.strip().upper()
-                ] = resolved
+                self._authoritative[candidate.ticker.strip().upper()] = resolved
 
     def resolve(self, ticker: str) -> ResolvedCompany | None:
         normalized = ticker.strip().upper()

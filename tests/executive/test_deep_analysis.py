@@ -302,6 +302,7 @@ def test_analysis_ticker_mismatch_crashes_instead_of_hiding_defect() -> None:
             )
         )
 
+
 def _analysis_result_with_stages(
     ticker: str,
     *,

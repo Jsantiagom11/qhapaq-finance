@@ -443,6 +443,7 @@ def test_shortlist_rejects_non_positive_depth(
 
     assert "--depth must be positive" in capsys.readouterr().err
 
+
 def test_run_shortlist_injects_diamond_identity_into_default_analysis(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -506,10 +507,7 @@ def test_run_shortlist_injects_diamond_identity_into_default_analysis(
 
         assert resolved is not None
         assert resolved.cik == "0000000123"
-        assert (
-            resolved.provenance.source_url
-            == "diamond://sec-first/security-ref"
-        )
+        assert resolved.provenance.source_url == "diamond://sec-first/security-ref"
 
         return sentinel
 

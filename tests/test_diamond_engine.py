@@ -105,6 +105,7 @@ def test_missing_market_cap_preserves_null_aware_compounder_ranking() -> None:
     assert candidate.archetypes.compounder is not None
     assert candidate.archetypes.research_priority is not None
 
+
 def test_evaluate_universe_preserves_exact_source_security() -> None:
     record = rich_record("ACME")
     result = evaluate_universe((record,))[0]

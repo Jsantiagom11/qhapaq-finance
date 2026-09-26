@@ -22,9 +22,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def _module() -> ModuleType:
     try:
-        return importlib.import_module(
-            "qhapaq_finance.executive.identity_resolver"
-        )
+        return importlib.import_module("qhapaq_finance.executive.identity_resolver")
     except ModuleNotFoundError as exc:
         pytest.fail(
             f"identity resolver module missing: {exc}",
