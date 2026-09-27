@@ -302,10 +302,27 @@ def accounting_evidence_policies(
         # Opening balance-sheet context.
         MetricPromotionPolicy(
             "operating_current_assets_opening",
-            ("AccountsReceivableNetCurrent", "InventoryNet"),
+            (),
             "USD",
-            PromotionStrategy.COMPOSITE_INSTANT,
-            component_coverages=("trade-receivables", "inventory"),
+            PromotionStrategy.ALTERNATIVE,
+            alternatives=(
+                MetricPromotionPolicy(
+                    "operating_current_assets_opening",
+                    ("AccountsReceivableNetCurrent", "InventoryNet"),
+                    "USD",
+                    PromotionStrategy.COMPOSITE_INSTANT,
+                    component_coverages=("trade-receivables", "inventory"),
+                    target_end=opening_end,
+                ),
+                MetricPromotionPolicy(
+                    "operating_current_assets_opening",
+                    ("ReceivablesNetCurrent", "InventoryNet"),
+                    "USD",
+                    PromotionStrategy.COMPOSITE_INSTANT,
+                    component_coverages=("current-receivables", "inventory"),
+                    target_end=opening_end,
+                ),
+            ),
             target_end=opening_end,
         ),
         MetricPromotionPolicy(
@@ -443,10 +460,27 @@ def accounting_evidence_policies(
         # Closing balance-sheet context.
         MetricPromotionPolicy(
             "operating_current_assets_closing",
-            ("AccountsReceivableNetCurrent", "InventoryNet"),
+            (),
             "USD",
-            PromotionStrategy.COMPOSITE_INSTANT,
-            component_coverages=("trade-receivables", "inventory"),
+            PromotionStrategy.ALTERNATIVE,
+            alternatives=(
+                MetricPromotionPolicy(
+                    "operating_current_assets_closing",
+                    ("AccountsReceivableNetCurrent", "InventoryNet"),
+                    "USD",
+                    PromotionStrategy.COMPOSITE_INSTANT,
+                    component_coverages=("trade-receivables", "inventory"),
+                    target_end=closing_end,
+                ),
+                MetricPromotionPolicy(
+                    "operating_current_assets_closing",
+                    ("ReceivablesNetCurrent", "InventoryNet"),
+                    "USD",
+                    PromotionStrategy.COMPOSITE_INSTANT,
+                    component_coverages=("current-receivables", "inventory"),
+                    target_end=closing_end,
+                ),
+            ),
             target_end=closing_end,
         ),
         MetricPromotionPolicy(

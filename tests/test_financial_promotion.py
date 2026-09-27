@@ -221,6 +221,125 @@ def test_composite_instant_promotes_aapl_total_debt_with_each_source_lineage(
     assert result.source_accessions == ("0000320193-26-000020", "0000320193-26-000020")
 
 
+def test_operating_current_assets_falls_back_to_aggregate_current_receivables() -> None:
+    endpoint = date(2025, 6, 30)
+    policy = next(
+        item
+        for item in accounting_evidence_policies(
+            opening_end=endpoint,
+            closing_end=date(2026, 6, 30),
+        )
+        if item.metric_id == "operating_current_assets_opening"
+    )
+
+    receivables = _instant(
+        fact_id="mo-receivables",
+        concept="ReceivablesNetCurrent",
+        value=241_000_000,
+        end=endpoint,
+        fiscal_year=2025,
+        fiscal_period="Q2",
+        filing_form="10-Q",
+        accession="0000764180-25-000111",
+        filing_date=date(2025, 7, 30),
+    )
+    inventory = _instant(
+        fact_id="mo-inventory",
+        concept="InventoryNet",
+        value=1_016_000_000,
+        end=endpoint,
+        fiscal_year=2025,
+        fiscal_period="Q2",
+        filing_form="10-Q",
+        accession="0000764180-25-000111",
+        filing_date=date(2025, 7, 30),
+    )
+
+    result = MultiPeriodFinancialPromoter().promote(
+        (receivables, inventory),
+        policy=policy,
+    )
+
+    assert result.value == 1_257_000_000
+    assert result.source_fact_ids == (
+        "mo-receivables",
+        "mo-inventory",
+    )
+
+
+def test_operating_current_assets_prefers_trade_accounts_receivable_when_present() -> None:
+    endpoint = date(2025, 6, 30)
+    policy = next(
+        item
+        for item in accounting_evidence_policies(
+            opening_end=endpoint,
+            closing_end=date(2026, 6, 30),
+        )
+        if item.metric_id == "operating_current_assets_opening"
+    )
+
+    accounts = _instant(
+        fact_id="accounts-receivable",
+        concept="AccountsReceivableNetCurrent",
+        value=200,
+        end=endpoint,
+    )
+    aggregate = _instant(
+        fact_id="aggregate-receivables",
+        concept="ReceivablesNetCurrent",
+        value=250,
+        end=endpoint,
+    )
+    inventory = _instant(
+        fact_id="inventory",
+        concept="InventoryNet",
+        value=100,
+        end=endpoint,
+    )
+
+    result = MultiPeriodFinancialPromoter().promote(
+        (accounts, aggregate, inventory),
+        policy=policy,
+    )
+
+    assert result.value == 300
+    assert result.source_fact_ids == (
+        "accounts-receivable",
+        "inventory",
+    )
+
+
+def test_operating_current_assets_does_not_substitute_other_receivables_only() -> None:
+    endpoint = date(2025, 6, 30)
+    policy = next(
+        item
+        for item in accounting_evidence_policies(
+            opening_end=endpoint,
+            closing_end=date(2026, 6, 30),
+        )
+        if item.metric_id == "operating_current_assets_opening"
+    )
+
+    other_receivables = _instant(
+        fact_id="other-receivables",
+        concept="OtherReceivablesNetCurrent",
+        value=241,
+        end=endpoint,
+    )
+    inventory = _instant(
+        fact_id="inventory",
+        concept="InventoryNet",
+        value=1_016,
+        end=endpoint,
+    )
+
+    with pytest.raises(FinancialPromotionError):
+        MultiPeriodFinancialPromoter().promote(
+            (other_receivables, inventory),
+            policy=policy,
+        )
+
+
 def test_derived_instant_promotes_aapl_operating_nwc_with_dependency_lineage(
     aapl_companyfacts: dict[str, object],
 ) -> None:
