@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Sequence
+from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -77,23 +78,35 @@ class DeepAnalysisOrchestrator:
         """Analyze in parallel while preserving exact Diamond input order."""
         semaphore = asyncio.Semaphore(2)
 
-        return tuple(
-            await asyncio.gather(
-                *(self._analyze_one(candidate, semaphore) for candidate in diamond_top_n)
-            )
+        executor = ThreadPoolExecutor(
+            max_workers=2,
+            thread_name_prefix="qhapaq-deep-analysis",
         )
+        tasks = tuple(
+            asyncio.create_task(self._analyze_one(candidate, semaphore, executor))
+            for candidate in diamond_top_n
+        )
+        try:
+            return tuple(await asyncio.gather(*tasks))
+        finally:
+            for task in tasks:
+                task.cancel()
+            await asyncio.gather(*tasks, return_exceptions=True)
+            executor.shutdown(wait=False, cancel_futures=True)
 
     async def _analyze_one(
         self,
         candidate: DiamondResult,
         semaphore: asyncio.Semaphore,
+        executor: ThreadPoolExecutor,
     ) -> DeepAnalysisResult:
         async with semaphore:
             try:
-                result = await asyncio.to_thread(
+                worker = executor.submit(
                     self._analyzer.analyze,
                     candidate.ticker,
                 )
+                result = await _wait_for_worker(worker)
             except EXPECTED_DOMAIN_ERRORS as exc:
                 return DeepAnalysisResult(
                     ticker=candidate.ticker,
@@ -131,6 +144,12 @@ class DeepAnalysisOrchestrator:
                 bottom_line=None,
             ),
         )
+
+
+async def _wait_for_worker(worker: Future[AnalysisResult]) -> AnalysisResult:
+    while not worker.done():
+        await asyncio.sleep(0.001)
+    return worker.result()
 
 
 def _first_blocked_reason(result: AnalysisResult) -> str | None:

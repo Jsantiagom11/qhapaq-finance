@@ -114,6 +114,24 @@ class RaisingAnalyzer:
         raise self.exc
 
 
+class SlowAndRaisingAnalyzer:
+    def __init__(self) -> None:
+        self.slow_started = threading.Event()
+        self.release_slow = threading.Event()
+        self.slow_finished = threading.Event()
+
+    def analyze(self, ticker: str) -> AnalysisResult:
+        if ticker == "SLOW":
+            self.slow_started.set()
+            self.release_slow.wait(timeout=0.5)
+            self.slow_finished.set()
+            return _analysis_result(ticker)
+
+        if not self.slow_started.wait(timeout=0.2):
+            raise AssertionError("slow sibling did not start")
+        raise TypeError("unexpected sibling failure")
+
+
 class TerminalAnalyzer:
     def __init__(self, status: AnalysisStatus) -> None:
         self.status = status
@@ -187,6 +205,88 @@ def test_sync_analyzer_runs_off_event_loop_thread() -> None:
 
     assert analyzer.thread_ids
     assert all(thread_id != caller_thread for thread_id in analyzer.thread_ids)
+
+
+def test_orchestrator_does_not_depend_on_event_loop_cross_thread_wakeup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _module()
+    loop = asyncio.new_event_loop()
+
+    def reject_run_in_executor(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("event-loop executor wakeup is not sandbox-safe")
+
+    monkeypatch.setattr(loop, "run_in_executor", reject_run_in_executor)
+
+    try:
+        output = loop.run_until_complete(
+            module.DeepAnalysisOrchestrator(analyzer=ThreadRecordingAnalyzer()).analyze(
+                (_candidate("MO"),)
+            )
+        )
+
+        assert [item.ticker for item in output] == ["MO"]
+        assert getattr(loop, "_default_executor", None) is None
+    finally:
+        loop.close()
+
+
+def test_unexpected_sibling_error_does_not_block_on_slow_worker_shutdown() -> None:
+    module = _module()
+    analyzer = SlowAndRaisingAnalyzer()
+
+    async def exercise() -> tuple[float, tuple[asyncio.Task[object], ...]]:
+        started_at = time.monotonic()
+        with pytest.raises(TypeError, match="unexpected sibling failure"):
+            await module.DeepAnalysisOrchestrator(analyzer=analyzer).analyze(
+                (_candidate("SLOW"), _candidate("RAISE"))
+            )
+        elapsed = time.monotonic() - started_at
+        await asyncio.sleep(0)
+        current = asyncio.current_task()
+        pending = tuple(
+            task for task in asyncio.all_tasks() if task is not current and not task.done()
+        )
+        return elapsed, pending
+
+    try:
+        elapsed, pending = asyncio.run(exercise())
+    finally:
+        analyzer.release_slow.set()
+
+    assert analyzer.slow_finished.wait(timeout=1.0)
+    assert elapsed < 0.25
+    assert pending == ()
+
+
+def test_cancellation_does_not_block_unrelated_event_loop_work() -> None:
+    module = _module()
+    analyzer = SlowAndRaisingAnalyzer()
+
+    async def exercise() -> float:
+        analysis = asyncio.create_task(
+            module.DeepAnalysisOrchestrator(analyzer=analyzer).analyze((_candidate("SLOW"),))
+        )
+        while not analyzer.slow_started.is_set():
+            await asyncio.sleep(0.001)
+
+        unrelated_work_finished = asyncio.Event()
+        asyncio.get_running_loop().call_later(0.02, unrelated_work_finished.set)
+        cancelled_at = time.monotonic()
+        analysis.cancel()
+
+        with pytest.raises(asyncio.CancelledError):
+            await analysis
+        await asyncio.wait_for(unrelated_work_finished.wait(), timeout=0.2)
+        return time.monotonic() - cancelled_at
+
+    try:
+        elapsed = asyncio.run(exercise())
+    finally:
+        analyzer.release_slow.set()
+
+    assert analyzer.slow_finished.wait(timeout=1.0)
+    assert elapsed < 0.25
 
 
 @pytest.mark.parametrize("error_type", EXPECTED_DOMAIN_ERRORS)

@@ -1,5 +1,11 @@
 # CandidateSet v1 Design
 
+**Implementation status (2026-10-29):** implemented in commit
+`afa8257fcdb6fd80c5a78752b8da90b2cb771b8b`. The post-implementation scope,
+external-candidate reconciliation and closure evidence are recorded in
+[`docs/governance/H2_RECONCILIATION_AND_REUSE.md`](../../governance/H2_RECONCILIATION_AND_REUSE.md).
+That record adopts no dependency and does not change this design.
+
 ## Intent
 
 Create the smallest typed boundary that turns an already ranked Diamond `FunnelRun`

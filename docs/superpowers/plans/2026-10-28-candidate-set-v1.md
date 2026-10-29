@@ -1,5 +1,11 @@
 # CandidateSet v1 Implementation Plan
 
+**Execution status (2026-10-29):** implemented in commit
+`afa8257fcdb6fd80c5a78752b8da90b2cb771b8b`. The checklist below is preserved as
+the original implementation plan, not used as a mutable execution ledger. Current
+verification and remaining conditions are recorded in
+[`docs/governance/H2_RECONCILIATION_AND_REUSE.md`](../../governance/H2_RECONCILIATION_AND_REUSE.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add a deterministic, typed and fail-closed CandidateSet v1 boundary over authoritative Diamond Top-N results.
