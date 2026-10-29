@@ -21,6 +21,8 @@ try:
 except ModuleNotFoundError:
     from diamond_helpers import make_record, obs, rich_record
 
+pytestmark = pytest.mark.fast
+
 
 def test_record_order_does_not_change_identity() -> None:
     first = rich_record("AAA")

@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from qhapaq_finance.diamond.engine import evaluate_universe
 from qhapaq_finance.diamond.serialization import (
     METRIC_KEYS,
@@ -12,6 +14,8 @@ try:
     from tests.diamond_helpers import rich_record
 except ModuleNotFoundError:
     from diamond_helpers import rich_record
+
+pytestmark = pytest.mark.fast
 
 
 def _results():

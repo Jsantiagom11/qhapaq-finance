@@ -7,6 +7,8 @@ import pytest
 from qhapaq_finance import valuation
 from qhapaq_finance.accounting import InvestedCapitalPair
 
+pytestmark = pytest.mark.fast
+
 
 def _contract():
     if not hasattr(valuation, "ValuationInput") or not hasattr(valuation, "run_valuation"):

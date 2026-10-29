@@ -35,7 +35,13 @@ packages = ["src/qhapaq_finance"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-markers = ["browser: requires an installed Playwright browser; excluded from normal unit tests"]
+markers = [
+    "fast: deterministic unit and contract tests with no external I/O",
+    "integration: deterministic cross-component tests using local immutable inputs",
+    "browser: requires an installed Playwright browser",
+    "socket: requires a local or remote network socket",
+    "live_data: requires mutable data from an external provider",
+]
 
 [tool.ruff]
 line-length = 100

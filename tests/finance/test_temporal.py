@@ -4,6 +4,8 @@ import pytest
 
 from qhapaq_finance.financial_temporal import FinancialTemporalError, TTMWindow
 
+pytestmark = pytest.mark.fast
+
 
 def test_ttm_window_derives_opening_balance_date_from_period_start() -> None:
     """A one-day opening offset prevents using a flow-start balance as opening capital."""

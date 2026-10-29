@@ -6,6 +6,8 @@ from types import ModuleType
 
 import pytest
 
+pytestmark = pytest.mark.fast
+
 
 def _goal_seek() -> ModuleType:
     try:

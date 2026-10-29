@@ -9,6 +9,8 @@ from qhapaq_finance.diamond.canonical_json import (
     sha256_canonical_json,
 )
 
+pytestmark = pytest.mark.fast
+
 
 def test_decimal_lexical_variants_share_one_value() -> None:
     assert normalize_decimal(10) == "10"

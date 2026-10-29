@@ -10,6 +10,8 @@ from qhapaq_finance.accounting import (
     InvestedCapitalPair,
 )
 
+pytestmark = pytest.mark.fast
+
 
 def test_invested_capital_pair_accepts_two_complete_endpoints() -> None:
     pair = InvestedCapitalPair(opening=100.0, closing=120.0)

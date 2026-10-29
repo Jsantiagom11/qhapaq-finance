@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -22,6 +23,46 @@ from qhapaq_finance.risk_free_evidence import (
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 AAPL_SEC_FIXTURE = REPOSITORY_ROOT / "tests/fixtures/sec_corpus/AAPL"
 FIXTURE_NOW = datetime(2026, 9, 15, 16, tzinfo=timezone.utc)
+FAST_INCOMPATIBLE_MARKERS = ("integration", "browser", "socket", "live_data")
+_fast_socket_guard_active = False
+_fast_socket_audit_hook_installed = False
+
+
+def _fast_socket_audit_hook(event: str, _args: tuple[object, ...]) -> None:
+    if _fast_socket_guard_active and event.startswith("socket."):
+        raise AssertionError(f"FAST tests must not create sockets ({event})")
+
+
+def pytest_configure(config: pytest.Config) -> None:
+    global _fast_socket_audit_hook_installed, _fast_socket_guard_active
+
+    if not _fast_socket_audit_hook_installed:
+        sys.addaudithook(_fast_socket_audit_hook)
+        _fast_socket_audit_hook_installed = True
+    _fast_socket_guard_active = config.option.markexpr.strip() == "fast"
+
+
+@pytest.hookimpl(trylast=True)
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    for item in items:
+        if item.get_closest_marker("fast") is None:
+            continue
+        incompatible = [
+            marker
+            for marker in FAST_INCOMPATIBLE_MARKERS
+            if item.get_closest_marker(marker) is not None
+        ]
+        if incompatible:
+            raise pytest.UsageError(
+                f"{item.nodeid}: FAST test cannot require environment marker(s): "
+                f"{', '.join(incompatible)}"
+            )
+
+
+def pytest_sessionfinish() -> None:
+    global _fast_socket_guard_active
+
+    _fast_socket_guard_active = False
 
 
 def _copy_aapl_sec_corpus(root: Path) -> None:

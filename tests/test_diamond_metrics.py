@@ -12,6 +12,8 @@ try:
 except ModuleNotFoundError:
     from diamond_helpers import rich_record
 
+pytestmark = pytest.mark.fast
+
 
 def _replace_observation(record, metric_id: str, slot: FiscalSlot, **changes):
     items = []

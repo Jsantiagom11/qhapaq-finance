@@ -11,6 +11,8 @@ import pytest
 from qhapaq_finance.analysis import AnalysisStatus
 from qhapaq_finance.diamond.archetypes import Archetype
 
+pytestmark = pytest.mark.fast
+
 
 def _contracts() -> ModuleType:
     try:

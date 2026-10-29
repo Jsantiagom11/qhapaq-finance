@@ -18,6 +18,8 @@ try:
 except ModuleNotFoundError:
     from diamond_helpers import rich_record
 
+pytestmark = pytest.mark.fast
+
 
 def test_winsorization_uses_explicit_linear_quantiles_for_eight_values() -> None:
     values = (0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 100.0)

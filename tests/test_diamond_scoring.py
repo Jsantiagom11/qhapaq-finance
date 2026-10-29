@@ -10,6 +10,8 @@ try:
 except ModuleNotFoundError:
     from diamond_helpers import rich_record
 
+pytestmark = pytest.mark.fast
+
 
 def _features():
     return derive_financial_features(rich_record("AAA"))
