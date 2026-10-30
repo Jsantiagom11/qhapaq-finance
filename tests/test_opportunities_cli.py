@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from dataclasses import replace
 from datetime import date, datetime, timezone
@@ -47,8 +48,7 @@ def _manifests() -> tuple[SecEvidenceManifest, ...]:
             schema_version="diamond-sec-evidence-v1",
             cik=f"{index + 1:010d}",
             request_identity=(
-                "https://data.sec.gov/api/xbrl/companyfacts/"
-                f"CIK{index + 1:010d}.json"
+                f"https://data.sec.gov/api/xbrl/companyfacts/CIK{index + 1:010d}.json"
             ),
             retrieved_at=datetime(2026, 9, 22, tzinfo=timezone.utc),
             data_as_of=AS_OF,
@@ -146,6 +146,7 @@ def test_first_run_seals_replays_and_writes_reports_without_analysis_or_network(
     assert roots == [source.resolve(), (output / "snapshot" / "cache").resolve()]
     assert (output / "snapshot" / "manifest.json").is_file()
     assert (output / "opportunities.json").is_file()
+    assert (output / "opportunities.json.sha256").is_file()
     assert (output / "opportunities.md").is_file()
     report = json.loads((output / "opportunities.json").read_text(encoding="utf-8"))
     assert report["summary"]["selected_count"] == 10
@@ -181,6 +182,36 @@ def test_existing_complete_snapshot_replays_without_source_cache(
     assert (output / "opportunities.md").read_bytes() == first_markdown
 
 
+@pytest.mark.parametrize("output_kind", ("same", "descendant", "ancestor"))
+def test_output_must_not_overlap_source_cache(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    output_kind: str,
+) -> None:
+    parent = tmp_path / "parent"
+    source = parent / "source"
+    _install_factory(monkeypatch, source)
+    output = {
+        "same": source,
+        "descendant": source / "report",
+        "ancestor": parent,
+    }[output_kind]
+
+    with pytest.raises(SystemExit):
+        run_opportunities(
+            [
+                "--as-of",
+                AS_OF.isoformat(),
+                "--cache-root",
+                str(source),
+                "--output",
+                str(output),
+            ]
+        )
+
+    assert not (output / "snapshot" / "manifest.json").exists()
+
+
 def test_focused_command_reads_artifact_only_and_main_dispatches(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -209,24 +240,123 @@ def test_focused_command_reads_artifact_only_and_main_dispatches(
 
     assert f"# {ticker}" in focused
     assert "Why selected" in focused
+    assert "Evidence provenance" in focused
+    assert "Evidence observations" in focused
+    assert "Epistemic status" in focused
+    assert "Verified facts" in focused
+    assert "Derived metrics" in focused
+    assert "Inference" in focused
+    assert "Assumptions" in focused
+    assert "Insufficient data" in focused
     assert "not an investment recommendation" in focused
 
 
-def test_focused_command_rejects_unknown_ticker(tmp_path: Path) -> None:
-    report = tmp_path / "report.json"
-    report.write_text(
+def test_focused_command_rejects_unknown_ticker(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    output = tmp_path / "output"
+    _install_factory(monkeypatch, source)
+    run_opportunities(
+        [
+            "--as-of",
+            AS_OF.isoformat(),
+            "--cache-root",
+            str(source),
+            "--output",
+            str(output),
+        ]
+    )
+
+    with pytest.raises(SystemExit):
+        run_opportunity(["MISSING", "--report", str(output / "opportunities.json")])
+
+
+def test_focused_command_rejects_tampered_report_bytes(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    output = tmp_path / "output"
+    _install_factory(monkeypatch, source)
+    run_opportunities(
+        [
+            "--as-of",
+            AS_OF.isoformat(),
+            "--cache-root",
+            str(source),
+            "--output",
+            str(output),
+        ]
+    )
+    report = output / "opportunities.json"
+    report.write_bytes(report.read_bytes() + b" ")
+
+    with pytest.raises(SystemExit):
+        run_opportunity(["T18", "--report", str(report)])
+
+
+def test_focused_command_rejects_rehashed_candidate_set_tampering(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    output = tmp_path / "output"
+    _install_factory(monkeypatch, source)
+    run_opportunities(
+        [
+            "--as-of",
+            AS_OF.isoformat(),
+            "--cache-root",
+            str(source),
+            "--output",
+            str(output),
+        ]
+    )
+    report = output / "opportunities.json"
+    payload = json.loads(report.read_text(encoding="utf-8"))
+    payload["candidate_set"]["candidate_set_id"] = "0" * 64
+    encoded = (
         json.dumps(
-            {
-                "schema_version": "diamond-opportunities-v0.1",
-                "cutoff": AS_OF.isoformat(),
-                "snapshot": {"snapshot_id": "snapshot:test"},
-                "opportunities": [],
-                "blocked_companies": [],
-                "disclaimer": "not an investment recommendation",
-            }
-        ),
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+            allow_nan=False,
+        )
+        + "\n"
+    ).encode()
+    report.write_bytes(encoded)
+    (output / "opportunities.json.sha256").write_text(
+        f"{hashlib.sha256(encoded).hexdigest()}  opportunities.json\n",
         encoding="utf-8",
     )
 
     with pytest.raises(SystemExit):
-        run_opportunity(["MISSING", "--report", str(report)])
+        run_opportunity(["T18", "--report", str(report)])
+
+
+def test_focused_command_rejects_tampered_snapshot_without_traceback(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source"
+    output = tmp_path / "output"
+    _install_factory(monkeypatch, source)
+    run_opportunities(
+        [
+            "--as-of",
+            AS_OF.isoformat(),
+            "--cache-root",
+            str(source),
+            "--output",
+            str(output),
+        ]
+    )
+    selected = output / "snapshot" / "cache" / "evidence.json"
+    selected.chmod(0o644)
+    selected.write_text('{"tampered":true}\n', encoding="utf-8")
+
+    with pytest.raises(SystemExit):
+        run_opportunity(["T18", "--report", str(output / "opportunities.json")])

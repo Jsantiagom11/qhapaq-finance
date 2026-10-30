@@ -16,6 +16,7 @@ from qhapaq_finance.candidate_set import (
 )
 
 from .canonical_json import canonical_json_bytes, sha256_canonical_json
+from .funnel import FunnelRun
 
 SNAPSHOT_SCHEMA_VERSION = "diamond-snapshot-v1"
 SNAPSHOT_CANONICALIZER_VERSION = "diamond-snapshot-canonicalizer-v1"
@@ -216,9 +217,7 @@ def _copy_verified(source: Path, target: Path) -> SnapshotFile:
 
 def _inventory(cache_root: Path) -> set[str]:
     return {
-        path.relative_to(cache_root).as_posix()
-        for path in cache_root.rglob("*")
-        if path.is_file()
+        path.relative_to(cache_root).as_posix() for path in cache_root.rglob("*") if path.is_file()
     }
 
 
@@ -258,8 +257,7 @@ def stage_snapshot(
     )
     normalized_universe = _require_text(universe_id, "SNAPSHOT_UNIVERSE_REQUIRED")
     normalized_ranked_ids = tuple(
-        _require_text(item, "SNAPSHOT_RANKED_ID_INVALID")
-        for item in ranked_security_ids
+        _require_text(item, "SNAPSHOT_RANKED_ID_INVALID") for item in ranked_security_ids
     )
 
     source = Path(source_root).resolve()
@@ -346,16 +344,28 @@ def _manifest_document(manifest: DiamondSnapshotManifest) -> dict[str, object]:
 def finalize_snapshot(
     staged: StagedDiamondSnapshot,
     *,
-    replay_dataset_identity: str,
-    replay_ranked_security_ids: tuple[str, ...],
+    replay: FunnelRun,
 ) -> DiamondSnapshotManifest:
     """Atomically transition a staged snapshot to COMPLETE after exact replay."""
 
     if (staged.root / MANIFEST_NAME).exists():
         raise DiamondSnapshotError("SNAPSHOT_ALREADY_COMPLETE")
+    if replay.metadata.provider_requests != 0 or replay.metadata.cache_misses != 0:
+        raise DiamondSnapshotError("SNAPSHOT_REPLAY_NOT_OFFLINE")
+    replay_results = replay.evaluated_results or replay.results
+    replay_ranked_ids: list[str] = []
+    for result in replay_results:
+        if result.data_as_of != staged.cutoff:
+            raise DiamondSnapshotError("SNAPSHOT_REPLAY_MISMATCH")
+        if result.archetypes.research_priority is None:
+            continue
+        if result.source_security is None:
+            raise DiamondSnapshotError("SNAPSHOT_REPLAY_MISMATCH")
+        replay_ranked_ids.append(result.source_security.security_id)
     if (
-        replay_dataset_identity != staged.dataset_identity
-        or tuple(replay_ranked_security_ids) != staged.ranked_security_ids
+        replay.metadata.dataset_identity != staged.dataset_identity
+        or replay.metadata.ranked_records != len(replay_ranked_ids)
+        or tuple(replay_ranked_ids) != staged.ranked_security_ids
     ):
         raise DiamondSnapshotError("SNAPSHOT_REPLAY_MISMATCH")
     _verify_inventory(staged.cache_root, staged.files)
@@ -426,9 +436,7 @@ def _decode_manifest(root: Path, payload: object) -> DiamondSnapshotManifest:
     if manifest.ranked_count < 0 or not manifest.files:
         raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
     relative_paths = [item.relative_path for item in manifest.files]
-    if relative_paths != sorted(relative_paths) or len(relative_paths) != len(
-        set(relative_paths)
-    ):
+    if relative_paths != sorted(relative_paths) or len(relative_paths) != len(set(relative_paths)):
         raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
     for item in manifest.files:
         path = Path(item.relative_path)
@@ -474,10 +482,7 @@ def load_complete_snapshot(
     if (
         (universe_id is not None and universe_id != manifest.universe_id)
         or (cutoff is not None and cutoff != manifest.cutoff)
-        or (
-            dataset_identity is not None
-            and dataset_identity != manifest.dataset_identity
-        )
+        or (dataset_identity is not None and dataset_identity != manifest.dataset_identity)
     ):
         raise DiamondSnapshotError("SNAPSHOT_CONTEXT_MISMATCH")
     _verify_inventory(manifest.cache_root, manifest.files)

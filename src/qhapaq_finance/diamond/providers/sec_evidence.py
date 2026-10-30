@@ -192,10 +192,7 @@ class SecEvidenceStore:
     def resolved_manifests(self) -> tuple[SecEvidenceManifest, ...]:
         """Return successfully resolved manifests in deterministic CIK order."""
 
-        return tuple(
-            self._resolved_manifests[cik]
-            for cik in sorted(self._resolved_manifests)
-        )
+        return tuple(self._resolved_manifests[cik] for cik in sorted(self._resolved_manifests))
 
     @staticmethod
     def request_identity(cik: str) -> str:

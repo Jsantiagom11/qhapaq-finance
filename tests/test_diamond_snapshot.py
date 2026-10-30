@@ -2,10 +2,15 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
+from types import SimpleNamespace
+from typing import cast
 
 import pytest
 
 from qhapaq_finance.candidate_set import SnapshotStatus
+from qhapaq_finance.diamond.contracts import SecurityRef
+from qhapaq_finance.diamond.engine import DiamondResult
+from qhapaq_finance.diamond.funnel import FunnelRun, FunnelRunMetadata
 from qhapaq_finance.diamond.snapshot import (
     DiamondSnapshotError,
     finalize_snapshot,
@@ -16,6 +21,44 @@ from qhapaq_finance.diamond.snapshot import (
 AS_OF = date(2026, 9, 22)
 DATASET_IDENTITY = "a" * 64
 RANKED_IDS = ("sec-cik:1:A", "sec-cik:2:B")
+
+
+def _replay(
+    *,
+    dataset_identity: str = DATASET_IDENTITY,
+    ranked_ids: tuple[str, ...] = RANKED_IDS,
+    provider_requests: int = 0,
+    cache_misses: int = 0,
+) -> FunnelRun:
+    results = tuple(
+        SimpleNamespace(
+            archetypes=SimpleNamespace(research_priority=1.0),
+            source_security=SecurityRef(
+                ticker=security_id.rsplit(":", 1)[-1],
+                security_id=security_id,
+                issuer_id=security_id.rsplit(":", 1)[0],
+            ),
+            data_as_of=AS_OF,
+        )
+        for security_id in ranked_ids
+    )
+    typed_results = cast(tuple[DiamondResult, ...], results)
+    return FunnelRun(
+        results=typed_results,
+        metadata=FunnelRunMetadata(
+            universe_count=len(results),
+            canonical_records=len(results),
+            ranked_records=len(results),
+            unranked_records=0,
+            provider_requests=provider_requests,
+            cache_hits=len(results),
+            cache_misses=cache_misses,
+            acquisition_seconds=0.0,
+            evaluation_seconds=0.0,
+            dataset_identity=dataset_identity,
+        ),
+        evaluated_results=typed_results,
+    )
 
 
 def _source(root: Path) -> tuple[Path, ...]:
@@ -64,23 +107,20 @@ def test_finalization_is_last_and_requires_exact_replay(tmp_path: Path) -> None:
     with pytest.raises(DiamondSnapshotError, match="SNAPSHOT_REPLAY_MISMATCH"):
         finalize_snapshot(
             staged,
-            replay_dataset_identity="b" * 64,
-            replay_ranked_security_ids=RANKED_IDS,
+            replay=_replay(dataset_identity="b" * 64),
         )
     assert not (staged.root / "manifest.json").exists()
 
     with pytest.raises(DiamondSnapshotError, match="SNAPSHOT_REPLAY_MISMATCH"):
         finalize_snapshot(
             staged,
-            replay_dataset_identity=DATASET_IDENTITY,
-            replay_ranked_security_ids=tuple(reversed(RANKED_IDS)),
+            replay=_replay(ranked_ids=tuple(reversed(RANKED_IDS))),
         )
     assert not (staged.root / "manifest.json").exists()
 
     manifest = finalize_snapshot(
         staged,
-        replay_dataset_identity=DATASET_IDENTITY,
-        replay_ranked_security_ids=RANKED_IDS,
+        replay=_replay(),
     )
 
     assert manifest.status is SnapshotStatus.COMPLETE
@@ -96,12 +136,34 @@ def test_snapshot_identity_excludes_absolute_paths(tmp_path: Path) -> None:
     assert first.files == second.files
 
 
+@pytest.mark.parametrize(
+    ("provider_requests", "cache_misses"),
+    ((1, 0), (0, 1)),
+)
+def test_finalization_rejects_non_offline_replay_metadata(
+    tmp_path: Path,
+    provider_requests: int,
+    cache_misses: int,
+) -> None:
+    staged = _stage(tmp_path / "source", tmp_path / "snapshot")
+
+    with pytest.raises(DiamondSnapshotError, match="SNAPSHOT_REPLAY_NOT_OFFLINE"):
+        finalize_snapshot(
+            staged,
+            replay=_replay(
+                provider_requests=provider_requests,
+                cache_misses=cache_misses,
+            ),
+        )
+
+    assert not (staged.root / "manifest.json").exists()
+
+
 def test_load_verifies_context_and_every_selected_byte(tmp_path: Path) -> None:
     staged = _stage(tmp_path / "source", tmp_path / "snapshot")
     finalized = finalize_snapshot(
         staged,
-        replay_dataset_identity=DATASET_IDENTITY,
-        replay_ranked_security_ids=RANKED_IDS,
+        replay=_replay(),
     )
 
     loaded = load_complete_snapshot(
@@ -128,8 +190,7 @@ def test_extra_file_and_manifest_mutation_fail_closed(tmp_path: Path) -> None:
     staged = _stage(tmp_path / "source", tmp_path / "snapshot")
     finalize_snapshot(
         staged,
-        replay_dataset_identity=DATASET_IDENTITY,
-        replay_ranked_security_ids=RANKED_IDS,
+        replay=_replay(),
     )
 
     extra = staged.cache_root / "unexpected.json"
@@ -156,8 +217,7 @@ def test_complete_snapshot_is_reusable_but_cannot_be_resealed(tmp_path: Path) ->
     staged = _stage(source, tmp_path / "snapshot")
     manifest = finalize_snapshot(
         staged,
-        replay_dataset_identity=DATASET_IDENTITY,
-        replay_ranked_security_ids=RANKED_IDS,
+        replay=_replay(),
     )
 
     assert load_complete_snapshot(staged.root) == manifest

@@ -183,8 +183,7 @@ def _rankable_results(funnel: FunnelRun) -> tuple[DiamondResult, ...]:
     return tuple(
         item
         for item in complete
-        if item.archetypes.research_priority is not None
-        and item.archetypes.surfaced_by is not None
+        if item.archetypes.research_priority is not None and item.archetypes.surfaced_by is not None
     )
 
 
@@ -231,9 +230,7 @@ def _exclusions(funnel: FunnelRun) -> tuple[dict[str, int], list[dict[str, objec
                     else None
                 ),
                 "issuer_id": (
-                    result.source_security.issuer_id
-                    if result.source_security is not None
-                    else None
+                    result.source_security.issuer_id if result.source_security is not None else None
                 ),
                 "status": "BLOCKED_BY_DIAMOND",
                 "reasons": list(reasons),
@@ -305,10 +302,7 @@ def _factor_rows(
         }
         for name, percentile in weakest
     ]
-    weaknesses.extend(
-        {"kind": "DIAGNOSTIC", "code": code}
-        for code in result.diagnostics
-    )
+    weaknesses.extend({"kind": "DIAGNOSTIC", "code": code} for code in result.diagnostics)
     return determinants, weaknesses
 
 
@@ -325,9 +319,7 @@ def _evidence_row(observation: FundamentalObservation) -> dict[str, object]:
         "unit_kind": observation.unit_kind.value,
         "period_kind": observation.period_kind.value,
         "period_start": (
-            observation.period_start.isoformat()
-            if observation.period_start is not None
-            else None
+            observation.period_start.isoformat() if observation.period_start is not None else None
         ),
         "period_end": observation.period_end.isoformat(),
         "publication_date": None,
@@ -409,13 +401,9 @@ def _opportunity(
     determinants, weaknesses = _factor_rows(result, feature_values)
     determinant_names = tuple(str(item["feature"]) for item in determinants)
     evidence = _determinant_evidence(record, determinant_names)
-    missing_features = sorted(
-        name for name, value in feature_values.items() if value is None
-    )
+    missing_features = sorted(name for name, value in feature_values.items() if value is None)
     missing_coverage = sorted(
-        f"{name}:{status}"
-        for name, status in result.coverage.items()
-        if status != "READY"
+        f"{name}:{status}" for name, status in result.coverage.items() if status != "READY"
     )
     why = (
         f"Diamond rank {rank}; {result.archetypes.surfaced_by.value} produced the "
@@ -509,10 +497,9 @@ def build_opportunity_report(
     if not rankable:
         raise OpportunityReportError("NO_RANKABLE_CANDIDATES")
     ranked_ids = _ranked_security_ids(rankable)
-    if (
-        snapshot.ranked_count != len(ranked_ids)
-        or snapshot.ranked_order_sha256 != sha256_canonical_json(list(ranked_ids))
-    ):
+    if snapshot.ranked_count != len(
+        ranked_ids
+    ) or snapshot.ranked_order_sha256 != sha256_canonical_json(list(ranked_ids)):
         raise OpportunityReportError("SNAPSHOT_RANKED_ORDER_MISMATCH")
 
     records_by_ticker = {record.ticker: record for record in funnel.records}
@@ -522,12 +509,9 @@ def build_opportunity_report(
     if len(manifests_by_cik) != len(sec_manifests):
         raise OpportunityReportError("SEC_MANIFEST_IDENTITY_CONFLICT")
     for manifest in sec_manifests:
-        if (
-            manifest.data_as_of != snapshot.cutoff
-            or (
-                manifest.latest_in_scope_filing_date is not None
-                and manifest.latest_in_scope_filing_date > snapshot.cutoff
-            )
+        if manifest.data_as_of != snapshot.cutoff or (
+            manifest.latest_in_scope_filing_date is not None
+            and manifest.latest_in_scope_filing_date > snapshot.cutoff
         ):
             raise OpportunityReportError("SEC_MANIFEST_CONTEXT_MISMATCH")
 
@@ -564,6 +548,7 @@ def build_opportunity_report(
         "schema_version": OPPORTUNITY_REPORT_SCHEMA_VERSION,
         "report_kind": "HISTORICAL_DIAMOND_RESEARCH_ROUTING",
         "historical": True,
+        "integrity_status": "PARTIAL_POINT_IN_TIME",
         "universe_id": snapshot.universe_id,
         "cutoff": snapshot.cutoff.isoformat(),
         "dataset_identity": funnel.metadata.dataset_identity,
@@ -577,9 +562,7 @@ def build_opportunity_report(
             "universe_count": funnel.metadata.universe_count,
             "canonical_count": funnel.metadata.canonical_records,
             "eligible_count": funnel.metadata.ranked_records,
-            "excluded_count": (
-                funnel.metadata.universe_count - funnel.metadata.ranked_records
-            ),
+            "excluded_count": (funnel.metadata.universe_count - funnel.metadata.ranked_records),
             "requested_count": top,
             "selected_count": selected_count,
             "selection_shortfall": max(top - selected_count, 0),
@@ -596,6 +579,9 @@ def build_opportunity_report(
         "blocked_companies": blocked,
         "global_limitations": [
             "The cutoff is historical and must not be described as today's screen.",
+            "The Wikipedia universe cache declares the cutoff but is not "
+            "membership-effective-dated; historical index membership cannot be "
+            "independently certified.",
             "Company Facts provenance is issuer-level structured evidence; exact per-value "
             "filing round trips are not available in this snapshot.",
             "A Diamond rank is a research priority, not a recommendation or valuation.",
@@ -652,8 +638,7 @@ def opportunity_report_markdown(report: OpportunityReport) -> str:
         "|---|---:|",
     ]
     lines.extend(
-        f"| `{reason}` | {count} |"
-        for reason, count in exclusions["reason_counts"].items()
+        f"| `{reason}` | {count} |" for reason, count in exclusions["reason_counts"].items()
     )
     for candidate in payload["opportunities"]:
         lines.extend(
@@ -718,9 +703,7 @@ def focus_opportunity(
     ticker: str,
 ) -> dict[str, Any]:
     payload = (
-        report.to_dict()
-        if isinstance(report, OpportunityReport)
-        else copy.deepcopy(dict(report))
+        report.to_dict() if isinstance(report, OpportunityReport) else copy.deepcopy(dict(report))
     )
     normalized = ticker.strip().upper()
     for key in ("opportunities", "blocked_companies"):
@@ -731,9 +714,7 @@ def focus_opportunity(
             if isinstance(item, dict) and item.get("ticker") == normalized:
                 focused = copy.deepcopy(item)
                 focused["report_cutoff"] = payload.get("cutoff")
-                focused["snapshot_id"] = cast(dict[str, object], payload["snapshot"])[
-                    "snapshot_id"
-                ]
+                focused["snapshot_id"] = cast(dict[str, object], payload["snapshot"])["snapshot_id"]
                 focused["disclaimer"] = payload.get("disclaimer")
                 return cast(dict[str, Any], focused)
     raise OpportunityReportError("OPPORTUNITY_NOT_FOUND")

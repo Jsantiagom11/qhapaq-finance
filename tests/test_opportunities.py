@@ -32,8 +32,7 @@ class _Provider:
     def __init__(self, records: tuple[FundamentalRecord, ...]) -> None:
         self.records = records
         self.securities = tuple(
-            SecurityRef(record.ticker, record.security_id, record.issuer_id)
-            for record in records
+            SecurityRef(record.ticker, record.security_id, record.issuer_id) for record in records
         )
 
     def universe(self, universe_id: str, as_of: date) -> tuple[SecurityRef, ...]:
@@ -66,9 +65,7 @@ def _records() -> tuple[FundamentalRecord, ...]:
             dilution=-0.005 + index * 0.0004,
             recent_share_change=-0.01 + index * 0.001,
             methodology=(
-                Methodology.UNSUPPORTED_FINANCIAL
-                if index == 0
-                else Methodology.OPERATING_COMPANY
+                Methodology.UNSUPPORTED_FINANCIAL if index == 0 else Methodology.OPERATING_COMPANY
             ),
         )
         cik = f"{index + 1:010d}"
@@ -86,9 +83,7 @@ def _manifest(cik: str) -> SecEvidenceManifest:
     return SecEvidenceManifest(
         schema_version="diamond-sec-evidence-v1",
         cik=cik,
-        request_identity=(
-            f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
-        ),
+        request_identity=(f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"),
         retrieved_at=datetime(2026, 9, 22, tzinfo=timezone.utc),
         data_as_of=AS_OF,
         payload_sha256="b" * 64,
@@ -117,8 +112,7 @@ def report_context(tmp_path: Path):
     ranked_ids = tuple(
         result.source_security.security_id
         for result in funnel.results
-        if result.archetypes.research_priority is not None
-        and result.source_security is not None
+        if result.archetypes.research_priority is not None and result.source_security is not None
     )
     staged = stage_snapshot(
         source_root=source,
@@ -131,13 +125,9 @@ def report_context(tmp_path: Path):
     )
     snapshot = finalize_snapshot(
         staged,
-        replay_dataset_identity=funnel.metadata.dataset_identity,
-        replay_ranked_security_ids=ranked_ids,
+        replay=funnel,
     )
-    manifests = tuple(
-        _manifest(record.issuer_id.removeprefix("sec-cik:"))
-        for record in records
-    )
+    manifests = tuple(_manifest(record.issuer_id.removeprefix("sec-cik:")) for record in records)
     return funnel, snapshot, manifests
 
 
@@ -170,8 +160,7 @@ def test_report_preserves_exact_diamond_candidate_order_and_identity(
     expected = [item.ticker for item in funnel.results[:10]]
     assert [item["ticker"] for item in payload["opportunities"]] == expected
     assert [
-        item["security"]["ticker"]
-        for item in payload["candidate_set"]["candidates"]
+        item["security"]["ticker"] for item in payload["candidate_set"]["candidates"]
     ] == expected
     assert payload["candidate_set"]["snapshot"]["snapshot_id"] == snapshot.snapshot_id
     assert payload["candidate_set"]["candidate_set_id"]
@@ -245,6 +234,10 @@ def test_serialization_and_focused_projection_are_deterministic(report_context) 
     assert first_json == second_json
     assert first_markdown == second_markdown
     assert "not an investment recommendation" in first_markdown
+    assert report.to_dict()["integrity_status"] == "PARTIAL_POINT_IN_TIME"
+    assert any(
+        "membership-effective-dated" in item for item in report.to_dict()["global_limitations"]
+    )
     ticker = report.to_dict()["opportunities"][0]["ticker"]
     focused = focus_opportunity(report, ticker)
     assert focused["ticker"] == ticker
