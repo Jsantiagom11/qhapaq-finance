@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
@@ -8,6 +9,7 @@ from typing import cast
 import pytest
 
 from qhapaq_finance.candidate_set import SnapshotStatus
+from qhapaq_finance.diamond.canonical_json import canonical_json_bytes, sha256_canonical_json
 from qhapaq_finance.diamond.contracts import SecurityRef
 from qhapaq_finance.diamond.engine import DiamondResult
 from qhapaq_finance.diamond.funnel import FunnelRun, FunnelRunMetadata
@@ -27,6 +29,7 @@ def _replay(
     *,
     dataset_identity: str = DATASET_IDENTITY,
     ranked_ids: tuple[str, ...] = RANKED_IDS,
+    universe_count: int | None = None,
     provider_requests: int = 0,
     cache_misses: int = 0,
 ) -> FunnelRun:
@@ -46,7 +49,7 @@ def _replay(
     return FunnelRun(
         results=typed_results,
         metadata=FunnelRunMetadata(
-            universe_count=len(results),
+            universe_count=len(results) if universe_count is None else universe_count,
             canonical_records=len(results),
             ranked_records=len(results),
             unranked_records=0,
@@ -80,8 +83,7 @@ def _stage(source: Path, snapshot: Path):
         selected_paths=_source(source),
         universe_id="sp500",
         cutoff=AS_OF,
-        dataset_identity=DATASET_IDENTITY,
-        ranked_security_ids=RANKED_IDS,
+        source_run=_replay(),
     )
 
 
@@ -134,6 +136,67 @@ def test_snapshot_identity_excludes_absolute_paths(tmp_path: Path) -> None:
 
     assert first.snapshot_id == second.snapshot_id
     assert first.files == second.files
+
+
+def test_manifest_binds_semantic_diamond_coverage(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    staged = stage_snapshot(
+        source_root=source,
+        snapshot_root=tmp_path / "snapshot",
+        selected_paths=_source(source),
+        universe_id="sp500",
+        cutoff=AS_OF,
+        source_run=_replay(universe_count=3),
+    )
+
+    manifest = finalize_snapshot(staged, replay=_replay(universe_count=3))
+    document = json.loads((staged.root / "manifest.json").read_text(encoding="utf-8"))
+
+    assert document["coverage"] == {
+        "canonical_records": 2,
+        "rankable_records": 2,
+        "universe_securities": 3,
+        "unrankable_records": 0,
+    }
+    assert manifest.coverage.universe_securities == 3
+    assert load_complete_snapshot(staged.root) == manifest
+
+
+def test_loader_retains_canonicalizer_v1_snapshot_compatibility(tmp_path: Path) -> None:
+    staged = _stage(tmp_path / "source", tmp_path / "snapshot")
+    finalize_snapshot(staged, replay=_replay())
+    manifest_path = staged.root / "manifest.json"
+    manifest_path.chmod(0o644)
+    document = json.loads(manifest_path.read_text(encoding="utf-8"))
+    document.pop("coverage")
+    document["canonicalizer_version"] = "diamond-snapshot-canonicalizer-v1"
+    identity = {
+        key: value for key, value in document.items() if key not in {"snapshot_id", "status"}
+    }
+    document["snapshot_id"] = f"diamond-snapshot:{sha256_canonical_json(identity)}"
+    manifest_path.write_bytes(canonical_json_bytes(document) + b"\n")
+
+    loaded = load_complete_snapshot(staged.root)
+
+    assert loaded.canonicalizer_version == "diamond-snapshot-canonicalizer-v1"
+    assert loaded.coverage is None
+
+
+def test_finalization_rejects_semantic_coverage_drift(tmp_path: Path) -> None:
+    source = tmp_path / "source"
+    staged = stage_snapshot(
+        source_root=source,
+        snapshot_root=tmp_path / "snapshot",
+        selected_paths=_source(source),
+        universe_id="sp500",
+        cutoff=AS_OF,
+        source_run=_replay(universe_count=3),
+    )
+
+    with pytest.raises(DiamondSnapshotError, match="SNAPSHOT_REPLAY_MISMATCH"):
+        finalize_snapshot(staged, replay=_replay(universe_count=4))
+
+    assert not (staged.root / "manifest.json").exists()
 
 
 @pytest.mark.parametrize(
@@ -229,8 +292,7 @@ def test_complete_snapshot_is_reusable_but_cannot_be_resealed(tmp_path: Path) ->
             selected_paths=_source(source),
             universe_id="sp500",
             cutoff=AS_OF,
-            dataset_identity=DATASET_IDENTITY,
-            ranked_security_ids=RANKED_IDS,
+            source_run=_replay(),
         )
 
 
@@ -247,6 +309,5 @@ def test_selected_path_must_be_a_file_inside_source_root(tmp_path: Path) -> None
             selected_paths=(outside,),
             universe_id="sp500",
             cutoff=AS_OF,
-            dataset_identity=DATASET_IDENTITY,
-            ranked_security_ids=RANKED_IDS,
+            source_run=_replay(),
         )

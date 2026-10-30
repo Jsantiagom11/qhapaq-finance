@@ -490,6 +490,13 @@ def build_opportunity_report(
         raise OpportunityReportError("SNAPSHOT_NOT_COMPLETE")
     if snapshot.dataset_identity != funnel.metadata.dataset_identity:
         raise OpportunityReportError("SNAPSHOT_DATASET_MISMATCH")
+    if snapshot.coverage is not None and (
+        snapshot.coverage.universe_securities != funnel.metadata.universe_count
+        or snapshot.coverage.canonical_records != funnel.metadata.canonical_records
+        or snapshot.coverage.rankable_records != funnel.metadata.ranked_records
+        or snapshot.coverage.unrankable_records != funnel.metadata.unranked_records
+    ):
+        raise OpportunityReportError("SNAPSHOT_COVERAGE_MISMATCH")
     if not funnel.records:
         raise OpportunityReportError("SOURCE_RECORDS_REQUIRED")
 
@@ -557,6 +564,7 @@ def build_opportunity_report(
             "status": snapshot.status.value,
             "file_count": len(snapshot.files),
             "ranked_order_sha256": snapshot.ranked_order_sha256,
+            **({"coverage": asdict(snapshot.coverage)} if snapshot.coverage is not None else {}),
         },
         "summary": {
             "universe_count": funnel.metadata.universe_count,

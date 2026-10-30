@@ -109,19 +109,13 @@ def report_context(tmp_path: Path):
     evidence = source / "universe" / "evidence.json"
     evidence.parent.mkdir(parents=True)
     evidence.write_text("{}\n", encoding="utf-8")
-    ranked_ids = tuple(
-        result.source_security.security_id
-        for result in funnel.results
-        if result.archetypes.research_priority is not None and result.source_security is not None
-    )
     staged = stage_snapshot(
         source_root=source,
         snapshot_root=tmp_path / "snapshot",
         selected_paths=(evidence,),
         universe_id="sp500",
         cutoff=AS_OF,
-        dataset_identity=funnel.metadata.dataset_identity,
-        ranked_security_ids=ranked_ids,
+        source_run=funnel,
     )
     snapshot = finalize_snapshot(
         staged,
@@ -164,6 +158,12 @@ def test_report_preserves_exact_diamond_candidate_order_and_identity(
     ] == expected
     assert payload["candidate_set"]["snapshot"]["snapshot_id"] == snapshot.snapshot_id
     assert payload["candidate_set"]["candidate_set_id"]
+    assert payload["snapshot"]["coverage"] == {
+        "canonical_records": 20,
+        "rankable_records": 19,
+        "universe_securities": 20,
+        "unrankable_records": 1,
+    }
 
 
 def test_report_never_pads_and_explains_nonexclusive_exclusions(

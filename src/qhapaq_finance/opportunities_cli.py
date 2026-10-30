@@ -173,15 +173,13 @@ def _load_or_seal(
         universe_id=universe_id,
         cutoff=cutoff,
     )
-    source_ranked_ids = _ranked_security_ids(source_run)
     staged = stage_snapshot(
         source_root=source_cache_root,
         snapshot_root=snapshot_root,
         selected_paths=source_provider.read_paths,
         universe_id=universe_id,
         cutoff=cutoff,
-        dataset_identity=source_run.metadata.dataset_identity,
-        ranked_security_ids=source_ranked_ids,
+        source_run=source_run,
     )
     replay_provider, replay = _run_offline(
         staged.cache_root,

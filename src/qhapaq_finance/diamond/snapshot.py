@@ -19,7 +19,8 @@ from .canonical_json import canonical_json_bytes, sha256_canonical_json
 from .funnel import FunnelRun
 
 SNAPSHOT_SCHEMA_VERSION = "diamond-snapshot-v1"
-SNAPSHOT_CANONICALIZER_VERSION = "diamond-snapshot-canonicalizer-v1"
+LEGACY_SNAPSHOT_CANONICALIZER_VERSION = "diamond-snapshot-canonicalizer-v1"
+SNAPSHOT_CANONICALIZER_VERSION = "diamond-snapshot-canonicalizer-v2"
 MANIFEST_NAME = "manifest.json"
 
 
@@ -35,6 +36,14 @@ class SnapshotFile:
 
 
 @dataclass(frozen=True, slots=True)
+class DiamondSnapshotCoverage:
+    universe_securities: int
+    canonical_records: int
+    rankable_records: int
+    unrankable_records: int
+
+
+@dataclass(frozen=True, slots=True)
 class StagedDiamondSnapshot:
     root: Path
     cache_root: Path
@@ -42,6 +51,8 @@ class StagedDiamondSnapshot:
     dataset_identity: str
     universe_id: str
     cutoff: date
+    canonicalizer_version: str
+    coverage: DiamondSnapshotCoverage
     files: tuple[SnapshotFile, ...]
     ranked_security_ids: tuple[str, ...]
     ranked_order_sha256: str
@@ -55,6 +66,8 @@ class DiamondSnapshotManifest:
     universe_id: str
     cutoff: date
     status: SnapshotStatus
+    canonicalizer_version: str
+    coverage: DiamondSnapshotCoverage | None
     files: tuple[SnapshotFile, ...]
     ranked_count: int
     ranked_order_sha256: str
@@ -115,47 +128,112 @@ def _files_payload(files: tuple[SnapshotFile, ...]) -> list[dict[str, object]]:
     ]
 
 
+def _coverage_payload(coverage: DiamondSnapshotCoverage) -> dict[str, int]:
+    return {
+        "universe_securities": coverage.universe_securities,
+        "canonical_records": coverage.canonical_records,
+        "rankable_records": coverage.rankable_records,
+        "unrankable_records": coverage.unrankable_records,
+    }
+
+
 def _identity_payload(
     *,
+    canonicalizer_version: str,
     dataset_identity: str,
     universe_id: str,
     cutoff: date,
+    coverage: DiamondSnapshotCoverage | None,
     files: tuple[SnapshotFile, ...],
     ranked_count: int,
     ranked_order_sha256: str,
 ) -> dict[str, object]:
     return {
         "schema_version": SNAPSHOT_SCHEMA_VERSION,
-        "canonicalizer_version": SNAPSHOT_CANONICALIZER_VERSION,
+        "canonicalizer_version": canonicalizer_version,
         "dataset_identity": dataset_identity,
         "universe_id": universe_id,
         "cutoff": cutoff.isoformat(),
         "files": _files_payload(files),
         "ranked_count": ranked_count,
         "ranked_order_sha256": ranked_order_sha256,
+        **({"coverage": _coverage_payload(coverage)} if coverage is not None else {}),
     }
 
 
 def _snapshot_id(
     *,
+    canonicalizer_version: str,
     dataset_identity: str,
     universe_id: str,
     cutoff: date,
+    coverage: DiamondSnapshotCoverage | None,
     files: tuple[SnapshotFile, ...],
     ranked_count: int,
     ranked_order_sha256: str,
 ) -> str:
     digest = sha256_canonical_json(
         _identity_payload(
+            canonicalizer_version=canonicalizer_version,
             dataset_identity=dataset_identity,
             universe_id=universe_id,
             cutoff=cutoff,
+            coverage=coverage,
             files=files,
             ranked_count=ranked_count,
             ranked_order_sha256=ranked_order_sha256,
         )
     )
     return f"diamond-snapshot:{digest}"
+
+
+def _run_state(
+    run: FunnelRun,
+    *,
+    cutoff: date,
+    offline_error: str,
+) -> tuple[str, tuple[str, ...], DiamondSnapshotCoverage]:
+    if run.metadata.provider_requests != 0 or run.metadata.cache_misses != 0:
+        raise DiamondSnapshotError(offline_error)
+    results = run.evaluated_results or run.results
+    ranked_ids: list[str] = []
+    for result in results:
+        if result.data_as_of != cutoff:
+            raise DiamondSnapshotError("SNAPSHOT_RUN_CONTEXT_MISMATCH")
+        if result.archetypes.research_priority is None:
+            continue
+        if result.source_security is None:
+            raise DiamondSnapshotError("SNAPSHOT_RUN_CONTEXT_MISMATCH")
+        ranked_ids.append(
+            _require_text(result.source_security.security_id, "SNAPSHOT_RANKED_ID_INVALID")
+        )
+    metadata = run.metadata
+    counts = (
+        metadata.universe_count,
+        metadata.canonical_records,
+        metadata.ranked_records,
+        metadata.unranked_records,
+    )
+    if any(
+        isinstance(value, bool) or not isinstance(value, int) or value < 0 for value in counts
+    ) or (
+        metadata.universe_count < metadata.canonical_records
+        or metadata.canonical_records != len(results)
+        or metadata.ranked_records != len(ranked_ids)
+        or metadata.unranked_records != len(results) - len(ranked_ids)
+    ):
+        raise DiamondSnapshotError("SNAPSHOT_RUN_COVERAGE_INVALID")
+    coverage = DiamondSnapshotCoverage(
+        universe_securities=metadata.universe_count,
+        canonical_records=metadata.canonical_records,
+        rankable_records=metadata.ranked_records,
+        unrankable_records=metadata.unranked_records,
+    )
+    return (
+        _require_sha256(metadata.dataset_identity, "SNAPSHOT_DATASET_IDENTITY_INVALID"),
+        tuple(ranked_ids),
+        coverage,
+    )
 
 
 def _atomic_write(target: Path, content: bytes) -> None:
@@ -244,21 +322,18 @@ def stage_snapshot(
     selected_paths: tuple[Path, ...],
     universe_id: str,
     cutoff: date,
-    dataset_identity: str,
-    ranked_security_ids: tuple[str, ...],
+    source_run: FunnelRun,
 ) -> StagedDiamondSnapshot:
     """Copy the exact selected cache inventory without declaring completeness."""
 
     if not isinstance(cutoff, date):
         raise DiamondSnapshotError("SNAPSHOT_CUTOFF_INVALID")
-    normalized_dataset = _require_sha256(
-        dataset_identity,
-        "SNAPSHOT_DATASET_IDENTITY_INVALID",
+    normalized_dataset, normalized_ranked_ids, coverage = _run_state(
+        source_run,
+        cutoff=cutoff,
+        offline_error="SNAPSHOT_SOURCE_NOT_OFFLINE",
     )
     normalized_universe = _require_text(universe_id, "SNAPSHOT_UNIVERSE_REQUIRED")
-    normalized_ranked_ids = tuple(
-        _require_text(item, "SNAPSHOT_RANKED_ID_INVALID") for item in ranked_security_ids
-    )
 
     source = Path(source_root).resolve()
     root = Path(snapshot_root).resolve()
@@ -306,9 +381,11 @@ def stage_snapshot(
         raise DiamondSnapshotError("SNAPSHOT_STAGING_DIRTY")
     ranked_order_sha256 = sha256_canonical_json(list(normalized_ranked_ids))
     snapshot_id = _snapshot_id(
+        canonicalizer_version=SNAPSHOT_CANONICALIZER_VERSION,
         dataset_identity=normalized_dataset,
         universe_id=normalized_universe,
         cutoff=cutoff,
+        coverage=coverage,
         files=files,
         ranked_count=len(normalized_ranked_ids),
         ranked_order_sha256=ranked_order_sha256,
@@ -320,6 +397,8 @@ def stage_snapshot(
         dataset_identity=normalized_dataset,
         universe_id=normalized_universe,
         cutoff=cutoff,
+        canonicalizer_version=SNAPSHOT_CANONICALIZER_VERSION,
+        coverage=coverage,
         files=files,
         ranked_security_ids=normalized_ranked_ids,
         ranked_order_sha256=ranked_order_sha256,
@@ -329,9 +408,11 @@ def stage_snapshot(
 def _manifest_document(manifest: DiamondSnapshotManifest) -> dict[str, object]:
     return {
         **_identity_payload(
+            canonicalizer_version=manifest.canonicalizer_version,
             dataset_identity=manifest.dataset_identity,
             universe_id=manifest.universe_id,
             cutoff=manifest.cutoff,
+            coverage=manifest.coverage,
             files=manifest.files,
             ranked_count=manifest.ranked_count,
             ranked_order_sha256=manifest.ranked_order_sha256,
@@ -339,6 +420,35 @@ def _manifest_document(manifest: DiamondSnapshotManifest) -> dict[str, object]:
         "snapshot_id": manifest.snapshot_id,
         "status": manifest.status.value,
     }
+
+
+def _decode_coverage(payload: object) -> DiamondSnapshotCoverage:
+    if not isinstance(payload, dict):
+        raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
+    names = (
+        "universe_securities",
+        "canonical_records",
+        "rankable_records",
+        "unrankable_records",
+    )
+    if set(payload) != set(names) or any(isinstance(payload[name], bool) for name in names):
+        raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
+    try:
+        coverage = DiamondSnapshotCoverage(
+            universe_securities=int(payload["universe_securities"]),
+            canonical_records=int(payload["canonical_records"]),
+            rankable_records=int(payload["rankable_records"]),
+            unrankable_records=int(payload["unrankable_records"]),
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise DiamondSnapshotError("SNAPSHOT_TAMPERED") from exc
+    counts = tuple(_coverage_payload(coverage).values())
+    if any(value < 0 for value in counts) or (
+        coverage.universe_securities < coverage.canonical_records
+        or coverage.canonical_records != coverage.rankable_records + coverage.unrankable_records
+    ):
+        raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
+    return coverage
 
 
 def finalize_snapshot(
@@ -350,21 +460,14 @@ def finalize_snapshot(
 
     if (staged.root / MANIFEST_NAME).exists():
         raise DiamondSnapshotError("SNAPSHOT_ALREADY_COMPLETE")
-    if replay.metadata.provider_requests != 0 or replay.metadata.cache_misses != 0:
-        raise DiamondSnapshotError("SNAPSHOT_REPLAY_NOT_OFFLINE")
-    replay_results = replay.evaluated_results or replay.results
-    replay_ranked_ids: list[str] = []
-    for result in replay_results:
-        if result.data_as_of != staged.cutoff:
-            raise DiamondSnapshotError("SNAPSHOT_REPLAY_MISMATCH")
-        if result.archetypes.research_priority is None:
-            continue
-        if result.source_security is None:
-            raise DiamondSnapshotError("SNAPSHOT_REPLAY_MISMATCH")
-        replay_ranked_ids.append(result.source_security.security_id)
+    replay_dataset_identity, replay_ranked_ids, replay_coverage = _run_state(
+        replay,
+        cutoff=staged.cutoff,
+        offline_error="SNAPSHOT_REPLAY_NOT_OFFLINE",
+    )
     if (
-        replay.metadata.dataset_identity != staged.dataset_identity
-        or replay.metadata.ranked_records != len(replay_ranked_ids)
+        replay_dataset_identity != staged.dataset_identity
+        or replay_coverage != staged.coverage
         or tuple(replay_ranked_ids) != staged.ranked_security_ids
     ):
         raise DiamondSnapshotError("SNAPSHOT_REPLAY_MISMATCH")
@@ -377,6 +480,8 @@ def finalize_snapshot(
         universe_id=staged.universe_id,
         cutoff=staged.cutoff,
         status=SnapshotStatus.COMPLETE,
+        canonicalizer_version=staged.canonicalizer_version,
+        coverage=staged.coverage,
         files=staged.files,
         ranked_count=len(staged.ranked_security_ids),
         ranked_order_sha256=staged.ranked_order_sha256,
@@ -394,6 +499,15 @@ def _decode_manifest(root: Path, payload: object) -> DiamondSnapshotManifest:
     if not isinstance(payload, dict):
         raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
     try:
+        canonicalizer_version = str(payload["canonicalizer_version"])
+        if canonicalizer_version == SNAPSHOT_CANONICALIZER_VERSION:
+            coverage: DiamondSnapshotCoverage | None = _decode_coverage(payload.get("coverage"))
+        elif canonicalizer_version == LEGACY_SNAPSHOT_CANONICALIZER_VERSION:
+            if "coverage" in payload:
+                raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
+            coverage = None
+        else:
+            raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
         files_raw = payload["files"]
         if not isinstance(files_raw, list):
             raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
@@ -418,6 +532,8 @@ def _decode_manifest(root: Path, payload: object) -> DiamondSnapshotManifest:
             universe_id=_require_text(str(payload["universe_id"]), "SNAPSHOT_TAMPERED"),
             cutoff=date.fromisoformat(str(payload["cutoff"])),
             status=SnapshotStatus(str(payload["status"])),
+            canonicalizer_version=canonicalizer_version,
+            coverage=coverage,
             files=files,
             ranked_count=int(payload["ranked_count"]),
             ranked_order_sha256=_require_sha256(
@@ -428,8 +544,6 @@ def _decode_manifest(root: Path, payload: object) -> DiamondSnapshotManifest:
     except (KeyError, TypeError, ValueError) as exc:
         raise DiamondSnapshotError("SNAPSHOT_TAMPERED") from exc
     if payload.get("schema_version") != SNAPSHOT_SCHEMA_VERSION:
-        raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
-    if payload.get("canonicalizer_version") != SNAPSHOT_CANONICALIZER_VERSION:
         raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
     if manifest.status is not SnapshotStatus.COMPLETE:
         raise DiamondSnapshotError("SNAPSHOT_INCOMPLETE")
@@ -449,9 +563,11 @@ def _decode_manifest(root: Path, payload: object) -> DiamondSnapshotManifest:
         ):
             raise DiamondSnapshotError("SNAPSHOT_TAMPERED")
     expected_id = _snapshot_id(
+        canonicalizer_version=manifest.canonicalizer_version,
         dataset_identity=manifest.dataset_identity,
         universe_id=manifest.universe_id,
         cutoff=manifest.cutoff,
+        coverage=manifest.coverage,
         files=manifest.files,
         ranked_count=manifest.ranked_count,
         ranked_order_sha256=manifest.ranked_order_sha256,
@@ -490,6 +606,7 @@ def load_complete_snapshot(
 
 
 __all__ = [
+    "DiamondSnapshotCoverage",
     "DiamondSnapshotError",
     "DiamondSnapshotManifest",
     "SnapshotFile",

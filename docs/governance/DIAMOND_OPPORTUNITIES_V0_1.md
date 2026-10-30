@@ -149,6 +149,33 @@ Continuation verification on 2026-10-30:
   119,332 KiB;
 - artifact hashes and byte-equality checks still match the identities above.
 
+### Semantic-coverage hardening
+
+The 2026-10-30 whole-branch review found that canonicalizer v1 reproduced the dataset
+and complete rankable order but did not bind semantic funnel coverage into the snapshot
+manifest. Canonicalizer v2 closes that gap without changing Diamond calculations:
+
+```text
+canonicalizer_version  diamond-snapshot-canonicalizer-v2
+snapshot_id            diamond-snapshot:5fdf5aa1f5215658896c39381167f808fb46adbcdef64151ddfaad7d3601e277
+universe_securities    503
+canonical_records      503
+rankable_records       117
+unrankable_records     386
+candidate_set_id       8f4dea0afdf7189e82f752addf49aabc048e29f11d95595c7e601752865c0a19
+opportunities.json     8e7973d31cc151c12aed8a849e06571a0194c1423d27678d999f2f530531186b
+opportunities.md       01fd6f59d9df054c1560064deb3dd1149e9453eab024dee0524dc876693765ce
+snapshot/manifest     1c72bbfb16201c41a8e95dc1a33d288840900500bbb73c2d716630f5f336570c
+```
+
+The identity-bound coverage is derived from the source `FunnelRunMetadata` and must
+match the strict offline replay before `COMPLETE` is written. New canonicalizer-v2
+artifacts are under `output/diamond-opportunities-2026-09-22-coverage-v2/`; an
+independent seal under the corresponding `-repro/` directory produced byte-identical
+manifest, JSON, checksum sidecar and Markdown files. The runs completed in 36.71 s and
+36.03 s with max RSS 195,080 KiB and 194,732 KiB. The loader retains canonicalizer-v1
+read compatibility; the original focused MO artifact still verifies and renders.
+
 ## Integrity and confidence boundary
 
 - Every selected snapshot file is content-addressed by relative path, size and SHA-256.
