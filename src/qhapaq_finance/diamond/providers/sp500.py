@@ -6,6 +6,7 @@ import re
 from dataclasses import asdict, dataclass
 from datetime import date
 from html.parser import HTMLParser
+from pathlib import Path
 from typing import Protocol
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -257,6 +258,10 @@ class Sp500UniverseProvider:
         self.provider_requests = 0
         self.cache_hits = 0
         self.cache_misses = 0
+
+    @property
+    def read_paths(self) -> tuple[Path, ...]:
+        return self._cache.read_paths
 
     def universe(self, universe_id: str, as_of: date) -> tuple[SecurityRef, ...]:
         if universe_id.casefold() != "sp500":

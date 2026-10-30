@@ -8,6 +8,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from http.client import HTTPConnection, HTTPSConnection
+from pathlib import Path
 from typing import Protocol
 from urllib.parse import urlencode, urlsplit
 
@@ -144,6 +145,10 @@ class YahooBatchMarketProvider:
         self.provider_requests = 0
         self.cache_hits = 0
         self.cache_misses = 0
+
+    @property
+    def read_paths(self) -> tuple[Path, ...]:
+        return self._cache.read_paths
 
     @staticmethod
     def _url(symbols: tuple[str, ...]) -> str:

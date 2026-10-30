@@ -29,6 +29,7 @@ def test_cache_round_trip_and_corruption_detection(tmp_path: Path) -> None:
 
     files = list(tmp_path.glob("*.json"))
     assert len(files) == 1
+    assert cache.read_paths == (files[0],)
 
     raw = json.loads(files[0].read_text(encoding="utf-8"))
     raw["payload"][0]["revenue"] = 2
@@ -36,6 +37,11 @@ def test_cache_round_trip_and_corruption_detection(tmp_path: Path) -> None:
 
     with pytest.raises(DiamondCacheError):
         cache.load("income-statement-bulk?period=FY&year=2025")
+
+    failed_audit = DiamondCache(tmp_path)
+    with pytest.raises(DiamondCacheError):
+        failed_audit.load("income-statement-bulk?period=FY&year=2025")
+    assert failed_audit.read_paths == ()
 
 
 def test_fmp_universe_maps_sp500_members() -> None:

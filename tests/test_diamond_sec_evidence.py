@@ -132,6 +132,73 @@ def test_fresh_manifest_performs_zero_sec_requests(tmp_path: Path) -> None:
     assert replay.cache_misses == 0
 
 
+def test_offline_exact_cutoff_replays_stale_manifest_and_audits_files(
+    tmp_path: Path,
+) -> None:
+    base = datetime(2026, 9, 22, 0, tzinfo=timezone.utc)
+    payload = revenue_payload(amendment_filed="2026-08-15", amendment_value=110.0)
+    seed = SecEvidenceStore(
+        root=tmp_path / "sec",
+        client=FakeSecHttpClient([SecResponse(200, {}, json.dumps(payload).encode())]),
+        legacy_cache=None,
+        now=lambda: base,
+    )
+    seeded = seed.resolve("0000320193", date(2026, 9, 22))
+
+    replay = SecEvidenceStore(
+        root=tmp_path / "sec",
+        client=None,
+        legacy_cache=None,
+        now=lambda: base + timedelta(days=30),
+        offline=True,
+    )
+    resolved = replay.resolve("0000320193", date(2026, 9, 22))
+
+    assert resolved.manifest == seeded.manifest
+    assert resolved.facts is None
+    assert replay.provider_requests == 0
+    assert replay.cache_hits == 1
+    assert replay.cache_misses == 0
+    assert replay.resolved_manifests == (seeded.manifest,)
+    assert replay.read_paths == tuple(
+        sorted(
+            (
+                tmp_path / "sec" / "blobs" / seeded.manifest.blob_name,
+                replay._manifest_path(seeded.manifest.request_identity),
+            )
+        )
+    )
+
+
+def test_offline_missing_or_wrong_cutoff_fails_without_network(tmp_path: Path) -> None:
+    store = SecEvidenceStore(
+        root=tmp_path / "sec",
+        client=None,
+        legacy_cache=None,
+        offline=True,
+    )
+
+    with pytest.raises(SecEvidenceError, match="SEC_EVIDENCE_OFFLINE_MISS"):
+        store.resolve("0000320193", date(2026, 9, 22))
+
+    assert store.provider_requests == 0
+    assert store.cache_hits == 0
+    assert store.cache_misses == 1
+    assert store.read_paths == ()
+
+
+def test_offline_refresh_is_rejected(tmp_path: Path) -> None:
+    store = SecEvidenceStore(
+        root=tmp_path / "sec",
+        client=None,
+        legacy_cache=None,
+        offline=True,
+    )
+
+    with pytest.raises(SecEvidenceError, match="SEC_OFFLINE_REFRESH_CONFLICT"):
+        store.resolve("0000320193", date(2026, 9, 22), refresh=True)
+
+
 def test_refresh_bypasses_ttl_and_refetches_unconditionally(tmp_path: Path) -> None:
     now = datetime(2026, 9, 22, 12, tzinfo=timezone.utc)
     original = revenue_payload(

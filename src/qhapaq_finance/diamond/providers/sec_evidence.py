@@ -168,15 +168,34 @@ class SecEvidenceStore:
         client: _SecHttpClient | None,
         legacy_cache: DiamondCache | None,
         now: Callable[[], datetime] | None = None,
+        offline: bool = False,
     ) -> None:
         self.root = Path(root)
         self.client = client
         self.legacy_cache = legacy_cache
         self._now = now or (lambda: datetime.now(timezone.utc))
+        self.offline = offline
+        self._read_paths: set[Path] = set()
+        self._resolved_manifests: dict[str, SecEvidenceManifest] = {}
 
         self.provider_requests = 0
         self.cache_hits = 0
         self.cache_misses = 0
+
+    @property
+    def read_paths(self) -> tuple[Path, ...]:
+        """Return verified SEC manifest/blob paths used by this instance."""
+
+        return tuple(sorted(self._read_paths))
+
+    @property
+    def resolved_manifests(self) -> tuple[SecEvidenceManifest, ...]:
+        """Return successfully resolved manifests in deterministic CIK order."""
+
+        return tuple(
+            self._resolved_manifests[cik]
+            for cik in sorted(self._resolved_manifests)
+        )
 
     @staticmethod
     def request_identity(cik: str) -> str:
@@ -190,6 +209,9 @@ class SecEvidenceStore:
         *,
         refresh: bool = False,
     ) -> ResolvedSecEvidence:
+        if self.offline and refresh:
+            raise SecEvidenceError("SEC_OFFLINE_REFRESH_CONFLICT")
+
         normalized_cik = _normalize_cik(cik)
         identity = self.request_identity(normalized_cik)
         manifest = self._load_manifest(identity)
@@ -200,6 +222,15 @@ class SecEvidenceStore:
                 cik=normalized_cik,
                 request_identity=identity,
             )
+
+        if self.offline:
+            if manifest is None or manifest.data_as_of != as_of:
+                self.cache_misses += 1
+                raise SecEvidenceError("SEC_EVIDENCE_OFFLINE_MISS")
+            self._verify_blob_checksum(manifest)
+            self._record_resolution(manifest)
+            self.cache_hits += 1
+            return ResolvedSecEvidence(manifest=manifest, facts=None)
 
         if refresh:
             self.cache_misses += 1
@@ -264,7 +295,26 @@ class SecEvidenceStore:
         if evidence_revision(facts) != manifest.evidence_revision_sha256:
             raise SecEvidenceError("SEC_EVIDENCE_REVISION_MISMATCH")
 
+        self._record_resolution(manifest)
+
         return facts
+
+    def _verify_blob_checksum(self, manifest: SecEvidenceManifest) -> None:
+        blob = self.root / "blobs" / manifest.blob_name
+        digest = hashlib.sha256()
+        try:
+            with blob.open("rb") as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    digest.update(chunk)
+        except OSError as exc:
+            raise SecEvidenceError("SEC_BLOB_UNREADABLE") from exc
+        if digest.hexdigest() != manifest.payload_sha256:
+            raise SecEvidenceError("SEC_BLOB_CHECKSUM_MISMATCH")
+
+    def _record_resolution(self, manifest: SecEvidenceManifest) -> None:
+        self._read_paths.add(self._manifest_path(manifest.request_identity))
+        self._read_paths.add(self.root / "blobs" / manifest.blob_name)
+        self._resolved_manifests[manifest.cik] = manifest
 
     def _is_fresh(self, manifest: SecEvidenceManifest) -> bool:
         now = self._now()

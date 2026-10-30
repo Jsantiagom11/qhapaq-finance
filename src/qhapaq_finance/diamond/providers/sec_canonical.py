@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from datetime import date
+from pathlib import Path
 
 from qhapaq_finance.diamond.cache import DiamondCache, DiamondCacheError
 from qhapaq_finance.diamond.canonical_json import sha256_canonical_json
@@ -597,6 +598,10 @@ class CanonicalIssuerCache:
         self._cache = cache
         self.cache_hits = 0
         self.cache_misses = 0
+
+    @property
+    def read_paths(self) -> tuple[Path, ...]:
+        return self._cache.read_paths
 
     @staticmethod
     def _identity(

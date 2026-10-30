@@ -20,7 +20,7 @@ from .providers.benchmark import benchmark_provider_sample
 from .providers.local import LocalJsonProvider
 from .providers.sec import SecFirstProvider, SecFirstProviderError
 from .providers.sec_canonical import CanonicalIssuerCache
-from .providers.sec_evidence import SecEvidenceStore
+from .providers.sec_evidence import SecEvidenceError, SecEvidenceStore
 from .providers.sp500 import Sp500ProviderError, Sp500UniverseProvider, WikipediaTextClient
 from .providers.yahoo import YahooBatchMarketProvider, YahooClient, YahooProviderError
 from .providers.yahoo_splits import YahooSplitAdjustmentProvider
@@ -258,16 +258,21 @@ def _production_funnel_provider(
     cache_root: Path,
     *,
     refresh: bool,
+    offline: bool = False,
 ) -> SecFirstProvider:
-    try:
-        sec_config = SecConfig.from_env()
-    except RuntimeError as exc:
-        raise SecFirstProviderError(f"SEC_CONFIG_INVALID:{exc}") from exc
+    if offline and refresh:
+        raise SecFirstProviderError("OFFLINE_REFRESH_CONFLICT")
 
-    sec_client = SecClient(sec_config)
+    sec_client: SecClient | None = None
+    if not offline:
+        try:
+            sec_config = SecConfig.from_env()
+        except RuntimeError as exc:
+            raise SecFirstProviderError(f"SEC_CONFIG_INVALID:{exc}") from exc
+        sec_client = SecClient(sec_config)
 
     universe_provider = Sp500UniverseProvider(
-        client=WikipediaTextClient(),
+        client=None if offline else WikipediaTextClient(),
         cache=DiamondCache(cache_root / "universe"),
         refresh=refresh,
     )
@@ -275,15 +280,16 @@ def _production_funnel_provider(
         root=cache_root / "sec",
         client=sec_client,
         legacy_cache=DiamondCache(cache_root / "sec"),
+        offline=offline,
     )
     canonical_cache = CanonicalIssuerCache(DiamondCache(cache_root / "canonical"))
     market_provider = YahooBatchMarketProvider(
-        client=YahooClient(),
+        client=None if offline else YahooClient(),
         cache=DiamondCache(cache_root / "market"),
         refresh=refresh,
     )
     split_provider = YahooSplitAdjustmentProvider(
-        client=YahooClient(),
+        client=None if offline else YahooClient(),
         cache=DiamondCache(cache_root / "splits"),
         refresh=refresh,
     )
@@ -332,13 +338,24 @@ def funnel_command(arguments: list[str]) -> None:
         action="store_true",
         help="bypass cache and reacquire provider evidence",
     )
+    parser.add_argument(
+        "--offline",
+        action="store_true",
+        help="require exact-cutoff cache evidence and disable all provider clients",
+    )
     args = parser.parse_args(arguments)
 
     if args.depth < 1:
         parser.error("--depth must be positive")
+    if args.offline and args.refresh:
+        parser.error("--offline and --refresh are mutually exclusive")
 
     try:
-        provider = _production_funnel_provider(args.cache_root, refresh=args.refresh)
+        provider = _production_funnel_provider(
+            args.cache_root,
+            refresh=args.refresh,
+            offline=args.offline,
+        )
         run = run_funnel(
             provider,
             universe_id=args.universe,
@@ -349,6 +366,7 @@ def funnel_command(arguments: list[str]) -> None:
         DiamondCacheError,
         SecClientError,
         SecFirstProviderError,
+        SecEvidenceError,
         Sp500ProviderError,
         YahooProviderError,
     ) as exc:

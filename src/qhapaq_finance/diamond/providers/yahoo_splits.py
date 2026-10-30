@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping
 from datetime import date, datetime, time, timedelta, timezone
+from pathlib import Path
 from urllib.parse import urlencode
 
 from ..cache import DiamondCache
@@ -69,6 +70,10 @@ class YahooSplitAdjustmentProvider:
         self.provider_requests = 0
         self.cache_hits = 0
         self.cache_misses = 0
+
+    @property
+    def read_paths(self) -> tuple[Path, ...]:
+        return self._cache.read_paths
 
     @classmethod
     def _url(cls, ticker: str, start_date: date, end_date: date) -> str:

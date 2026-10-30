@@ -50,6 +50,13 @@ class DiamondCache:
 
     def __init__(self, root: Path) -> None:
         self.root = Path(root)
+        self._read_paths: set[Path] = set()
+
+    @property
+    def read_paths(self) -> tuple[Path, ...]:
+        """Return checksum-verified cache files read by this instance."""
+
+        return tuple(sorted(self._read_paths))
 
     def _path(self, request_identity: str) -> Path:
         digest = hashlib.sha256(request_identity.encode("utf-8")).hexdigest()
@@ -96,6 +103,8 @@ class DiamondCache:
         actual = _sha256(payload)
         if actual != payload_sha256:
             raise DiamondCacheError("CACHE_CHECKSUM_MISMATCH")
+
+        self._read_paths.add(path)
 
         return CachedEvidence(
             provider=provider,

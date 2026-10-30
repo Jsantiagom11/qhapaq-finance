@@ -71,6 +71,23 @@ def test_production_funnel_provider_does_not_require_fmp(monkeypatch, tmp_path: 
     assert isinstance(provider, SecFirstProvider)
 
 
+def test_offline_production_provider_needs_no_credentials_or_live_clients(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    def forbidden() -> SecConfig:
+        raise AssertionError("offline provider must not load SEC credentials")
+
+    monkeypatch.setattr(diamond_cli.SecConfig, "from_env", forbidden)
+    provider = _production_funnel_provider(tmp_path, refresh=False, offline=True)
+
+    assert provider.evidence_store.offline is True
+    assert provider.evidence_store.client is None
+    assert provider._universe_provider._client is None
+    assert provider._market_provider._client is None
+    assert provider._split_provider._client is None
+
+
 def test_funnel_cli_does_not_invoke_analysis_orchestrator(monkeypatch, capsys) -> None:
     local = LocalJsonProvider(FIXTURE)
 
@@ -88,7 +105,7 @@ def test_funnel_cli_does_not_invoke_analysis_orchestrator(monkeypatch, capsys) -
     monkeypatch.setattr("qhapaq_finance.analysis.AnalysisOrchestrator.analyze", forbidden)
     monkeypatch.setattr(
         "qhapaq_finance.diamond.cli._production_funnel_provider",
-        lambda cache_root, refresh: Sp500AliasProvider(),
+        lambda cache_root, refresh, offline=False: Sp500AliasProvider(),
     )
 
     funnel_command(
@@ -159,10 +176,11 @@ def test_production_funnel_wires_debt_zero_cache_roots(
         seen["market_refresh"] = refresh
         return market_provider
 
-    def capture_store(*, root, client, legacy_cache, now=None):
+    def capture_store(*, root, client, legacy_cache, now=None, offline=False):
         seen["sec"] = root
         seen["sec_legacy"] = legacy_cache.root
         seen["sec_client"] = client
+        seen["sec_offline"] = offline
         return evidence_store
 
     def capture_canonical(cache):
@@ -223,6 +241,7 @@ def test_production_funnel_wires_debt_zero_cache_roots(
     assert seen["splits"] == tmp_path / "splits"
 
     assert seen["sec_client"] is sec_client
+    assert seen["sec_offline"] is False
     assert seen["universe_refresh"] is refresh
     assert seen["market_refresh"] is refresh
     assert seen["splits_refresh"] is refresh
@@ -238,3 +257,8 @@ def test_production_funnel_wires_debt_zero_cache_roots(
 
     assert "sec_client" not in kwargs
     assert "sec_cache" not in kwargs
+
+
+def test_funnel_offline_and_refresh_are_mutually_exclusive() -> None:
+    with pytest.raises(SystemExit):
+        funnel_command(["--offline", "--refresh"])

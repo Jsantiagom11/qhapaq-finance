@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from datetime import date, timedelta
+from pathlib import Path
 from typing import Protocol
 
 from qhapaq_finance.sec_client import SecResponse
@@ -30,7 +31,7 @@ from .sec_canonical import (
     CanonicalIssuerSnapshot,
     canonicalize_issuer,
 )
-from .sec_evidence import SecEvidenceStore
+from .sec_evidence import SecEvidenceManifest, SecEvidenceStore
 from .sp500 import Sp500Company
 
 
@@ -168,6 +169,25 @@ class SecFirstProvider:
                 self._split_provider,
             )
         )
+
+    @property
+    def read_paths(self) -> tuple[Path, ...]:
+        paths: set[Path] = set()
+        for provider in (
+            self._universe_provider,
+            self.evidence_store,
+            self.canonical_cache,
+            self._market_provider,
+            self._split_provider,
+        ):
+            provider_paths = getattr(provider, "read_paths", ())
+            if isinstance(provider_paths, tuple):
+                paths.update(path for path in provider_paths if isinstance(path, Path))
+        return tuple(sorted(paths))
+
+    @property
+    def resolved_manifests(self) -> tuple[SecEvidenceManifest, ...]:
+        return self.evidence_store.resolved_manifests
 
     def universe(self, universe_id: str, as_of: date) -> tuple[SecurityRef, ...]:
         return self._universe_provider.universe(universe_id, as_of)
