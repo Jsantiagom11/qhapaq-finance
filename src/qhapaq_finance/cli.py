@@ -697,6 +697,14 @@ def main(argv: list[str] | None = None) -> None:
         from .diamond.cli import funnel_command
 
         funnel_command(arguments[1:])
+    elif arguments and arguments[0] == "opportunities":
+        from .opportunities_cli import run_opportunities
+
+        run_opportunities(arguments[1:])
+    elif arguments and arguments[0] == "opportunity":
+        from .opportunities_cli import run_opportunity
+
+        run_opportunity(arguments[1:])
     elif arguments and arguments[0] == "screen":
         from .diamond.cli import screen_command
 

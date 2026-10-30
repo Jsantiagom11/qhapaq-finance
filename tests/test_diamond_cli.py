@@ -254,6 +254,7 @@ def test_production_funnel_wires_debt_zero_cache_roots(
     assert kwargs["canonical_cache"] is canonical_cache
     assert kwargs["split_provider"] is split_provider
     assert kwargs["refresh"] is refresh
+    assert kwargs["offline"] is False
 
     assert "sec_client" not in kwargs
     assert "sec_cache" not in kwargs

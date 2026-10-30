@@ -21,6 +21,7 @@ from qhapaq_finance.diamond.providers.market import (
 )
 from qhapaq_finance.diamond.providers.sec import (
     SecFirstProvider,
+    SecFirstProviderError,
     UniverseMetadataProvider,
 )
 from qhapaq_finance.diamond.providers.sec_canonical import (
@@ -327,6 +328,38 @@ def make_sec_first_provider(
         split_provider=split_provider,
         refresh=refresh,
     )
+
+
+def test_offline_provider_never_canonicalizes_or_writes_a_cache_miss(
+    tmp_path: Path,
+) -> None:
+    cutoff = date(2026, 9, 22)
+    evidence_root = tmp_path / "sec-evidence"
+    InstrumentedEvidenceStore(
+        root=evidence_root,
+        client=FakeSecClient(_companyfacts()),
+        legacy_cache=None,
+        now=lambda: datetime(2026, 9, 22, 12, tzinfo=timezone.utc),
+    ).resolve("0000320193", cutoff)
+    replay_store = InstrumentedEvidenceStore(
+        root=evidence_root,
+        client=None,
+        legacy_cache=None,
+        offline=True,
+    )
+    provider = SecFirstProvider(
+        universe_provider=FakeUniverse(),
+        evidence_store=replay_store,
+        canonical_cache=CanonicalIssuerCache(DiamondCache(tmp_path / "canonical")),
+        market_provider=None,
+        offline=True,
+    )
+
+    with pytest.raises(SecFirstProviderError, match="SEC_CANONICAL_OFFLINE_MISS"):
+        provider.fundamentals(provider.universe("sp500", cutoff), cutoff)
+
+    assert replay_store.load_facts_calls == 0
+    assert not (tmp_path / "canonical").exists()
 
 
 class FakeMarketProvider:

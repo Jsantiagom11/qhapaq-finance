@@ -104,6 +104,7 @@ class SecFirstProvider:
         canonical_cache: CanonicalIssuerCache | None = None,
         split_provider: SplitAdjustmentProvider | None = None,
         refresh: bool = False,
+        offline: bool = False,
         sec_client: SecHttpClient | None = None,
         sec_cache: DiamondCache | None = None,
     ) -> None:
@@ -118,6 +119,7 @@ class SecFirstProvider:
                 root=sec_cache.root,
                 client=sec_client,
                 legacy_cache=sec_cache,
+                offline=offline,
             )
             canonical_cache = CanonicalIssuerCache(
                 DiamondCache(sec_cache.root.parent / "canonical")
@@ -131,6 +133,7 @@ class SecFirstProvider:
         self._market_provider = market_provider
         self._split_provider = split_provider
         self._refresh = refresh
+        self._offline = offline
 
     @property
     def provider_requests(self) -> int:
@@ -262,6 +265,9 @@ class SecFirstProvider:
         )
         if snapshot is not None:
             return snapshot
+
+        if self._offline:
+            raise SecFirstProviderError("SEC_CANONICAL_OFFLINE_MISS")
 
         facts = (
             resolved.facts

@@ -301,6 +301,7 @@ def _production_funnel_provider(
         market_provider=market_provider,
         split_provider=split_provider,
         refresh=refresh,
+        offline=offline,
     )
 
 
