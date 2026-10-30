@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import date
 from time import perf_counter
 
+from .contracts import FundamentalRecord
 from .dataset_identity import dataset_identity
 from .engine import DiamondResult, evaluate_universe
 from .providers.protocol import FundamentalDataProvider
@@ -29,6 +30,8 @@ class FunnelRunMetadata:
 class FunnelRun:
     results: tuple[DiamondResult, ...]
     metadata: FunnelRunMetadata
+    records: tuple[FundamentalRecord, ...] = ()
+    evaluated_results: tuple[DiamondResult, ...] = ()
 
 
 def _ranked(
@@ -104,4 +107,6 @@ def run_funnel(
             evaluation_seconds=evaluation_seconds,
             dataset_identity=dataset_identity(records),
         ),
+        records=records,
+        evaluated_results=tuple(ranked),
     )
