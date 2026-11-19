@@ -8,9 +8,7 @@ from datetime import date
 from pathlib import Path
 
 from qhapaq_finance.diamond.cache import DiamondCacheError
-from qhapaq_finance.diamond.cli import (
-    _production_funnel_provider,
-)
+from qhapaq_finance.diamond.providers.production import build_funnel_provider
 from qhapaq_finance.diamond.providers.sec import (
     SecFirstProviderError,
 )
@@ -22,12 +20,9 @@ from qhapaq_finance.diamond.providers.yahoo import (
 )
 from qhapaq_finance.sec_client import SecClientError
 
-from .shortlist import (
-    ExecutiveShortlistRun,
-    canonical_shortlist_json,
-    render_shortlist_text,
-    run_shortlist,
-)
+from .contracts import ExecutiveShortlistRun
+from .shortlist import run_shortlist
+from .shortlist_render import canonical_shortlist_json, render_shortlist_text
 
 
 def run_production_shortlist(
@@ -36,7 +31,7 @@ def run_production_shortlist(
     depth: int,
 ) -> ExecutiveShortlistRun:
     """Use the existing production Diamond provider wiring unchanged."""
-    provider = _production_funnel_provider(
+    provider = build_funnel_provider(
         Path("data/cache/diamond"),
         refresh=False,
     )

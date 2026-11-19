@@ -8,12 +8,12 @@ import pytest
 import qhapaq_finance.diamond.cli as diamond_cli
 from qhapaq_finance import cli
 from qhapaq_finance.diamond.cli import (
-    _production_funnel_provider,
     funnel_command,
     inspect_command,
     provider_benchmark_command,
     screen_command,
 )
+from qhapaq_finance.diamond.providers import production
 from qhapaq_finance.diamond.providers.local import LocalJsonProvider
 from qhapaq_finance.diamond.providers.sec import SecFirstProvider
 from qhapaq_finance.sec_config import SecConfig
@@ -62,11 +62,12 @@ def test_main_dispatch_exposes_screen_without_invoking_analysis(monkeypatch, cap
 def test_production_funnel_provider_does_not_require_fmp(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.delenv("FMP_API_KEY", raising=False)
     monkeypatch.setattr(
-        "qhapaq_finance.diamond.cli.SecConfig.from_env",
+        production.SecConfig,
+        "from_env",
         lambda: SecConfig("Qhapaq Finance", "research@example.com", 8.0),
     )
 
-    provider = _production_funnel_provider(tmp_path, refresh=False)
+    provider = diamond_cli._production_funnel_provider(tmp_path, refresh=False)
 
     assert isinstance(provider, SecFirstProvider)
 
@@ -78,8 +79,8 @@ def test_offline_production_provider_needs_no_credentials_or_live_clients(
     def forbidden() -> SecConfig:
         raise AssertionError("offline provider must not load SEC credentials")
 
-    monkeypatch.setattr(diamond_cli.SecConfig, "from_env", forbidden)
-    provider = _production_funnel_provider(tmp_path, refresh=False, offline=True)
+    monkeypatch.setattr(production.SecConfig, "from_env", forbidden)
+    provider = production.build_funnel_provider(tmp_path, refresh=False, offline=True)
 
     assert provider.evidence_store.offline is True
     assert provider.evidence_store.client is None
@@ -142,7 +143,7 @@ def test_production_funnel_wires_debt_zero_cache_roots(
     final_provider = object()
 
     monkeypatch.setattr(
-        diamond_cli.SecConfig,
+        production.SecConfig,
         "from_env",
         lambda: SecConfig(
             "Qhapaq Finance",
@@ -151,17 +152,17 @@ def test_production_funnel_wires_debt_zero_cache_roots(
         ),
     )
     monkeypatch.setattr(
-        diamond_cli,
+        production,
         "SecClient",
         lambda config: sec_client,
     )
     monkeypatch.setattr(
-        diamond_cli,
+        production,
         "WikipediaTextClient",
         lambda: object(),
     )
     monkeypatch.setattr(
-        diamond_cli,
+        production,
         "YahooClient",
         lambda: object(),
     )
@@ -197,37 +198,37 @@ def test_production_funnel_wires_debt_zero_cache_roots(
         return final_provider
 
     monkeypatch.setattr(
-        diamond_cli,
+        production,
         "Sp500UniverseProvider",
         capture_universe,
     )
     monkeypatch.setattr(
-        diamond_cli,
+        production,
         "YahooBatchMarketProvider",
         capture_market,
     )
     monkeypatch.setattr(
-        diamond_cli,
+        production,
         "SecEvidenceStore",
         capture_store,
     )
     monkeypatch.setattr(
-        diamond_cli,
+        production,
         "CanonicalIssuerCache",
         capture_canonical,
     )
     monkeypatch.setattr(
-        diamond_cli,
+        production,
         "YahooSplitAdjustmentProvider",
         capture_split,
     )
     monkeypatch.setattr(
-        diamond_cli,
+        production,
         "SecFirstProvider",
         capture_provider,
     )
 
-    provider = diamond_cli._production_funnel_provider(
+    provider = production.build_funnel_provider(
         tmp_path,
         refresh=refresh,
     )

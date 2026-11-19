@@ -8,6 +8,7 @@ from datetime import date
 
 from qhapaq_finance.analysis import AnalysisStatus
 from qhapaq_finance.diamond.archetypes import Archetype
+from qhapaq_finance.diamond.funnel import FunnelRunMetadata
 from qhapaq_finance.string_enum import StringEnum
 
 
@@ -146,3 +147,13 @@ class ExecutiveShortlistEntry:
 
         if not self.analysis_status.conclusion_available and self.bottom_line is not None:
             raise ValueError("bottom_line must be None when conclusion_available is False")
+
+
+@dataclass(frozen=True)
+class ExecutiveShortlistRun:
+    """Diamond-selected and deep-analysis-enriched shortlist."""
+
+    universe_id: str
+    as_of: date
+    entries: tuple[ExecutiveShortlistEntry, ...]
+    funnel_metadata: FunnelRunMetadata
