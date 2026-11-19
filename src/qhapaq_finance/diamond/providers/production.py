@@ -21,10 +21,13 @@ def build_funnel_provider(
     *,
     refresh: bool,
     offline: bool = False,
+    prefer_fresh_revenue: bool = False,
 ) -> SecFirstProvider:
     """Compose the SEC-first provider and its local evidence stores."""
     if offline and refresh:
         raise SecFirstProviderError("OFFLINE_REFRESH_CONFLICT")
+    if prefer_fresh_revenue and not offline:
+        raise SecFirstProviderError("FRESH_REVENUE_REQUIRES_OFFLINE")
 
     sec_client: SecClient | None = None
     if not offline:
@@ -65,4 +68,5 @@ def build_funnel_provider(
         split_provider=split_provider,
         refresh=refresh,
         offline=offline,
+        prefer_fresh_revenue=prefer_fresh_revenue,
     )

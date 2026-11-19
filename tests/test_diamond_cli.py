@@ -106,7 +106,7 @@ def test_funnel_cli_does_not_invoke_analysis_orchestrator(monkeypatch, capsys) -
     monkeypatch.setattr("qhapaq_finance.analysis.AnalysisOrchestrator.analyze", forbidden)
     monkeypatch.setattr(
         "qhapaq_finance.diamond.cli._production_funnel_provider",
-        lambda cache_root, refresh, offline=False: Sp500AliasProvider(),
+        lambda cache_root, refresh, offline=False, prefer_fresh_revenue=False: Sp500AliasProvider(),
     )
 
     funnel_command(
@@ -318,3 +318,11 @@ def test_funnel_peer_period_window_recovers_only_eligible_rankings(
     assert "PEER_PERIOD_WINDOW_APPLIED" in current["T00"]["diagnostics"]
     for ticker in ("OLDER", "STALE"):
         assert current[ticker]["scores"]["research_priority"] is None
+
+
+def test_fresh_revenue_replay_requires_offline(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit) as error:
+        funnel_command(["--prefer-fresh-revenue"])
+
+    assert error.value.code == 2
+    assert "--prefer-fresh-revenue requires --offline" in capsys.readouterr().err

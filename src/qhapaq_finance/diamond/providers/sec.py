@@ -19,6 +19,7 @@ from ..contracts import (
     SecurityRef,
     UnitKind,
 )
+from ..validation import MAX_FUNDAMENTAL_AGE_DAYS
 from .market import (
     BatchMarketProvider,
     MarketProviderError,
@@ -29,6 +30,7 @@ from .market import (
 from .sec_canonical import (
     CanonicalIssuerCache,
     CanonicalIssuerSnapshot,
+    SecCanonicalError,
     canonicalize_issuer,
 )
 from .sec_evidence import SecEvidenceManifest, SecEvidenceStore
@@ -105,9 +107,12 @@ class SecFirstProvider:
         split_provider: SplitAdjustmentProvider | None = None,
         refresh: bool = False,
         offline: bool = False,
+        prefer_fresh_revenue: bool = False,
         sec_client: SecHttpClient | None = None,
         sec_cache: DiamondCache | None = None,
     ) -> None:
+        if prefer_fresh_revenue and (not offline or refresh):
+            raise SecFirstProviderError("FRESH_REVENUE_REQUIRES_OFFLINE")
         using_legacy_inputs = sec_client is not None or sec_cache is not None
         using_canonical_inputs = evidence_store is not None or canonical_cache is not None
         if using_legacy_inputs and using_canonical_inputs:
@@ -134,6 +139,7 @@ class SecFirstProvider:
         self._split_provider = split_provider
         self._refresh = refresh
         self._offline = offline
+        self._prefer_fresh_revenue = prefer_fresh_revenue
 
     @property
     def provider_requests(self) -> int:
@@ -222,6 +228,11 @@ class SecFirstProvider:
                     cik=cik,
                     as_of=as_of,
                     history_years=history_years,
+                    prefer_fresh_revenue=(
+                        self._prefer_fresh_revenue
+                        and _methodology(self._universe_provider.metadata(security.ticker))
+                        is Methodology.OPERATING_COMPANY
+                    ),
                 )
             snapshot = snapshots_by_cik[cik]
             if snapshot is None:
@@ -254,6 +265,7 @@ class SecFirstProvider:
         cik: str,
         as_of: date,
         history_years: int,
+        prefer_fresh_revenue: bool = False,
     ) -> CanonicalIssuerSnapshot | None:
         resolved = self.evidence_store.resolve(cik, as_of, refresh=self._refresh)
         revision = resolved.manifest.evidence_revision_sha256
@@ -264,6 +276,25 @@ class SecFirstProvider:
             evidence_revision_sha256=revision,
         )
         if snapshot is not None:
+            first_fresh_end = as_of - timedelta(days=MAX_FUNDAMENTAL_AGE_DAYS)
+            if not prefer_fresh_revenue or snapshot.fundamental_period_end >= first_fresh_end:
+                return snapshot
+            facts = self.evidence_store.load_facts(resolved.manifest)
+            try:
+                updated = canonicalize_issuer(
+                    issuer_id=issuer_id,
+                    cik=cik,
+                    as_of=as_of,
+                    history_years=history_years,
+                    evidence_revision_sha256=revision,
+                    facts=facts,
+                    fresh_revenue_from=first_fresh_end,
+                )
+            except SecCanonicalError:
+                # An ambiguous reconstruction cannot replace the cached period.
+                return snapshot
+            if updated is not None and first_fresh_end <= updated.fundamental_period_end <= as_of:
+                return updated
             return snapshot
 
         if self._offline:

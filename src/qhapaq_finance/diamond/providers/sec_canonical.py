@@ -102,8 +102,11 @@ def _promotion_form(form: str) -> str:
 def _promote_ttm(
     facts: tuple[RawFact, ...],
     concepts: tuple[tuple[str, str], ...],
+    *,
+    fresh_revenue_from: date | None = None,
 ) -> FinancialFact | DerivedFact | None:
     promoter = MultiPeriodFinancialPromoter()
+    selected: FinancialFact | DerivedFact | None = None
     for concept, unit in concepts:
         candidates = tuple(
             fact
@@ -117,11 +120,20 @@ def _promote_ttm(
             )
         )
         try:
-            return promoter.promote_ttm(candidates, concept=concept)
+            result = promoter.promote_ttm(candidates, concept=concept)
         except FinancialPromotionError as exc:
             if exc.kind is FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT:
                 raise SecCanonicalError("SEC_TTM_FACT_AMBIGUOUS") from exc
-    return None
+            continue
+        if fresh_revenue_from is None:
+            return result
+        if selected is None:
+            if result.period_end >= fresh_revenue_from:
+                return result
+            selected = result
+        elif fresh_revenue_from <= result.period_end and selected.period_end < result.period_end:
+            selected = result
+    return selected
 
 
 def _annual_fact(
@@ -267,6 +279,7 @@ def canonicalize_issuer(
     history_years: int,
     evidence_revision_sha256: str,
     facts: tuple[RawFact, ...],
+    fresh_revenue_from: date | None = None,
 ) -> CanonicalIssuerSnapshot | None:
     """Build immutable SEC accounting observations for one issuer evidence revision."""
     if history_years < 1:
@@ -278,7 +291,13 @@ def canonicalize_issuer(
         replace(item, filing_form=_promotion_form(item.filing_form)) for item in facts
     )
     annual_ends = _annual_ends(facts)[:history_years]
-    revenue_ttm = _promote_ttm(promotion_facts, _DURATION_CONCEPTS["revenue"])
+    revenue_ttm = _promote_ttm(
+        promotion_facts, _DURATION_CONCEPTS["revenue"], fresh_revenue_from=fresh_revenue_from
+    )
+    if fresh_revenue_from is not None and (
+        revenue_ttm is None or not fresh_revenue_from <= revenue_ttm.period_end <= as_of
+    ):
+        return None
     fundamental_end = (
         revenue_ttm.period_end if revenue_ttm is not None else _latest_balance_end(facts)
     )

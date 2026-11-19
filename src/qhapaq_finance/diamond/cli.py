@@ -201,10 +201,13 @@ def provider_benchmark_command(arguments: list[str]) -> None:
     print(f"diagnostics={','.join(result.diagnostics) or 'none'}")
 
 
-def _funnel_json(run: FunnelRun) -> str:
+def _funnel_json(run: FunnelRun, *, prefer_fresh_revenue: bool = False) -> str:
+    metadata = asdict(run.metadata)
+    if prefer_fresh_revenue:
+        metadata["fundamental_period_policy"] = "fresh-authorized-revenue-v1"
     payload = {
         "schema_version": "diamond-funnel-run-v1",
-        "metadata": asdict(run.metadata),
+        "metadata": metadata,
         "results": [diamond_result_dict(item) for item in run.results],
     }
     return (
@@ -297,18 +300,26 @@ def funnel_command(arguments: list[str]) -> None:
         action="store_true",
         help="rebuild misaligned peer groups around each issuer's fiscal period",
     )
+    parser.add_argument(
+        "--prefer-fresh-revenue",
+        action="store_true",
+        help="try authorized SEC revenue tags for stale operating issuers (offline only)",
+    )
     args = parser.parse_args(arguments)
 
     if args.depth < 1:
         parser.error("--depth must be positive")
     if args.offline and args.refresh:
         parser.error("--offline and --refresh are mutually exclusive")
+    if args.prefer_fresh_revenue and not args.offline:
+        parser.error("--prefer-fresh-revenue requires --offline")
 
     try:
         provider = _production_funnel_provider(
             args.cache_root,
             refresh=args.refresh,
             offline=args.offline,
+            prefer_fresh_revenue=args.prefer_fresh_revenue,
         )
         run = run_funnel(
             provider,
@@ -328,7 +339,7 @@ def funnel_command(arguments: list[str]) -> None:
         parser.error(str(exc))
 
     if args.format == "json":
-        print(_funnel_json(run), end="")
+        print(_funnel_json(run, prefer_fresh_revenue=args.prefer_fresh_revenue), end="")
     elif args.format == "csv":
         print(diamond_csv(run.results), end="")
     else:

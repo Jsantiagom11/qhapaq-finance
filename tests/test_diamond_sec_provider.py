@@ -884,3 +884,58 @@ def test_ttm_ignores_short_duration_facts_labeled_fy(
         "revenue",
         FiscalSlot.TTM,
     ) == pytest.approx(110.0)
+
+
+@pytest.mark.parametrize("scenario", ["fresh_alternative", "primary_fresh", "missing", "ambiguous"])
+def test_offline_provider_reuses_fresh_revenue_alternative_without_writing_snapshot(
+    tmp_path: Path,
+    scenario: str,
+) -> None:
+    cutoff = date(2026, 9, 22)
+    payload = _companyfacts()
+    facts = cast(dict[str, object], payload["facts"])
+    gaap = cast(dict[str, object], facts["us-gaap"])
+    primary = cast(dict[str, object], gaap["RevenueFromContractWithCustomerExcludingAssessedTax"])
+    units = cast(dict[str, list[dict[str, object]]], primary["units"])
+    revenue_history = units["USD"]
+    if scenario != "missing":
+        gaap["Revenues"] = {"units": {"USD": revenue_history}}
+    if scenario == "ambiguous":
+        revenue_history.append({**revenue_history[-1], "val": 70.0})
+    if scenario != "primary_fresh":
+        units["USD"] = [row for row in revenue_history if row["fp"] == "FY"]
+
+    universe = TwoClassUniverse()
+    seed = make_sec_first_provider(
+        tmp_path=tmp_path, payload=payload, market_provider=None, universe_provider=universe
+    )
+    securities = seed.universe("sp500", cutoff)
+    original = seed.fundamentals(securities, cutoff)
+    expected_baseline = date(2026, 6, 30) if scenario == "primary_fresh" else date(2025, 12, 31)
+    assert all(r.fundamental_period_end == expected_baseline for r in original)
+    files = {path: path.read_bytes() for path in tmp_path.rglob("*") if path.is_file()}
+
+    store = InstrumentedEvidenceStore(
+        root=tmp_path / "sec-evidence", client=None, legacy_cache=None, offline=True
+    )
+    provider = SecFirstProvider(
+        universe_provider=universe,
+        market_provider=None,
+        evidence_store=store,
+        canonical_cache=CanonicalIssuerCache(DiamondCache(tmp_path / "canonical")),
+        offline=True,
+        prefer_fresh_revenue=True,
+    )
+
+    updated = provider.fundamentals(securities, cutoff)
+
+    assert len(updated) == 2
+    if scenario == "fresh_alternative":
+        assert all(r.fundamental_period_end == date(2026, 6, 30) for r in updated)
+        assert all(value(r, "revenue", FiscalSlot.TTM) == 110.0 for r in updated)
+        assert all(value(r, "operating_income", FiscalSlot.TTM) == 30.0 for r in updated)
+    else:
+        assert updated == original
+    assert store.load_facts_calls == (0 if scenario == "primary_fresh" else 1)
+    assert provider.provider_requests == provider.cache_misses == 0
+    assert {path: path.read_bytes() for path in tmp_path.rglob("*") if path.is_file()} == files
