@@ -4,11 +4,19 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Mapping
+from dataclasses import dataclass
 from datetime import date
+from pathlib import Path
+from types import MappingProxyType
+from typing import TYPE_CHECKING
 
 from .evidence_orchestration import EvidenceRequirement
 from .sec_acquisition import StagedSecResource, stage_sec_response
 from .sec_client import SecClient, SecResponse
+
+if TYPE_CHECKING:
+    from .analysis import CompanyIdentity
 
 _ACCESSION = re.compile(r"^\d{10}-\d{2}-\d{6}$")
 
@@ -20,13 +28,92 @@ class SecArtifactKind:
     LATEST_10Q = "SEC_LATEST_10Q_METADATA"
 
 
+@dataclass(frozen=True)
+class SecFilingDescriptor:
+    accession: str
+    form: str
+    filing_date: str
+    report_date: str | None
+    primary_document: str
+    amendment: bool
+
+
+@dataclass(frozen=True)
+class SecSubmissionsBundle:
+    payload: Mapping[str, object]
+    staged: StagedSecResource
+    filings: tuple[SecFilingDescriptor, ...]
+
+
+@dataclass(frozen=True)
+class SecFastPathBundle:
+    submissions: SecSubmissionsBundle
+    companyfacts: dict[str, object]
+    companyfacts_staged: StagedSecResource
+
+
 class StructuredSecProvider:
     """Derives fixed SEC endpoints from a requirement's normalized CIK."""
 
     name = "SEC"
 
-    def __init__(self, client: SecClient, staging_root: str = "data/raw") -> None:
+    def __init__(self, client: SecClient, staging_root: str | Path = "data/raw") -> None:
         self.client, self.staging_root = client, staging_root
+
+    def acquire_fast_path(self, company: CompanyIdentity) -> SecFastPathBundle:
+        """Fetch and immutably stage each aggregate SEC entity exactly once."""
+
+        cik = company.cik
+        if cik is None or len(cik) != 10 or not cik.isdigit():
+            raise ValueError("SEC fast path requires normalized CIK")
+        submissions_url = f"https://data.sec.gov/submissions/CIK{cik}.json"
+        submissions_response = self.client.get(submissions_url)
+        submissions = self._json(submissions_response, "submissions")
+        filings = self._filings(submissions, cik)
+        staged_submissions = stage_sec_response(
+            submissions_url,
+            submissions_response,
+            self.staging_root,
+            source_metadata={
+                "artifact_kind": SecArtifactKind.SUBMISSIONS,
+                "ticker": company.ticker,
+                "cik": cik,
+            },
+        )
+
+        companyfacts_url = f"https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json"
+        companyfacts_response = self.client.get(companyfacts_url)
+        companyfacts = self._json(companyfacts_response, "company facts")
+        if str(companyfacts.get("cik", "")).zfill(10) != cik or not isinstance(
+            companyfacts.get("facts"), dict
+        ):
+            raise ValueError("invalid SEC company facts payload")
+        staged_companyfacts = stage_sec_response(
+            companyfacts_url,
+            companyfacts_response,
+            self.staging_root,
+            source_metadata={
+                "artifact_kind": SecArtifactKind.COMPANY_FACTS,
+                "ticker": company.ticker,
+                "cik": cik,
+            },
+        )
+        return SecFastPathBundle(
+            SecSubmissionsBundle(self._freeze_payload(submissions), staged_submissions, filings),
+            companyfacts,
+            staged_companyfacts,
+        )
+
+    @staticmethod
+    def original_filing(bundle: SecSubmissionsBundle, form: str) -> SecFilingDescriptor:
+        """Select the newest original filing from prefetched submissions only."""
+
+        if form not in {"10-K", "10-Q"}:
+            raise ValueError("filing discovery requires 10-K or 10-Q")
+        filing = next((item for item in bundle.filings if item.form == form), None)
+        if filing is None:
+            raise ValueError(f"SEC submissions has no {form}")
+        return filing
 
     def acquire(self, requirement: EvidenceRequirement) -> StagedSecResource:
         cik = requirement.company.cik
@@ -56,10 +143,14 @@ class StructuredSecProvider:
             return raw
         if form is None:
             raise ValueError("unsupported SEC artifact kind")
-        filing = next((item for item in filings if item[1] == form), None)
+        filing = next((item for item in filings if item.form == form), None)
         if filing is None:
             raise ValueError(f"SEC submissions has no {form}")
-        accession, _, filing_date, report_date, document, amendment = filing
+        accession = filing.accession
+        filing_date = filing.filing_date
+        report_date = filing.report_date
+        document = filing.primary_document
+        amendment = filing.amendment
         discovery = json.dumps(
             {
                 "schema_version": "sec-filing-discovery-v1",
@@ -101,9 +192,23 @@ class StructuredSecProvider:
         return payload
 
     @staticmethod
-    def _filings(
-        payload: dict[str, object], cik: str
-    ) -> tuple[tuple[str, str, str, str | None, str, bool], ...]:
+    def _freeze_payload(payload: dict[str, object]) -> Mapping[str, object]:
+        return MappingProxyType(
+            {key: StructuredSecProvider._freeze_value(value) for key, value in payload.items()}
+        )
+
+    @staticmethod
+    def _freeze_value(value: object) -> object:
+        if isinstance(value, dict):
+            return MappingProxyType(
+                {key: StructuredSecProvider._freeze_value(nested) for key, nested in value.items()}
+            )
+        if isinstance(value, list):
+            return tuple(StructuredSecProvider._freeze_value(item) for item in value)
+        return value
+
+    @staticmethod
+    def _filings(payload: dict[str, object], cik: str) -> tuple[SecFilingDescriptor, ...]:
         try:
             recent = payload["filings"]
             if not isinstance(recent, dict):
@@ -143,6 +248,15 @@ class StructuredSecProvider:
                 date.fromisoformat(report)
             if form in {"10-K", "10-K/A", "10-Q", "10-Q/A"}:
                 result.append(
-                    (accession, form, filed, report or None, document, form.endswith("/A"))
+                    SecFilingDescriptor(
+                        accession,
+                        form,
+                        filed,
+                        report or None,
+                        document,
+                        form.endswith("/A"),
+                    )
                 )
-        return tuple(sorted(result, key=lambda item: (item[2], item[0]), reverse=True))
+        return tuple(
+            sorted(result, key=lambda item: (item.filing_date, item.accession), reverse=True)
+        )

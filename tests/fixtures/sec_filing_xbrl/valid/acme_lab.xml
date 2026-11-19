@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<link:linkbase xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <link:labelLink xlink:role="labels" xlink:type="extended">
+    <link:loc xlink:label="custom-loc" xlink:href="acme.xsd#acme_CustomRevenue"/>
+    <link:label xlink:label="custom-label" xlink:role="http://www.xbrl.org/2003/role/label">Revenue</link:label>
+    <link:labelArc xlink:from="custom-loc" xlink:to="custom-label"/>
+    <link:loc xlink:label="label-loc" xlink:href="acme.xsd#acme_LabelOnlyRevenue"/>
+    <link:label xlink:label="label-resource" xlink:role="http://www.xbrl.org/2003/role/label">Revenue</link:label>
+    <link:labelArc xlink:from="label-loc" xlink:to="label-resource"/>
+  </link:labelLink>
+</link:linkbase>

@@ -8,6 +8,7 @@ dist/
 build/
 *.egg-info/
 data/raw/
+data/cache/diamond/
 reports/generated/
 logs/
 .env
@@ -23,3 +24,6 @@ logs/
 output/
 
 .env
+
+.worktrees/
+.superpowers/

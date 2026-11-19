@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 from .company_resolver import CompanyResolver, SymbolResolver
 from .sec_acquisition import (
@@ -45,6 +45,25 @@ class Filing:
     filing_date: str
     report_date: str | None
     primary_document: str
+
+
+class FilingDescriptor(Protocol):
+    """The filing fields needed to export an already selected SEC filing."""
+
+    @property
+    def accession(self) -> str: ...
+
+    @property
+    def form(self) -> str: ...
+
+    @property
+    def filing_date(self) -> str: ...
+
+    @property
+    def report_date(self) -> str | None: ...
+
+    @property
+    def primary_document(self) -> str: ...
 
 
 def reconcile_sec_corpus_manifest(
@@ -204,7 +223,12 @@ def _fetch_json(
 
 
 def _export_filing(
-    client: SecClient, staging: Path, issuer_root: Path, ticker: str, cik: str, filing: Filing
+    client: SecClient,
+    staging: Path,
+    issuer_root: Path,
+    ticker: str,
+    cik: str,
+    filing: FilingDescriptor,
 ) -> list[dict[str, Any]]:
     accession_id = filing.accession.replace("-", "")
     base = f"https://www.sec.gov/Archives/edgar/data/{int(cik)}/{accession_id}"
@@ -254,6 +278,27 @@ def _export_filing(
     return records
 
 
+def export_sec_filing(
+    client: SecClient,
+    *,
+    staging_root: str | Path,
+    issuer_root: str | Path,
+    ticker: str,
+    cik: str,
+    filing: FilingDescriptor,
+) -> list[dict[str, Any]]:
+    """Acquire one explicit filing descriptor without refetching SEC aggregates."""
+
+    return _export_filing(
+        client,
+        Path(staging_root),
+        Path(issuer_root),
+        ticker,
+        cik,
+        filing,
+    )
+
+
 def _stage_validate_export(
     client: SecClient,
     staging: Path,
@@ -263,7 +308,7 @@ def _stage_validate_export(
     kind: str,
     url: str,
     response: SecResponse,
-    filing: Filing | None,
+    filing: FilingDescriptor | None,
     name: str | None,
     format_hint: str | None,
 ) -> dict[str, Any]:
@@ -353,7 +398,7 @@ def _filings(payload: dict[str, Any]) -> list[Filing]:
     return sorted(result, key=lambda item: (item.filing_date, item.accession), reverse=True)
 
 
-def _validate_index(payload: dict[str, Any], filing: Filing) -> set[str]:
+def _validate_index(payload: dict[str, Any], filing: FilingDescriptor) -> set[str]:
     try:
         items = payload["directory"]["item"]
     except (KeyError, TypeError) as exc:

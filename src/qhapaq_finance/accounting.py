@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, timedelta
 from enum import Enum
 from typing import TYPE_CHECKING
@@ -28,11 +28,46 @@ from .financial_temporal import TTMWindow
 
 if TYPE_CHECKING:
     from .analysis import CompanyIdentity
+    from .financial_canonicalization import SemanticEvidence
     from .local_sec_corpus import LocalSecCorpus
 
 
 class AccountingError(ValueError):
     """Raised when evidence cannot support a normalized accounting input."""
+
+
+class AccountingEvidenceGapKind(str, Enum):
+    """Stable causes for SEC evidence that cannot yet satisfy accounting."""
+
+    MISSING_STANDARD_CONCEPT = "MISSING_STANDARD_CONCEPT"
+    STANDARD_CONCEPT_COVERAGE_GAP = "STANDARD_CONCEPT_COVERAGE_GAP"
+    REQUIRED_COMPONENT_MISSING = "REQUIRED_COMPONENT_MISSING"
+    PERIOD_COVERAGE_GAP = "PERIOD_COVERAGE_GAP"
+
+
+class AccountingEvidenceGap(AccountingError):
+    """A typed accounting-evidence gap that filing-native facts may repair."""
+
+    def __init__(self, kind: AccountingEvidenceGapKind, metric_id: str) -> None:
+        super().__init__(f"{kind.value}: {metric_id}")
+        self.kind = kind
+        self.metric_id = metric_id
+
+
+class AccountingEvidenceFailureKind(str, Enum):
+    """Stable fail-closed causes from SEC accounting promotion."""
+
+    AMBIGUOUS_CONTEXT = "AMBIGUOUS_CONTEXT"
+    CANONICAL_INVARIANT = "CANONICAL_INVARIANT"
+
+
+class AccountingEvidenceFailure(AccountingError):
+    """A typed accounting failure that filing-native evidence must not repair."""
+
+    def __init__(self, kind: AccountingEvidenceFailureKind, metric_id: str) -> None:
+        super().__init__(f"{kind.value}: {metric_id}")
+        self.kind = kind
+        self.metric_id = metric_id
 
 
 class DataState(str, Enum):
@@ -200,7 +235,7 @@ _GENERIC_IC_METRIC_IDS = frozenset(
 
 
 def accounting_evidence_spec_from_promoted_facts(
-    facts: Mapping[str, FinancialFact],
+    facts: Mapping[str, FinancialFact | DerivedFact],
 ) -> AccountingEvidenceSpec:
     """Build the accounting contract from canonical promoted evidence."""
     from .financial_promotion import ACCOUNTING_EVIDENCE_POLICY_FIELDS
@@ -258,26 +293,209 @@ def accounting_evidence_spec_from_promoted_facts(
 
 def promote_local_sec_accounting_evidence(
     corpus: LocalSecCorpus, identity: CompanyIdentity
-) -> tuple[dict[str, FinancialFact], AccountingEvidenceSpec]:
+) -> tuple[dict[str, FinancialFact | DerivedFact], AccountingEvidenceSpec]:
     """Promote validated local SEC evidence into the generic accounting contract."""
 
     from .financial_canonicalization import extract_company_facts
-    from .financial_promotion import (
-        FinancialPromotionError,
-        MultiPeriodFinancialPromoter,
-        accounting_evidence_policies,
-        validate_accounting_evidence_policy_coverage,
-    )
 
     evidence = corpus.evidence(identity)
     raw_facts = extract_company_facts(
         evidence.companyfacts,
         source_identity=evidence.companyfacts_identity,
     )
+    return promote_sec_accounting_evidence(raw_facts)
+
+
+def promote_sec_accounting_evidence(
+    raw_facts: tuple[object, ...],
+    *,
+    semantic_extensions: Mapping[tuple[str, str], SemanticEvidence] | None = None,
+) -> tuple[dict[str, FinancialFact | DerivedFact], AccountingEvidenceSpec]:
+    """Promote already-validated SEC raw facts into the accounting contract."""
+
+    from .financial_canonicalization import (
+        MetricSpec,
+        RawFact,
+    )
+    from .financial_canonicalization import (
+        PeriodKind as CanonicalPeriodKind,
+    )
+    from .financial_promotion import (
+        FinancialPromotionError,
+        FinancialPromotionFailureKind,
+        MetricPromotionPolicy,
+        MultiPeriodFinancialPromoter,
+        PromotionStrategy,
+        accounting_evidence_policies,
+        validate_accounting_evidence_policy_coverage,
+    )
+
+    if any(not isinstance(fact, RawFact) for fact in raw_facts):
+        raise AccountingError("SEC accounting evidence requires RawFact values")
+    typed_facts = tuple(fact for fact in raw_facts if isinstance(fact, RawFact))
+
+    def policy_period_kind(
+        policy: MetricPromotionPolicy,
+    ) -> CanonicalPeriodKind | None:
+        if policy.strategy in {
+            PromotionStrategy.DIRECT_INSTANT,
+            PromotionStrategy.COMPOSITE_INSTANT,
+            PromotionStrategy.DERIVED_INSTANT,
+        }:
+            return CanonicalPeriodKind.INSTANT
+        if policy.strategy in {
+            PromotionStrategy.DIRECT_DURATION,
+            PromotionStrategy.TTM_DURATION,
+            PromotionStrategy.COMPOSITE_DURATION,
+        }:
+            return CanonicalPeriodKind.DURATION
+        return None
+
+    def semantic_targets(
+        policies: tuple[MetricPromotionPolicy, ...],
+        metric_id: str,
+    ) -> tuple[tuple[str, str, str, CanonicalPeriodKind], ...]:
+        result: set[tuple[str, str, str, CanonicalPeriodKind]] = set()
+
+        def visit(policy: MetricPromotionPolicy) -> None:
+            kind = policy_period_kind(policy)
+            if policy.metric_id == metric_id and kind is not None and len(policy.concepts) == 1:
+                result.add(
+                    (
+                        policy.taxonomy,
+                        policy.concepts[0],
+                        policy.unit,
+                        kind,
+                    )
+                )
+            for nested in policy.dependencies + policy.alternatives:
+                visit(nested)
+
+        for policy in policies:
+            visit(policy)
+
+        return tuple(sorted(result, key=lambda item: (item[0], item[1], item[2], item[3].value)))
+
+    def materialize_semantic_extensions(
+        facts: tuple[RawFact, ...],
+        policies: tuple[MetricPromotionPolicy, ...],
+    ) -> tuple[RawFact, ...]:
+        if not semantic_extensions:
+            return facts
+
+        materialized = list(facts)
+
+        for fact in facts:
+            semantic = semantic_extensions.get((fact.taxonomy, fact.concept))
+            if semantic is None:
+                continue
+
+            expected_qname = f"{fact.taxonomy}:{fact.concept}"
+            if semantic.concept.qname != expected_qname:
+                raise AccountingEvidenceFailure(
+                    AccountingEvidenceFailureKind.CANONICAL_INVARIANT,
+                    semantic.target_metric,
+                )
+
+            targets = semantic_targets(policies, semantic.target_metric)
+            if not targets:
+                raise AccountingEvidenceFailure(
+                    AccountingEvidenceFailureKind.CANONICAL_INVARIANT,
+                    semantic.target_metric,
+                )
+
+            presentation_parents = {
+                arc.parent
+                for arc in semantic.relationships.presentations
+                if arc.child == semantic.concept.qname
+            }
+            calculation_parents = {
+                arc.parent
+                for arc in semantic.relationships.calculations
+                if arc.child == semantic.concept.qname and arc.period_compatible
+            }
+            structural_parents = presentation_parents & calculation_parents
+
+            structurally_matched = tuple(
+                target for target in targets if f"{target[0]}:{target[1]}" in structural_parents
+            )
+
+            if len(structurally_matched) == 1:
+                target = structurally_matched[0]
+            elif len(targets) == 1:
+                # The filing-native parser already resolved the structural
+                # relationship to one accounting metric. A unique accounting
+                # representation may therefore be adapted without guessing.
+                target = targets[0]
+            else:
+                raise AccountingEvidenceFailure(
+                    AccountingEvidenceFailureKind.CANONICAL_INVARIANT,
+                    semantic.target_metric,
+                )
+
+            taxonomy, concept, unit, period_kind = target
+
+            spec = MetricSpec(
+                metric=semantic.target_metric,
+                standard_taxonomy=taxonomy,
+                standard_concept=concept,
+                approved_aliases=(),
+                unit=unit,
+                period_kind=period_kind,
+            )
+            supported, _ = semantic.supports(spec)
+
+            if not supported or fact.unit != unit or fact.period_kind is not period_kind:
+                raise AccountingEvidenceFailure(
+                    AccountingEvidenceFailureKind.CANONICAL_INVARIANT,
+                    semantic.target_metric,
+                )
+
+            materialized.append(
+                replace(
+                    fact,
+                    taxonomy=taxonomy,
+                    concept=concept,
+                )
+            )
+
+        return tuple(materialized)
+
     promoter = MultiPeriodFinancialPromoter()
+
+    def promote_required(policy: MetricPromotionPolicy) -> FinancialFact | DerivedFact:
+        try:
+            return promoter.promote(typed_facts, policy=policy)
+        except FinancialPromotionError as exc:
+            recoverable = {
+                FinancialPromotionFailureKind.MISSING_STANDARD_CONCEPT: (
+                    AccountingEvidenceGapKind.MISSING_STANDARD_CONCEPT
+                ),
+                FinancialPromotionFailureKind.STANDARD_CONCEPT_COVERAGE_GAP: (
+                    AccountingEvidenceGapKind.STANDARD_CONCEPT_COVERAGE_GAP
+                ),
+                FinancialPromotionFailureKind.REQUIRED_COMPONENT_MISSING: (
+                    AccountingEvidenceGapKind.REQUIRED_COMPONENT_MISSING
+                ),
+                FinancialPromotionFailureKind.PERIOD_COVERAGE_GAP: (
+                    AccountingEvidenceGapKind.PERIOD_COVERAGE_GAP
+                ),
+            }.get(exc.kind)
+            if recoverable is not None:
+                raise AccountingEvidenceGap(recoverable, policy.metric_id) from exc
+            failure = (
+                AccountingEvidenceFailureKind.AMBIGUOUS_CONTEXT
+                if exc.kind is FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT
+                else AccountingEvidenceFailureKind.CANONICAL_INVARIANT
+            )
+            raise AccountingEvidenceFailure(failure, policy.metric_id) from exc
 
     # Revenue defines the actual TTM accounting window.
     bootstrap_policies = accounting_evidence_policies()
+    typed_facts = materialize_semantic_extensions(
+        typed_facts,
+        bootstrap_policies,
+    )
     revenue_policy = next(
         (policy for policy in bootstrap_policies if policy.metric_id == "revenue"),
         None,
@@ -285,7 +503,7 @@ def promote_local_sec_accounting_evidence(
     if revenue_policy is None:
         raise AccountingError("revenue promotion policy is missing")
 
-    revenue = promoter.promote(raw_facts, policy=revenue_policy)
+    revenue = promote_required(revenue_policy)
     if revenue.period_start is None:
         raise AccountingError("promoted revenue has no TTM period start")
 
@@ -306,7 +524,7 @@ def promote_local_sec_accounting_evidence(
 
     # Everything used by FCFF / capital structure remains mandatory.
     promoted = {
-        policy.metric_id: promoter.promote(raw_facts, policy=policy)
+        policy.metric_id: promote_required(policy)
         for policy in policies
         if policy.metric_id in required - noa_ids
     }
@@ -319,7 +537,7 @@ def promote_local_sec_accounting_evidence(
 
     try:
         promoted_noa = {
-            metric_id: promoter.promote(raw_facts, policy=noa_policies[metric_id])
+            metric_id: promoter.promote(typed_facts, policy=noa_policies[metric_id])
             for metric_id in noa_ids
         }
     except FinancialPromotionError:
@@ -336,7 +554,7 @@ def promote_local_sec_accounting_evidence(
         raise AccountingError("invested-capital component promotion policies are incomplete")
     for metric_id, policy in component_policies.items():
         try:
-            promoted[metric_id] = promoter.promote(raw_facts, policy=policy)
+            promoted[metric_id] = promoter.promote(typed_facts, policy=policy)
         except FinancialPromotionError:
             # A policy records unavailable evidence as missing at the component
             # boundary; it never fabricates a reported numeric zero.
@@ -726,6 +944,18 @@ def _ttm(
             promoted = facts[spec.annual]
             if isinstance(promoted, DerivedFact):
                 return promoted
+            if promoted.period_kind is not PeriodKind.DURATION or promoted.period_start is None:
+                raise AccountingError(f"{name} canonical promoted input must be a duration fact")
+            return DerivedFact(
+                id=f"ttm_{name}",
+                concept=promoted.concept,
+                value=promoted.value,
+                unit=promoted.unit,
+                inputs=(promoted.id,),
+                formula="canonical promoted duration fact",
+                period_start=promoted.period_start,
+                period_end=promoted.period_end,
+            )
         annual = facts[spec.annual]
         prior_ytd = facts[spec.prior_ytd]
         current_ytd = facts[spec.current_ytd]

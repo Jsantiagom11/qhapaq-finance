@@ -112,7 +112,9 @@ def test_malformed_refresh_preserves_the_existing_valid_cache(tmp_path: Path) ->
     assert resolver.resolve("QCOM") is not None
 
 
-def test_dynamically_resolved_unconfigured_company_requires_evidence(tmp_path: Path) -> None:
+def test_dynamically_resolved_unconfigured_company_acquisition_failure_is_blocked(
+    tmp_path: Path,
+) -> None:
     resolver = CompanyResolver(cache_path=tmp_path / "company_tickers.json")
     client, _ = _client(
         SecResponse(
@@ -125,11 +127,23 @@ def test_dynamically_resolved_unconfigured_company_requires_evidence(tmp_path: P
     )
     resolver.refresh(client)
 
-    orchestrator = AnalysisOrchestrator(Path(__file__).resolve().parents[1], resolver=resolver)
+    factory_calls = 0
+
+    def unavailable_sec_client() -> SecClient:
+        nonlocal factory_calls
+        factory_calls += 1
+        raise RuntimeError("missing SEC configuration")
+
+    orchestrator = AnalysisOrchestrator(
+        Path(__file__).resolve().parents[1],
+        resolver=resolver,
+        sec_client_factory=unavailable_sec_client,
+    )
     result = orchestrator.analyze("acme")
 
-    assert result.status is AnalysisStatus.EVIDENCE_REQUIRED
+    assert result.status is AnalysisStatus.BLOCKED
     assert result.canonical_result is None
+    assert factory_calls == 1
     assert result.plan.identity.to_dict()["cik"] == "0000000123"
     assert result.plan.identity.to_dict()["exchange"] is None
 
@@ -153,7 +167,9 @@ def test_analyze_local_resolution_hit_does_not_refresh() -> None:
     assert resolver.refresh_calls == 0
 
 
-def test_analyze_local_miss_refreshes_once_and_continues_when_found(tmp_path: Path) -> None:
+def test_analyze_local_miss_refreshes_once_then_runs_bounded_acquisition(
+    tmp_path: Path,
+) -> None:
     client, transport = _client(SecResponse(200, {}, _single_company_payload()))
     resolver = CountingResolver(CompanyResolver(cache_path=tmp_path / "company_tickers.json"))
 
@@ -163,12 +179,15 @@ def test_analyze_local_miss_refreshes_once_and_continues_when_found(tmp_path: Pa
         sec_client_factory=lambda: client,
     ).analyze(" cost ")
 
-    assert result.status is AnalysisStatus.EVIDENCE_REQUIRED
+    assert result.status is AnalysisStatus.BLOCKED
     assert result.plan.identity.ticker == "COST"
     assert result.plan.identity.cik == "0000909832"
     assert resolver.resolve_calls == 2
     assert resolver.refresh_calls == 1
-    assert transport.urls == [SEC_COMPANY_TICKERS_URL]
+    assert transport.urls == [
+        SEC_COMPANY_TICKERS_URL,
+        "https://data.sec.gov/submissions/CIK0000909832.json",
+    ]
 
 
 def test_analyze_authoritative_negative_is_unsupported_after_one_refresh(

@@ -309,3 +309,49 @@ def test_aapl_financing_identity_remains_complete_when_opening_intangibles_are_m
     assert snapshot.invested_capital.average == pytest.approx(39_944_500_000)
     assert snapshot.invested_capital.opening.bottom_up is not None
     assert snapshot.invested_capital.opening.bottom_up.components["net_intangibles"].value is None
+
+
+def test_ttm_preserves_promoted_full_fiscal_year_window() -> None:
+    from datetime import date
+    from pathlib import Path
+
+    from qhapaq_finance.accounting import TtmFactSpec, _ttm
+    from qhapaq_finance.evidence import (
+        EvidenceKind,
+        FilingRef,
+        FinancialFact,
+        PeriodKind,
+    )
+
+    fact = FinancialFact(
+        id="revenue-fy26",
+        concept="RevenueFromContractWithCustomerExcludingAssessedTax",
+        value=331_839_000_000.0,
+        unit="USD",
+        kind=EvidenceKind.FACT,
+        period_kind=PeriodKind.DURATION,
+        period_start=date(2025, 7, 1),
+        period_end=date(2026, 6, 30),
+        fiscal_year=2026,
+        fiscal_period="FY",
+        filing=FilingRef(
+            "0001193125-26-323660",
+            "10-K",
+            date(2026, 7, 29),
+            Path("."),
+            "sha",
+        ),
+        locator="diagnostic",
+        method="canonical SEC company facts",
+    )
+
+    result = _ttm(
+        {"revenue": fact},
+        TtmFactSpec("revenue", "revenue", "revenue"),
+        "revenue",
+    )
+
+    assert result.value == fact.value
+    assert result.period_start == date(2025, 7, 1)
+    assert result.period_end == date(2026, 6, 30)
+    assert result.inputs == (fact.id,)
