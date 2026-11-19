@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from datetime import date
 from pathlib import Path
 
@@ -15,6 +15,7 @@ from .archetypes import Archetype
 from .cache import DiamondCacheError
 from .engine import DiamondResult, evaluate_universe
 from .funnel import FunnelRun, run_funnel
+from .percentiles import DEFAULT_PERCENTILE_POLICY
 from .providers.benchmark import benchmark_provider_sample
 from .providers.local import LocalJsonProvider
 from .providers.production import build_funnel_provider as _production_funnel_provider
@@ -291,6 +292,11 @@ def funnel_command(arguments: list[str]) -> None:
         action="store_true",
         help="require exact-cutoff cache evidence and disable all provider clients",
     )
+    parser.add_argument(
+        "--align-peer-periods",
+        action="store_true",
+        help="rebuild misaligned peer groups around each issuer's fiscal period",
+    )
     args = parser.parse_args(arguments)
 
     if args.depth < 1:
@@ -309,6 +315,7 @@ def funnel_command(arguments: list[str]) -> None:
             universe_id=args.universe,
             as_of=args.as_of,
             depth=args.depth,
+            policy=replace(DEFAULT_PERCENTILE_POLICY, align_peer_periods=args.align_peer_periods),
         )
     except (
         DiamondCacheError,

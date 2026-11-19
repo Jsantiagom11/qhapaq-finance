@@ -264,3 +264,57 @@ def test_production_funnel_wires_debt_zero_cache_roots(
 def test_funnel_offline_and_refresh_are_mutually_exclusive() -> None:
     with pytest.raises(SystemExit):
         funnel_command(["--offline", "--refresh"])
+
+
+def test_funnel_peer_period_window_recovers_only_eligible_rankings(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from dataclasses import replace
+    from datetime import date
+
+    from qhapaq_finance.diamond.contracts import FundamentalRecord, SecurityRef
+
+    try:
+        from tests.diamond_helpers import rich_record
+    except ModuleNotFoundError:
+        from diamond_helpers import rich_record
+
+    cutoff = date(2026, 8, 1)
+    records = tuple(
+        replace(record, data_as_of=cutoff)
+        for record in (
+            *(rich_record(f"T{i:02d}") for i in range(20)),
+            rich_record("OLDER", period_end=date(2026, 3, 29)),
+            rich_record("STALE", period_end=date(2026, 1, 30)),
+            *(rich_record(f"Y{i:02d}", peer_group_id="Healthy") for i in range(20)),
+        )
+    )
+
+    class FixtureProvider:
+        def universe(self, universe_id: str, as_of: date) -> tuple[SecurityRef, ...]:
+            return tuple(SecurityRef(r.ticker, r.security_id, r.issuer_id) for r in records)
+
+        def fundamentals(
+            self, securities: tuple[SecurityRef, ...], as_of: date, history_years: int = 5
+        ) -> tuple[FundamentalRecord, ...]:
+            return records
+
+    monkeypatch.setattr(
+        diamond_cli, "_production_funnel_provider", lambda *a, **kw: FixtureProvider()
+    )
+    arguments = ["--offline", "--depth", "503", "--as-of", cutoff.isoformat(), "--format", "json"]
+    cli.main(["funnel", *arguments])
+    before = json.loads(capsys.readouterr().out)
+    cli.main(["funnel", *arguments, "--align-peer-periods"])
+    after = json.loads(capsys.readouterr().out)
+
+    assert before["metadata"]["ranked_records"] == 20
+    assert after["metadata"]["ranked_records"] == 40
+    assert before["metadata"]["dataset_identity"] == after["metadata"]["dataset_identity"]
+
+    previous = {row["ticker"]: row for row in before["results"]}
+    current = {row["ticker"]: row for row in after["results"]}
+    assert all(current[f"Y{i:02d}"] == previous[f"Y{i:02d}"] for i in range(20))
+    assert "PEER_PERIOD_WINDOW_APPLIED" in current["T00"]["diagnostics"]
+    for ticker in ("OLDER", "STALE"):
+        assert current[ticker]["scores"]["research_priority"] is None

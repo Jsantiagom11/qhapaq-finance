@@ -9,6 +9,7 @@ from time import perf_counter
 from .contracts import FundamentalRecord
 from .dataset_identity import dataset_identity
 from .engine import DiamondResult, evaluate_universe
+from .percentiles import DEFAULT_PERCENTILE_POLICY, PercentilePolicy
 from .providers.protocol import FundamentalDataProvider
 
 
@@ -58,6 +59,7 @@ def run_funnel(
     universe_id: str,
     as_of: date,
     depth: int,
+    policy: PercentilePolicy = DEFAULT_PERCENTILE_POLICY,
 ) -> FunnelRun:
     if depth < 1:
         raise ValueError("depth must be positive")
@@ -81,7 +83,7 @@ def run_funnel(
     acquisition_seconds = perf_counter() - acquisition_started
 
     evaluation_started = perf_counter()
-    evaluated = evaluate_universe(records)
+    evaluated = evaluate_universe(records, policy=policy)
     ranked = _ranked(evaluated)
     evaluation_seconds = perf_counter() - evaluation_started
 

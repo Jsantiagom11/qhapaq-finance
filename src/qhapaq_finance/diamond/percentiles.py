@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import numpy as np
 
@@ -27,6 +27,7 @@ class PercentilePolicy:
     winsor_upper: float = 0.95
     soft_period_spread_days: int = 45
     hard_period_spread_days: int = 92
+    align_peer_periods: bool = False
 
     def __post_init__(self) -> None:
         if self.primary_peer_minimum < 1 or self.feature_observation_minimum < 2:
@@ -110,6 +111,25 @@ def resolve_peer_context(
     period_ends = [record.fundamental_period_end for record in selected]
     spread = (max(period_ends) - min(period_ends)).days
     diagnostics: list[str] = []
+    if (
+        spread > policy.hard_period_spread_days
+        and policy.align_peer_periods
+        and record_eligible_for_scoring(target)
+    ):
+        radius = policy.hard_period_spread_days // 2
+        near_target = tuple(
+            record
+            for record in eligible
+            if abs((record.fundamental_period_end - target.fundamental_period_end).days) <= radius
+        )
+        aligned = resolve_peer_context(
+            near_target, target, replace(policy, align_peer_periods=False)
+        )
+        return replace(
+            aligned,
+            diagnostics=(*aligned.diagnostics, "PEER_PERIOD_WINDOW_APPLIED"),
+        )
+
     blocked = False
     if spread > policy.hard_period_spread_days:
         diagnostics.append("PEER_PERIOD_MISALIGNED")
