@@ -10,7 +10,11 @@ import math
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date
+from decimal import Decimal
 from enum import Enum
+from typing import Literal
+
+XbrlDecimals = int | Literal["INF"]
 
 
 class ProfileKind(str, Enum):
@@ -123,6 +127,8 @@ class RawFact:
     label: str | None = None
     data_type: str | None = None
     balance: str | None = None
+    xbrl_value: Decimal | None = None
+    xbrl_decimals: XbrlDecimals | None = None
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.value) or not self.unit.strip():
@@ -131,6 +137,12 @@ class RawFact:
             raise ValueError("duration raw facts require a start date")
         if self.period_kind is PeriodKind.INSTANT and self.start is not None:
             raise ValueError("instant raw facts cannot have a start date")
+        if self.xbrl_value is not None and (
+            not self.xbrl_value.is_finite() or float(self.xbrl_value) != self.value
+        ):
+            raise ValueError("XBRL amount must agree with the numeric fact")
+        if self.xbrl_decimals is not None and self.xbrl_value is None:
+            raise ValueError("XBRL decimals require a reported XBRL amount")
 
 
 @dataclass(frozen=True)

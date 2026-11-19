@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import replace
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -67,6 +68,8 @@ def test_bridge_emits_standard_raw_fact_with_verified_lineage() -> None:
     assert fact.start == date(2025, 1, 1)
     assert fact.end == date(2025, 12, 31)
     assert fact.source_identity in evidence.source_identities
+    assert fact.xbrl_value == Decimal("100")
+    assert fact.xbrl_decimals == 0
 
 
 def test_structural_extension_is_accepted_but_label_only_extension_is_not() -> None:
