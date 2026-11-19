@@ -11,6 +11,7 @@ from qhapaq_finance.evidence import PeriodKind as EvidencePeriodKind
 from qhapaq_finance.financial_canonicalization import PeriodKind, RawFact, extract_company_facts
 from qhapaq_finance.financial_promotion import (
     FinancialPromotionError,
+    FinancialPromotionFailureKind,
     MetricPromotionPolicy,
     MultiPeriodFinancialPromoter,
     PromotionStrategy,
@@ -99,6 +100,63 @@ def test_promoter_rejects_incompatible_ytd_windows() -> None:
     )
     with pytest.raises(FinancialPromotionError):
         MultiPeriodFinancialPromoter().promote_ttm(facts, concept="OperatingIncomeLoss")
+
+
+def _revenue_duration_series(concept: str, annual: float) -> tuple[RawFact, ...]:
+    return tuple(
+        replace(fact, fact_id=f"{concept}:{fact.fact_id}", concept=concept)
+        for fact in (
+            _fact(annual, date(2025, 1, 1), date(2025, 12, 31), "FY"),
+            _fact(70, date(2025, 1, 1), date(2025, 6, 30), "Q2"),
+            _fact(90, date(2026, 1, 1), date(2026, 6, 30), "Q2"),
+        )
+    )
+
+
+def test_revenues_fallback_rebuilds_ttm_from_one_concept() -> None:
+    policy = next(item for item in accounting_evidence_policies() if item.metric_id == "revenue")
+    preferred = _revenue_duration_series("RevenueFromContractWithCustomerExcludingAssessedTax", 130)
+    aggregate = _revenue_duration_series("Revenues", 100)
+    operating = _revenue_duration_series("OperatingIncomeLoss", 30)
+    promoter = MultiPeriodFinancialPromoter()
+
+    for facts in (operating + aggregate, operating + preferred[1:] + aggregate):
+        promoted = promoter.promote(facts, policy=policy)
+        assert promoted.value == 120
+        assert promoted.inputs == tuple(item.fact_id for item in aggregate)
+        assert promoted.period_start == date(2025, 7, 1)
+        assert promoted.period_end == date(2026, 6, 30)
+
+    assert promoter.promote(operating + preferred + aggregate, policy=policy).value == 150
+
+
+def test_revenues_fallback_preserves_the_period_gap_without_a_complete_series() -> None:
+    policy = next(item for item in accounting_evidence_policies() if item.metric_id == "revenue")
+    preferred = _revenue_duration_series("RevenueFromContractWithCustomerExcludingAssessedTax", 130)
+    aggregate = _revenue_duration_series("Revenues", 100)
+    operating = _revenue_duration_series("OperatingIncomeLoss", 30)
+    promoter = MultiPeriodFinancialPromoter()
+
+    for facts in (operating + preferred[1:], operating + preferred[1:] + aggregate[:2]):
+        with pytest.raises(FinancialPromotionError) as error:
+            promoter.promote(facts, policy=policy)
+
+        assert error.value.kind is FinancialPromotionFailureKind.PERIOD_COVERAGE_GAP
+
+
+def test_revenues_fallback_does_not_bypass_ambiguous_preferred_facts() -> None:
+    policy = next(item for item in accounting_evidence_policies() if item.metric_id == "revenue")
+    preferred = _revenue_duration_series("RevenueFromContractWithCustomerExcludingAssessedTax", 130)
+    aggregate = _revenue_duration_series("Revenues", 100)
+    operating = _revenue_duration_series("OperatingIncomeLoss", 30)
+    conflict = replace(preferred[0], fact_id="preferred:conflict", value=135)
+
+    with pytest.raises(FinancialPromotionError) as error:
+        MultiPeriodFinancialPromoter().promote(
+            (*operating, *preferred, conflict, *aggregate), policy=policy
+        )
+
+    assert error.value.kind is FinancialPromotionFailureKind.AMBIGUOUS_CONTEXT
 
 
 def test_promoter_uses_the_annual_period_preceding_the_latest_comparable_ytd_pair() -> None:

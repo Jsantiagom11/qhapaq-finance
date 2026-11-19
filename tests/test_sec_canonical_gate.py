@@ -42,6 +42,21 @@ def test_gate_returns_ready_snapshot_from_complete_canonical_sec_evidence() -> N
     assert result.snapshot.revenue == 466_823_000_000.0
 
 
+def test_gate_accepts_authorized_aggregate_revenue_with_full_ttm_evidence() -> None:
+    facts = tuple(
+        replace(fact, concept="Revenues")
+        if fact.concept == "RevenueFromContractWithCustomerExcludingAssessedTax"
+        else fact
+        for fact in _aapl_facts()
+    )
+
+    result = evaluate_sec_canonical_gate(facts)
+
+    assert result.state is SecCanonicalGateState.READY
+    assert result.snapshot is not None
+    assert result.snapshot.revenue == 466_823_000_000.0
+
+
 def test_gate_returns_typed_recoverable_gap_when_standard_concept_is_absent() -> None:
     facts = tuple(
         fact
