@@ -51,6 +51,33 @@ class CanonicalIssuerSnapshot:
     observations: tuple[FundamentalObservation, ...]
 
 
+@dataclass(frozen=True, slots=True)
+class CanonicalObservationProvenance:
+    """Ephemeral exact inputs for one unchanged canonical observation."""
+
+    observation: FundamentalObservation
+    source_facts: tuple[RawFact, ...]
+    derivation_kind: str
+    formula: str | None = None
+    transformations: tuple[str, ...] = ()
+
+    @property
+    def metric_id(self) -> str:
+        return self.observation.metric_id
+
+    @property
+    def fiscal_slot(self) -> FiscalSlot:
+        return self.observation.fiscal_slot
+
+
+@dataclass(frozen=True, slots=True)
+class CanonicalIssuerWithProvenance:
+    """Canonical snapshot plus a non-persisted provenance sidecar."""
+
+    snapshot: CanonicalIssuerSnapshot
+    provenance: tuple[CanonicalObservationProvenance, ...]
+
+
 _FISCAL_SLOTS = (
     FiscalSlot.FY1,
     FiscalSlot.FY2,
@@ -271,7 +298,7 @@ def _promoted_instants(
     return selected
 
 
-def canonicalize_issuer(
+def canonicalize_issuer_with_provenance(
     *,
     issuer_id: str,
     cik: str,
@@ -280,8 +307,8 @@ def canonicalize_issuer(
     evidence_revision_sha256: str,
     facts: tuple[RawFact, ...],
     fresh_revenue_from: date | None = None,
-) -> CanonicalIssuerSnapshot | None:
-    """Build immutable SEC accounting observations for one issuer evidence revision."""
+) -> CanonicalIssuerWithProvenance | None:
+    """Build unchanged SEC observations and retain their exact selected inputs."""
     if history_years < 1:
         raise ValueError("history_years must be positive")
     if not facts:
@@ -306,6 +333,36 @@ def canonicalize_issuer(
 
     source_identity = f"sec-evidence:{evidence_revision_sha256}"
     observations: list[FundamentalObservation] = []
+    provenance: list[CanonicalObservationProvenance] = []
+    facts_by_id = {fact.fact_id: fact for fact in facts}
+    if len(facts_by_id) != len(facts):
+        raise SecCanonicalError("SEC_FACT_ID_CONFLICT")
+
+    def source_facts(
+        selected: RawFact | FinancialFact | DerivedFact,
+    ) -> tuple[RawFact, ...]:
+        if isinstance(selected, RawFact):
+            identifiers: tuple[str, ...] = (selected.fact_id,)
+        elif isinstance(selected, FinancialFact):
+            identifiers = selected.source_fact_ids or (selected.id,)
+        else:
+            identifiers = selected.inputs
+        try:
+            resolved = tuple(facts_by_id[identifier] for identifier in identifiers)
+        except KeyError as exc:
+            raise SecCanonicalError("SEC_PROVENANCE_INPUT_MISSING") from exc
+        if not resolved:
+            raise SecCanonicalError("SEC_PROVENANCE_INPUT_MISSING")
+        return resolved
+
+    def promoted_derivation(
+        selected: FinancialFact | DerivedFact,
+    ) -> tuple[str, str | None]:
+        if isinstance(selected, DerivedFact):
+            return "DERIVED", selected.formula
+        if len(selected.source_fact_ids) > 1:
+            return "COMPOSITE", selected.method
+        return "DIRECT", None
 
     def add(
         metric_id: str,
@@ -316,25 +373,38 @@ def canonicalize_issuer(
         period_end: date,
         period_kind: PeriodKind,
         unit_kind: UnitKind,
+        selected_facts: tuple[RawFact, ...],
+        derivation_kind: str,
+        formula: str | None = None,
         share_class_id: str | None = None,
         adjustment_basis_id: str | None = None,
     ) -> None:
         if raw_value is None:
             return
         canonical_value = abs(raw_value) if metric_id == "capital_expenditures" else raw_value
-        observations.append(
-            FundamentalObservation(
-                metric_id=metric_id,
-                fiscal_slot=slot,
-                value=canonical_value,
-                period_start=period_start,
-                period_end=period_end,
-                period_kind=period_kind,
-                unit_kind=unit_kind,
-                source_provider="sec",
-                source_identity=source_identity,
-                share_class_id=share_class_id,
-                adjustment_basis_id=adjustment_basis_id,
+        observation = FundamentalObservation(
+            metric_id=metric_id,
+            fiscal_slot=slot,
+            value=canonical_value,
+            period_start=period_start,
+            period_end=period_end,
+            period_kind=period_kind,
+            unit_kind=unit_kind,
+            source_provider="sec",
+            source_identity=source_identity,
+            share_class_id=share_class_id,
+            adjustment_basis_id=adjustment_basis_id,
+        )
+        observations.append(observation)
+        provenance.append(
+            CanonicalObservationProvenance(
+                observation=observation,
+                source_facts=selected_facts,
+                derivation_kind=derivation_kind,
+                formula=formula,
+                transformations=(
+                    ("ABSOLUTE_VALUE",) if metric_id == "capital_expenditures" else ()
+                ),
             )
         )
 
@@ -352,6 +422,9 @@ def canonicalize_issuer(
             period_end=promoted.period_end,
             period_kind=PeriodKind.DURATION,
             unit_kind=(UnitKind.SHARES if metric_id == "diluted_shares" else UnitKind.CURRENCY),
+            selected_facts=source_facts(promoted),
+            derivation_kind=("TTM" if isinstance(promoted, DerivedFact) else "DIRECT"),
+            formula=(promoted.formula if isinstance(promoted, DerivedFact) else None),
             adjustment_basis_id=(
                 "SEC_REPORTED_DILUTED_V1" if metric_id == "diluted_shares" else None
             ),
@@ -371,6 +444,8 @@ def canonicalize_issuer(
                 period_end=fact.end,
                 period_kind=PeriodKind.DURATION,
                 unit_kind=(UnitKind.SHARES if metric_id == "diluted_shares" else UnitKind.CURRENCY),
+                selected_facts=source_facts(fact),
+                derivation_kind="DIRECT",
                 adjustment_basis_id=(
                     "SEC_REPORTED_DILUTED_V1" if metric_id == "diluted_shares" else None
                 ),
@@ -385,6 +460,9 @@ def canonicalize_issuer(
                 period_end=promoted.period_end,
                 period_kind=PeriodKind.INSTANT,
                 unit_kind=UnitKind.CURRENCY,
+                selected_facts=source_facts(promoted),
+                derivation_kind=promoted_derivation(promoted)[0],
+                formula=promoted_derivation(promoted)[1],
             )
 
     latest_end = _latest_balance_end(facts)
@@ -398,6 +476,9 @@ def canonicalize_issuer(
                 period_end=promoted.period_end,
                 period_kind=PeriodKind.INSTANT,
                 unit_kind=UnitKind.CURRENCY,
+                selected_facts=source_facts(promoted),
+                derivation_kind=promoted_derivation(promoted)[0],
+                formula=promoted_derivation(promoted)[1],
             )
         latest_shares = _latest_instant_fact(
             facts,
@@ -414,6 +495,8 @@ def canonicalize_issuer(
                 period_end=latest_shares.end,
                 period_kind=PeriodKind.INSTANT,
                 unit_kind=UnitKind.SHARES,
+                selected_facts=source_facts(latest_shares),
+                derivation_kind="DIRECT",
                 share_class_id="CONSOLIDATED_COMMON",
                 adjustment_basis_id="SEC_REPORTED_COMMON_V1",
             )
@@ -435,23 +518,52 @@ def canonicalize_issuer(
                 period_end=annual_shares.end,
                 period_kind=PeriodKind.INSTANT,
                 unit_kind=UnitKind.SHARES,
+                selected_facts=source_facts(annual_shares),
+                derivation_kind="DIRECT",
                 share_class_id="CONSOLIDATED_COMMON",
                 adjustment_basis_id="SEC_REPORTED_COMMON_V1",
             )
 
-    return CanonicalIssuerSnapshot(
-        schema_version=CANONICAL_SCHEMA_VERSION,
-        canonicalizer_version=SEC_CANONICALIZER_VERSION,
+    return CanonicalIssuerWithProvenance(
+        snapshot=CanonicalIssuerSnapshot(
+            schema_version=CANONICAL_SCHEMA_VERSION,
+            canonicalizer_version=SEC_CANONICALIZER_VERSION,
+            issuer_id=issuer_id,
+            cik=cik,
+            as_of=as_of,
+            history_years=history_years,
+            evidence_revision_sha256=evidence_revision_sha256,
+            fundamental_period_type=FundamentalPeriodType.TTM,
+            fundamental_period_end=fundamental_end,
+            fiscal_year_end=(annual_ends[0].isoformat()[5:] if annual_ends else None),
+            observations=tuple(observations),
+        ),
+        provenance=tuple(provenance),
+    )
+
+
+def canonicalize_issuer(
+    *,
+    issuer_id: str,
+    cik: str,
+    as_of: date,
+    history_years: int,
+    evidence_revision_sha256: str,
+    facts: tuple[RawFact, ...],
+    fresh_revenue_from: date | None = None,
+) -> CanonicalIssuerSnapshot | None:
+    """Build the historical canonical snapshot without changing its public contract."""
+
+    traced = canonicalize_issuer_with_provenance(
         issuer_id=issuer_id,
         cik=cik,
         as_of=as_of,
         history_years=history_years,
         evidence_revision_sha256=evidence_revision_sha256,
-        fundamental_period_type=FundamentalPeriodType.TTM,
-        fundamental_period_end=fundamental_end,
-        fiscal_year_end=(annual_ends[0].isoformat()[5:] if annual_ends else None),
-        observations=tuple(observations),
+        facts=facts,
+        fresh_revenue_from=fresh_revenue_from,
     )
+    return traced.snapshot if traced is not None else None
 
 
 def _identity_payload(
