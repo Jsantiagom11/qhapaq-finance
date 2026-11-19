@@ -73,6 +73,16 @@ bundle under `data/evidence/qcom/`, research record, evidence manifests, and bou
 repository-safe inputs. Acquisition scratch files under `data/raw/` and generated reports remain
 ignored.
 
+Plan historical SEC filing fallback from captured SEC submissions and company facts:
+
+```bash
+qhapaq sec plan-filings 0001543151 --as-of 2026-09-22 \
+  --submissions /path/to/submissions.json --companyfacts /path/to/companyfacts.json
+```
+
+The offline JSON reports the canonical accounting gate, any original filings selected for fallback,
+and the SHA-256 of both inputs. Eligibility uses the filing date and the supplied recent submissions.
+
 ## Methodological baseline
 
 At each scheduled rebalance, the baseline ranks assets by trailing return, holds up to the strongest

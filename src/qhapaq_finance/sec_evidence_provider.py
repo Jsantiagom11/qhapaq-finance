@@ -69,7 +69,7 @@ class StructuredSecProvider:
         submissions_url = f"https://data.sec.gov/submissions/CIK{cik}.json"
         submissions_response = self.client.get(submissions_url)
         submissions = self._json(submissions_response, "submissions")
-        filings = self._filings(submissions, cik)
+        filings = self.parse_filings(submissions, cik)
         staged_submissions = stage_sec_response(
             submissions_url,
             submissions_response,
@@ -132,7 +132,7 @@ class StructuredSecProvider:
             )
         url = f"https://data.sec.gov/submissions/CIK{cik}.json"
         response = self.client.get(url)
-        filings = self._filings(self._json(response, "submissions"), cik)
+        filings = self.parse_filings(self._json(response, "submissions"), cik)
         raw = stage_sec_response(
             url, response, self.staging_root, source_metadata=self._meta(requirement)
         )
@@ -208,7 +208,8 @@ class StructuredSecProvider:
         return value
 
     @staticmethod
-    def _filings(payload: dict[str, object], cik: str) -> tuple[SecFilingDescriptor, ...]:
+    def parse_filings(payload: dict[str, object], cik: str) -> tuple[SecFilingDescriptor, ...]:
+        """Validate a submissions payload and sort recent filings newest first."""
         try:
             recent = payload["filings"]
             if not isinstance(recent, dict):

@@ -35,10 +35,13 @@ from .sec_config import SecConfig
 from .sec_corpus import export_sec_filing
 from .sec_evidence_provider import (
     SecFilingDescriptor,
-    SecSubmissionsBundle,
     StructuredSecProvider,
 )
-from .sec_filing_plan import FilingRequirementContext, plan_filing_fallback
+from .sec_filing_plan import (
+    filing_fact_identities,
+    filing_requirement_context,
+    plan_filing_fallback,
+)
 from .sec_filing_xbrl import (
     FilingArtifact,
     VerifiedFilingArtifacts,
@@ -521,7 +524,7 @@ class AnalysisOrchestrator:
             fallback = plan_filing_fallback(
                 gate.reason,
                 bundle.submissions,
-                self._filing_requirement_context(bundle.submissions, raw_facts),
+                filing_requirement_context(bundle.submissions.filings, raw_facts),
             )
             if fallback is None:
                 return _SecRecoveryResult(
@@ -597,70 +600,7 @@ class AnalysisOrchestrator:
         )
 
     @staticmethod
-    def _filing_requirement_context(
-        submissions: SecSubmissionsBundle,
-        raw_facts: tuple[RawFact, ...],
-    ) -> FilingRequirementContext:
-        originals = tuple(
-            filing
-            for filing in submissions.filings
-            if not filing.amendment
-            and filing.form in {"10-K", "10-Q"}
-            and filing.report_date is not None
-        )
-        annual = next((filing for filing in originals if filing.form == "10-K"), None)
-        quarters = tuple(filing for filing in originals if filing.form == "10-Q")
-        current = quarters[0] if quarters else None
-        prior: SecFilingDescriptor | None = None
-        if current is not None:
-            identities = AnalysisOrchestrator._filing_fact_identities(raw_facts)
-            current_identity = identities.get(current.accession)
-            if current_identity is not None:
-                current_year, current_period = current_identity
-                prior = next(
-                    (
-                        filing
-                        for filing in quarters[1:]
-                        if identities.get(filing.accession) == (current_year - 1, current_period)
-                    ),
-                    None,
-                )
-            if prior is None and current.report_date is not None:
-                current_date = date.fromisoformat(current.report_date)
-                prior = next(
-                    (
-                        filing
-                        for filing in quarters[1:]
-                        if filing.report_date is not None
-                        and date.fromisoformat(filing.report_date).year == current_date.year - 1
-                    ),
-                    None,
-                )
-        return FilingRequirementContext(
-            annual_report_date=annual.report_date if annual is not None else None,
-            current_ytd_report_date=current.report_date if current is not None else None,
-            prior_ytd_report_date=prior.report_date if prior is not None else None,
-        )
-
-    @staticmethod
-    def _filing_fact_identities(
-        raw_facts: tuple[RawFact, ...],
-    ) -> dict[str, tuple[int, str]]:
-        candidates: dict[str, set[tuple[int, str]]] = {}
-        for fact in raw_facts:
-            if fact.fiscal_year > 0 and fact.fiscal_period in {"FY", "Q1", "Q2", "Q3"}:
-                candidates.setdefault(fact.accession, set()).add(
-                    (fact.fiscal_year, fact.fiscal_period)
-                )
-        return {
-            accession: next(iter(identities))
-            for accession, identities in candidates.items()
-            if len(identities) == 1
-        }
-
-    @classmethod
     def _verified_filing_artifacts(
-        cls,
         identity: CompanyIdentity,
         filing: SecFilingDescriptor,
         records: list[dict[str, object]],
@@ -703,7 +643,7 @@ class AnalysisOrchestrator:
         if not artifacts:
             raise ValueError("filing export contains no filing artifacts")
 
-        filing_identity = cls._filing_fact_identities(raw_facts).get(filing.accession)
+        filing_identity = filing_fact_identities(raw_facts).get(filing.accession)
         if filing_identity is None:
             raise ValueError("filing fiscal identity is unavailable")
         fiscal_year, fiscal_period = filing_identity

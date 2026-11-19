@@ -4,7 +4,7 @@ import shutil
 import sys
 import webbrowser
 from collections.abc import Callable
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import cast
 
@@ -46,6 +46,7 @@ from .research_result import (
 from .sec_acquisition import fetch_to_staging
 from .sec_client import SecClient
 from .sec_config import SecConfig
+from .sec_history import plan_historical_filings
 from .tearsheet import build_tearsheet_model, png_dimensions, render_tearsheet
 from .universe import DomainRegistry, UniverseError, issuer_batch_plan, load_universe
 from .valuation import ResearchResult, analyze_case, load_fixture_case
@@ -220,7 +221,7 @@ def _research_case(arguments: list[str]) -> None:
 
 
 def _sec(arguments: list[str]) -> None:
-    parser = argparse.ArgumentParser(description="Explicitly stage an SEC resource for review")
+    parser = argparse.ArgumentParser(description="Acquire or inspect SEC evidence")
     subparsers = parser.add_subparsers(dest="command", required=True)
     fetch = subparsers.add_parser("fetch", help="fetch an SEC resource into untrusted staging")
     fetch.add_argument("url")
@@ -231,7 +232,32 @@ def _sec(arguments: list[str]) -> None:
     )
     refresh_symbols.add_argument("--repository-root", type=Path, default=Path("."))
     refresh_symbols.add_argument("--cache-path", type=Path)
+    plan_filings = subparsers.add_parser(
+        "plan-filings", help="plan historical SEC filing fallback from local JSON"
+    )
+    plan_filings.add_argument("cik", help="the SEC Central Index Key")
+    plan_filings.add_argument("--as-of", required=True, metavar="YYYY-MM-DD")
+    plan_filings.add_argument("--submissions", required=True, type=Path)
+    plan_filings.add_argument("--companyfacts", required=True, type=Path)
     args = parser.parse_args(arguments)
+    if args.command == "plan-filings":
+        try:
+            as_of = date.fromisoformat(args.as_of)
+        except ValueError:
+            plan_filings.error("--as-of: expected YYYY-MM-DD")
+        if as_of.isoformat() != args.as_of:
+            plan_filings.error("--as-of: expected YYYY-MM-DD")
+        try:
+            plan = plan_historical_filings(
+                args.cik,
+                as_of=as_of,
+                submissions_path=args.submissions,
+                companyfacts_path=args.companyfacts,
+            )
+        except (OSError, ValueError) as exc:
+            plan_filings.error(str(exc))
+        print(canonical_json(plan), end="")
+        return
     client = SecClient(SecConfig.from_env())
     if args.command == "fetch":
         metadata = {"source_id": args.source_id} if args.source_id else None
