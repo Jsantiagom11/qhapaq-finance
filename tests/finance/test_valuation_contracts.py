@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import inspect
+import math
+from dataclasses import replace
 
 import pytest
 
@@ -69,3 +71,50 @@ def test_run_valuation_with_invested_capital_adds_optional_extensions() -> None:
     assert result.roic == pytest.approx(0.30)
     assert result.implied_growth_from_reinvestment == pytest.approx(0.12)
     assert result.roic_minus_wacc == pytest.approx(0.21)
+
+
+def test_run_valuation_enforces_closed_reinvestment_rate_boundary() -> None:
+    ValuationInput, run_valuation = _contract()
+    inputs = ValuationInput(
+        fcff=110.0,
+        nopat=150.0,
+        wacc=0.09,
+        market_equity=1_000.0,
+        debt=100.0,
+        cash=80.0,
+        marketable_securities=20.0,
+        invested_capital=InvestedCapitalPair(opening=400.0, closing=600.0),
+    )
+
+    for reinvestment_rate, expected_growth in ((0.0, 0.0), (1.0, 0.30)):
+        result = run_valuation(replace(inputs, reinvestment_rate=reinvestment_rate))
+        assert result.roic == pytest.approx(0.30)
+        assert result.implied_growth_from_reinvestment == pytest.approx(expected_growth)
+
+    for invalid_rate in (-0.01, 1.01):
+        with pytest.raises(valuation.ValuationError, match="between 0% and 100%"):
+            run_valuation(replace(inputs, reinvestment_rate=invalid_rate))
+
+
+@pytest.mark.parametrize(
+    ("invalid_rate", "message"),
+    ((True, "must be numeric"), (math.nan, "must be finite"), (math.inf, "must be finite")),
+)
+def test_run_valuation_preserves_numeric_reinvestment_rate_guard(
+    invalid_rate: object,
+    message: str,
+) -> None:
+    ValuationInput, run_valuation = _contract()
+    inputs = ValuationInput(
+        fcff=110.0,
+        nopat=150.0,
+        wacc=0.09,
+        market_equity=1_000.0,
+        debt=100.0,
+        cash=80.0,
+        marketable_securities=20.0,
+        invested_capital=InvestedCapitalPair(opening=400.0, closing=600.0),
+    )
+
+    with pytest.raises(valuation.ValuationError, match=message):
+        run_valuation(replace(inputs, reinvestment_rate=invalid_rate))

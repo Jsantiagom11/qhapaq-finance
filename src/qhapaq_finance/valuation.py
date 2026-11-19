@@ -274,7 +274,9 @@ def run_valuation(inputs: ValuationInput) -> ValuationOutput:
 
     reinvestment_rate = None
     if inputs.reinvestment_rate is not None:
-        reinvestment_rate = _rate(inputs.reinvestment_rate, "reinvestment_rate")
+        reinvestment_rate = _number(inputs.reinvestment_rate, "reinvestment_rate")
+        if not 0 <= reinvestment_rate <= 1:
+            raise ValuationError("reinvestment_rate must be between 0% and 100%")
 
     roic = implied_growth = roic_minus_wacc = None
     if inputs.invested_capital is not None:
