@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 
+from .financial_canonicalization import RawFact
 from .sec_canonical_gate import SecCanonicalReason
 from .sec_evidence_provider import SecFilingDescriptor, SecSubmissionsBundle
 
@@ -48,16 +50,87 @@ _LATEST_PERIODS = frozenset(
 )
 
 
+def filing_requirement_context(
+    filings: tuple[SecFilingDescriptor, ...],
+    raw_facts: tuple[RawFact, ...],
+) -> FilingRequirementContext:
+    """Resolve exact-period targets using the eligible originals and their fiscal identities."""
+    originals = tuple(
+        filing
+        for filing in filings
+        if not filing.amendment
+        and filing.form in {"10-K", "10-Q"}
+        and filing.report_date is not None
+    )
+    annual = next((filing for filing in originals if filing.form == "10-K"), None)
+    quarters = tuple(filing for filing in originals if filing.form == "10-Q")
+    current = quarters[0] if quarters else None
+    prior: SecFilingDescriptor | None = None
+    if current is not None:
+        identities = filing_fact_identities(raw_facts)
+        current_identity = identities.get(current.accession)
+        if current_identity is not None:
+            current_year, current_period = current_identity
+            prior = next(
+                (
+                    filing
+                    for filing in quarters[1:]
+                    if identities.get(filing.accession) == (current_year - 1, current_period)
+                ),
+                None,
+            )
+        if prior is None and current.report_date is not None:
+            current_date = date.fromisoformat(current.report_date)
+            prior = next(
+                (
+                    filing
+                    for filing in quarters[1:]
+                    if filing.report_date is not None
+                    and date.fromisoformat(filing.report_date).year == current_date.year - 1
+                ),
+                None,
+            )
+    return FilingRequirementContext(
+        annual_report_date=annual.report_date if annual is not None else None,
+        current_ytd_report_date=current.report_date if current is not None else None,
+        prior_ytd_report_date=prior.report_date if prior is not None else None,
+    )
+
+
+def filing_fact_identities(
+    raw_facts: tuple[RawFact, ...],
+) -> dict[str, tuple[int, str]]:
+    """Return the unambiguous fiscal year and period of each observed accession."""
+    candidates: dict[str, set[tuple[int, str]]] = {}
+    for fact in raw_facts:
+        if fact.fiscal_year > 0 and fact.fiscal_period in {"FY", "Q1", "Q2", "Q3"}:
+            candidates.setdefault(fact.accession, set()).add((fact.fiscal_year, fact.fiscal_period))
+    return {
+        accession: next(iter(identities))
+        for accession, identities in candidates.items()
+        if len(identities) == 1
+    }
+
+
 def plan_filing_fallback(
     reason: SecCanonicalReason,
     submissions_bundle: SecSubmissionsBundle,
+    requirement_context: FilingRequirementContext,
+) -> FilingFallbackPlan | None:
+    """Plan fallback from the filings in a staged submissions bundle."""
+    return select_filing_fallback(reason, submissions_bundle.filings, requirement_context)
+
+
+def select_filing_fallback(
+    reason: SecCanonicalReason,
+    eligible_filings: tuple[SecFilingDescriptor, ...],
     requirement_context: FilingRequirementContext,
 ) -> FilingFallbackPlan | None:
     """Select the minimum original filing set implied by a typed SEC gap."""
 
     originals = tuple(
         filing
-        for filing in submissions_bundle.filings
+        for filing in eligible_filings
         if not filing.amendment and filing.form in {"10-K", "10-Q"}
     )
 

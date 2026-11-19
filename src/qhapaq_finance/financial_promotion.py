@@ -65,6 +65,7 @@ class MetricPromotionPolicy:
     derivation: str | None = None
     target_end: date | None = None
     taxonomy: str = "us-gaap"
+    reporting_period_concept: str | None = None
 
 
 ACCOUNTING_EVIDENCE_EXTERNAL_FIELDS = frozenset(
@@ -231,9 +232,24 @@ def accounting_evidence_policies(
     policies = (
         MetricPromotionPolicy(
             "revenue",
-            ("RevenueFromContractWithCustomerExcludingAssessedTax",),
+            (),
             "USD",
-            PromotionStrategy.TTM_DURATION,
+            PromotionStrategy.ALTERNATIVE,
+            alternatives=(
+                MetricPromotionPolicy(
+                    "revenue",
+                    ("RevenueFromContractWithCustomerExcludingAssessedTax",),
+                    "USD",
+                    PromotionStrategy.TTM_DURATION,
+                ),
+                MetricPromotionPolicy(
+                    "revenue",
+                    ("Revenues",),
+                    "USD",
+                    PromotionStrategy.TTM_DURATION,
+                    reporting_period_concept="OperatingIncomeLoss",
+                ),
+            ),
         ),
         MetricPromotionPolicy(
             "ebit",
@@ -688,10 +704,32 @@ class MultiPeriodFinancialPromoter:
             raise FinancialPromotionError("unsupported promotion policy")
         if len(policy.concepts) != 1:
             raise FinancialPromotionError("unsupported or ambiguous promotion policy")
-        result = self.promote_ttm(facts, concept=policy.concepts[0])
+        concept = policy.concepts[0]
+        anchor_end = None
+        if policy.reporting_period_concept is not None:
+            anchor_end = max(
+                (
+                    fact.end
+                    for fact in self._duration_candidates(facts, policy.reporting_period_concept)
+                    if fact.unit == policy.unit
+                ),
+                default=None,
+            )
+            if anchor_end is None or not any(
+                fact.end == anchor_end and fact.unit == policy.unit
+                for fact in self._duration_candidates(facts, concept)
+            ):
+                raise FinancialPromotionError(
+                    "alternative concept is unavailable for the current reporting period",
+                    FinancialPromotionFailureKind.MISSING_STANDARD_CONCEPT,
+                )
+            facts = tuple(fact for fact in facts if fact.end <= anchor_end)
+        result = self.promote_ttm(facts, concept=concept)
         if result.unit != policy.unit:
             raise FinancialPromotionError("policy unit mismatch")
-        if policy.target_end is not None and result.period_end != policy.target_end:
+        if any(
+            end is not None and result.period_end != end for end in (policy.target_end, anchor_end)
+        ):
             raise FinancialPromotionError(
                 "duration target end mismatch",
                 FinancialPromotionFailureKind.PERIOD_COVERAGE_GAP,
@@ -732,10 +770,18 @@ class MultiPeriodFinancialPromoter:
         if blocking_error is not None:
             raise blocking_error
 
+        gap = next(
+            (
+                exc
+                for exc in reversed(errors)
+                if exc.kind is not FinancialPromotionFailureKind.MISSING_STANDARD_CONCEPT
+            ),
+            errors[-1],
+        )
         raise FinancialPromotionError(
             "no authorized alternative representation can be promoted",
-            errors[-1].kind,
-        ) from errors[-1]
+            gap.kind,
+        ) from gap
 
     def _composite_duration(
         self, facts: tuple[RawFact, ...], policy: MetricPromotionPolicy
@@ -1030,8 +1076,9 @@ class MultiPeriodFinancialPromoter:
             fact.filing.sha256,
         )
 
-    def promote_ttm(self, facts: tuple[RawFact, ...], *, concept: str):
-        candidates = tuple(
+    @staticmethod
+    def _duration_candidates(facts: tuple[RawFact, ...], concept: str) -> tuple[RawFact, ...]:
+        return tuple(
             item
             for item in facts
             if item.taxonomy == "us-gaap"
@@ -1041,6 +1088,9 @@ class MultiPeriodFinancialPromoter:
             and not item.dimensions
             and item.filing_form in {"10-K", "10-Q"}
         )
+
+    def promote_ttm(self, facts: tuple[RawFact, ...], *, concept: str):
+        candidates = self._duration_candidates(facts, concept)
         selected: list[RawFact] = []
         for key in {(item.fiscal_period, item.start, item.end) for item in candidates}:
             observations = [

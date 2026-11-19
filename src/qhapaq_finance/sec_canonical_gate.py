@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from decimal import Decimal, DecimalException, localcontext
 from enum import Enum
 
 from .accounting import (
@@ -16,7 +17,7 @@ from .accounting import (
     normalize_accounting_snapshot,
     promote_sec_accounting_evidence,
 )
-from .financial_canonicalization import RawFact, SemanticEvidence
+from .financial_canonicalization import RawFact, SemanticEvidence, XbrlDecimals
 from .financial_promotion import MetricPromotionPolicy, accounting_evidence_policies
 
 
@@ -56,10 +57,11 @@ def evaluate_sec_canonical_gate(
 ) -> SecCanonicalGateResult:
     """Evaluate SEC accounting evidence without valuation, market data, or HTTP."""
 
-    if _has_source_conflict(
+    reconciled_facts = _reconcile_source_observations(
         raw_facts,
         semantic_extensions=semantic_extensions,
-    ):
+    )
+    if reconciled_facts is None:
         return SecCanonicalGateResult(
             SecCanonicalGateState.BLOCKED,
             SecCanonicalReason.CANONICAL_CONFLICT,
@@ -67,7 +69,7 @@ def evaluate_sec_canonical_gate(
         )
     try:
         promoted, spec = promote_sec_accounting_evidence(
-            raw_facts,
+            reconciled_facts,
             semantic_extensions=semantic_extensions,
         )
         snapshot = normalize_accounting_snapshot(promoted, spec=spec, tax_rate=None)
@@ -121,15 +123,15 @@ def _accounting_policy_surface() -> tuple[
     return frozenset(concepts), frozenset(metrics)
 
 
-def _has_source_conflict(
+def _reconcile_source_observations(
     raw_facts: tuple[RawFact, ...],
     *,
     semantic_extensions: Mapping[tuple[str, str], SemanticEvidence] | None = None,
-) -> bool:
+) -> tuple[RawFact, ...] | None:
     authorized_concepts, authorized_metrics = _accounting_policy_surface()
-    values: dict[tuple[object, ...], set[float]] = {}
+    groups: dict[tuple[object, ...], list[int]] = {}
 
-    for fact in raw_facts:
+    for index, fact in enumerate(raw_facts):
         authorized = (fact.taxonomy, fact.concept) in authorized_concepts
 
         if not authorized and semantic_extensions is not None:
@@ -154,6 +156,71 @@ def _has_source_conflict(
             fact.dimensions,
             fact.consolidated,
         )
-        values.setdefault(key, set()).add(fact.value)
+        groups.setdefault(key, []).append(index)
 
-    return any(len(observations) > 1 for observations in values.values())
+    discarded: set[int] = set()
+    for indexes in groups.values():
+        if len(indexes) == 1:
+            continue
+        observations = tuple(
+            (
+                fact.xbrl_value if fact.xbrl_value is not None else Decimal(str(fact.value)),
+                fact.xbrl_decimals,
+            )
+            for fact in (raw_facts[index] for index in indexes)
+        )
+        if len({value for value, _ in observations}) == 1:
+            continue
+        best = _compatible_reported_amount(observations)
+        if best is None:
+            return None
+        discarded.update(
+            index for index, (value, _) in zip(indexes, observations, strict=True) if value != best
+        )
+    if not discarded:
+        return raw_facts
+    return tuple(fact for index, fact in enumerate(raw_facts) if index not in discarded)
+
+
+def _compatible_reported_amount(
+    observations: tuple[tuple[Decimal, XbrlDecimals | None], ...],
+) -> Decimal | None:
+    """Keep the most precise reported value when all observations support that point."""
+    declared: dict[XbrlDecimals, Decimal] = {}
+    for value, decimals in observations:
+        if decimals is None:
+            continue
+        if declared.setdefault(decimals, value) != value:
+            return None
+        if isinstance(decimals, int):
+            digits = value.as_tuple()
+            excess_offset = int(digits.exponent) + decimals
+            if excess_offset < 0 and any(digits.digits[excess_offset:]):
+                return None
+    if not declared:
+        return None
+
+    finest = max(
+        declared,
+        key=lambda decimals: (decimals == "INF", int(decimals) if decimals != "INF" else 0),
+    )
+    best = declared[finest]
+    for value, decimals in observations:
+        if value == best:
+            continue
+        if not isinstance(decimals, int) or not _rounding_interval_contains(value, decimals, best):
+            return None
+    return best
+
+
+def _rounding_interval_contains(value: Decimal, decimals: int, candidate: Decimal) -> bool:
+    try:
+        radius = Decimal((0, (5,), -decimals - 1))
+        minimum_exponent = min(int(value.as_tuple().exponent), int(candidate.as_tuple().exponent))
+        with localcontext() as context:
+            context.prec = max(
+                context.prec, max(value.adjusted(), candidate.adjusted()) - minimum_exponent + 2
+            )
+            return abs(value - candidate) <= radius
+    except (DecimalException, OverflowError, ValueError):
+        return False

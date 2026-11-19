@@ -10,7 +10,11 @@ import math
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import date
+from decimal import Decimal
 from enum import Enum
+from typing import Literal
+
+XbrlDecimals = int | Literal["INF"]
 
 
 class ProfileKind(str, Enum):
@@ -123,6 +127,8 @@ class RawFact:
     label: str | None = None
     data_type: str | None = None
     balance: str | None = None
+    xbrl_value: Decimal | None = None
+    xbrl_decimals: XbrlDecimals | None = None
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.value) or not self.unit.strip():
@@ -131,6 +137,12 @@ class RawFact:
             raise ValueError("duration raw facts require a start date")
         if self.period_kind is PeriodKind.INSTANT and self.start is not None:
             raise ValueError("instant raw facts cannot have a start date")
+        if self.xbrl_value is not None and (
+            not self.xbrl_value.is_finite() or float(self.xbrl_value) != self.value
+        ):
+            raise ValueError("XBRL amount must agree with the numeric fact")
+        if self.xbrl_decimals is not None and self.xbrl_value is None:
+            raise ValueError("XBRL decimals require a reported XBRL amount")
 
 
 @dataclass(frozen=True)
@@ -916,9 +928,9 @@ INITIAL_METRIC_SPECS = (
 
 
 def extract_company_facts(
-    payload: Mapping[str, object], *, source_identity: str
+    payload: Mapping[str, object], *, source_identity: str, as_of: date | None = None
 ) -> tuple[RawFact, ...]:
-    """Parse every SEC company-facts observation without collapsing competitors."""
+    """Parse SEC observations filed by the optional cutoff without collapsing competitors."""
     facts = payload.get("facts")
     if not isinstance(facts, Mapping):
         raise ValueError("company facts payload has no facts object")
@@ -939,12 +951,14 @@ def extract_company_facts(
                     if not isinstance(observation, Mapping):
                         raise ValueError("invalid company facts observation")
                     try:
+                        filed = date.fromisoformat(str(observation["filed"]))
+                        if as_of is not None and filed > as_of:
+                            continue
                         end = date.fromisoformat(str(observation["end"]))
                         start_value = observation.get("start")
                         start = date.fromisoformat(str(start_value)) if start_value else None
                         kind = PeriodKind.DURATION if start else PeriodKind.INSTANT
                         value = float(observation["val"])
-                        filed = date.fromisoformat(str(observation["filed"]))
                         accession = str(observation["accn"])
                         form = str(observation["form"])
                     except (KeyError, TypeError, ValueError) as exc:

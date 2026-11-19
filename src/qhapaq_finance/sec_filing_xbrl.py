@@ -23,6 +23,7 @@ from .financial_canonicalization import (
     SemanticEvidence,
     XbrlCalculationArc,
     XbrlConcept,
+    XbrlDecimals,
     XbrlLabel,
     XbrlPresentationArc,
     XbrlRelationshipSet,
@@ -778,9 +779,25 @@ def _instance_facts(
                 None,
                 concept.data_type if concept else None,
                 concept.balance if concept else None,
+                xbrl_value=scaled,
+                xbrl_decimals=_declared_decimals(element),
             )
         )
     return tuple(result)
+
+
+def _declared_decimals(element: ET.Element) -> XbrlDecimals | None:
+    declared = element.attrib.get("decimals")
+    if declared is None or "precision" in element.attrib:
+        return None
+    if declared == "INF":
+        return "INF"
+    if re.fullmatch(r"[+-]?[0-9]+", declared) is not None:
+        try:
+            return int(declared)
+        except ValueError:
+            return None
+    return None
 
 
 def _contexts(root: ET.Element, cik: str) -> dict[str, _Context]:

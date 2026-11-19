@@ -2,10 +2,14 @@ from __future__ import annotations
 
 import json
 from dataclasses import replace
+from decimal import Decimal
 from pathlib import Path
+
+import pytest
 
 from qhapaq_finance.financial_canonicalization import (
     PeriodKind,
+    RawFact,
     SemanticEvidence,
     XbrlCalculationArc,
     XbrlConcept,
@@ -34,6 +38,21 @@ def test_gate_returns_ready_snapshot_from_complete_canonical_sec_evidence() -> N
 
     assert result.state is SecCanonicalGateState.READY
     assert result.reason is None
+    assert result.snapshot is not None
+    assert result.snapshot.revenue == 466_823_000_000.0
+
+
+def test_gate_accepts_authorized_aggregate_revenue_with_full_ttm_evidence() -> None:
+    facts = tuple(
+        replace(fact, concept="Revenues")
+        if fact.concept == "RevenueFromContractWithCustomerExcludingAssessedTax"
+        else fact
+        for fact in _aapl_facts()
+    )
+
+    result = evaluate_sec_canonical_gate(facts)
+
+    assert result.state is SecCanonicalGateState.READY
     assert result.snapshot is not None
     assert result.snapshot.revenue == 466_823_000_000.0
 
@@ -73,6 +92,84 @@ def test_gate_blocks_conflicting_source_observations() -> None:
     assert result.state is SecCanonicalGateState.BLOCKED
     assert result.reason is SecCanonicalGapReason.CANONICAL_CONFLICT
     assert result.snapshot is None
+
+
+def _rounding_facts() -> tuple[tuple[RawFact, ...], RawFact, RawFact]:
+    facts = _aapl_facts()
+    aggregate = next(
+        fact
+        for fact in facts
+        if fact.concept == "RevenueFromContractWithCustomerExcludingAssessedTax"
+        and fact.fiscal_period == "FY"
+        and fact.end.isoformat() == "2025-09-27"
+    )
+    precise = replace(
+        aggregate,
+        fact_id="native:precise",
+        source_identity="verified-filing",
+        xbrl_value=Decimal(str(aggregate.value)),
+        xbrl_decimals=-6,
+    )
+    coarse_amount = Decimal(str(round(aggregate.value, -9)))
+    assert coarse_amount != precise.xbrl_value
+    coarse = replace(
+        precise,
+        fact_id="native:rounded",
+        value=float(coarse_amount),
+        xbrl_value=coarse_amount,
+        xbrl_decimals=-9,
+    )
+    return facts, precise, coarse
+
+
+def test_gate_uses_precise_filing_amount_when_rounding_is_supported() -> None:
+    facts, precise, coarse = _rounding_facts()
+    baseline = evaluate_sec_canonical_gate(facts)
+
+    for reported in ((precise, coarse), (coarse, precise)):
+        result = evaluate_sec_canonical_gate((*facts, *reported))
+        assert result == baseline
+        assert result.state is SecCanonicalGateState.READY
+
+
+@pytest.mark.parametrize(
+    "case", ["disjoint", "same_precision", "unknown_precision", "excess_digits"]
+)
+def test_gate_still_blocks_when_rounding_cannot_reconcile(case: str) -> None:
+    facts, precise, coarse = _rounding_facts()
+    assert coarse.xbrl_value is not None
+    if case == "disjoint":
+        coarse = replace(
+            coarse, value=coarse.value + 2e9, xbrl_value=coarse.xbrl_value + Decimal("2e9")
+        )
+    elif case == "same_precision":
+        coarse = replace(coarse, xbrl_decimals=precise.xbrl_decimals)
+    elif case == "unknown_precision":
+        coarse = replace(coarse, xbrl_decimals=None)
+    else:
+        coarse = replace(coarse, value=coarse.value + 1, xbrl_value=coarse.xbrl_value + 1)
+
+    result = evaluate_sec_canonical_gate((*facts, precise, coarse))
+
+    assert result.state is SecCanonicalGateState.BLOCKED
+    assert result.reason is SecCanonicalGapReason.CANONICAL_CONFLICT
+    assert result.snapshot is None
+
+
+def test_gate_does_not_assign_precision_to_a_disagreeing_companyfacts_value() -> None:
+    facts, precise, coarse = _rounding_facts()
+    aggregate = replace(
+        coarse,
+        fact_id="aggregate:disagreeing",
+        source_identity="fixture-companyfacts",
+        xbrl_value=None,
+        xbrl_decimals=None,
+    )
+
+    result = evaluate_sec_canonical_gate((*facts, precise, coarse, aggregate))
+
+    assert result.state is SecCanonicalGateState.BLOCKED
+    assert result.reason is SecCanonicalGapReason.CANONICAL_CONFLICT
 
 
 def test_gate_blocks_ambiguous_required_instant_evidence() -> None:

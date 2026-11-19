@@ -314,6 +314,7 @@ def promote_sec_accounting_evidence(
     """Promote already-validated SEC raw facts into the accounting contract."""
 
     from .financial_canonicalization import (
+        INITIAL_METRIC_SPECS,
         MetricSpec,
         RawFact,
     )
@@ -416,24 +417,29 @@ def promote_sec_accounting_evidence(
             }
             structural_parents = presentation_parents & calculation_parents
 
-            structurally_matched = tuple(
+            candidates = tuple(
                 target for target in targets if f"{target[0]}:{target[1]}" in structural_parents
             )
 
-            if len(structurally_matched) == 1:
-                target = structurally_matched[0]
-            elif len(targets) == 1:
-                # The filing-native parser already resolved the structural
-                # relationship to one accounting metric. A unique accounting
-                # representation may therefore be adapted without guessing.
-                target = targets[0]
-            else:
+            if not candidates:
+                # Verified metric-level evidence can use its declared standard representation.
+                canonical_targets = {
+                    (spec.standard_taxonomy, spec.standard_concept, spec.unit, spec.period_kind)
+                    for spec in INITIAL_METRIC_SPECS
+                    if spec.metric == semantic.target_metric
+                }
+                candidates = (
+                    targets
+                    if len(targets) == 1
+                    else tuple(target for target in targets if target in canonical_targets)
+                )
+            if len(candidates) != 1:
                 raise AccountingEvidenceFailure(
                     AccountingEvidenceFailureKind.CANONICAL_INVARIANT,
                     semantic.target_metric,
                 )
 
-            taxonomy, concept, unit, period_kind = target
+            taxonomy, concept, unit, period_kind = candidates[0]
 
             spec = MetricSpec(
                 metric=semantic.target_metric,
